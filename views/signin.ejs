@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login</title>
+    <link rel="stylesheet" href="/stylesheets/output.css" />
+  </head>
+  <body class="bg-green-100">
+    <!-- Header -->
+    <header class="bg-green-600 text-white p-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-3xl font-bold">SIMTASI</h1>
+        <a
+          href="/signup"
+          class="text-white font-medium py-2 px-4 border border-white rounded hover:bg-white hover:text-green-600 transition"
+          >Sign Up</a
+        >
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex" style="min-height: calc(100vh - 130px)">
+      <!-- Left Side with Image -->
+      <div
+        class="w-1/2 bg-cover bg-center"
+        style="background-image: url('../images/background.jpg')"
+      >
+        <!-- Background Image, replace '/path/to/your/image.jpg' with actual image path -->
+        <div class="flex justify-left items-center h-full">
+          <h2 class="ml-8 text-white text-6xl font-bold text-left">
+            Sistem Informasi<br />Monitoring Tugas<br />Akhir Mahasiswa
+          </h2>
+        </div>
+      </div>
+
+      <!-- Right Side with Form -->
+      <div class="w-1/2 p-8 flex justify-center items-center bg-white">
+        <div class="w-full max-w-md bg-green-50 p-8 rounded-lg shadow-lg">
+          <h2 class="text-2xl font-semibold text-center text-green-600 mb-6">
+            Login
+          </h2>
+          <form action="/signin" method="POST">
+            <div class="mb-4">
+              <label for="email" class="block text-gray-700">Email</label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                required
+                class="w-full p-3 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+            </div>
+            <div class="mb-6">
+              <label for="password" class="block text-gray-700">Password</label>
+              <div class="relative">
+                <input
+                  type="password"
+                  name="password"
+                  id="password"
+                  required
+                  class="w-full p-3 mt-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+                <img
+                  id="eye-icon"
+                  src="/images/view.png"
+                  width="20"
+                  height="20"
+                  alt="Toggle Password Visibility"
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 cursor-pointer object-contain z-10"
+                  onclick="toggleVisibility()"
+                  style="
+                    position: absolute;
+                    top: 50%;
+                    right: 0.75rem;
+                    transform: translateY(-30%);
+                    cursor: pointer;
+                    z-index: 10;
+                  "
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-green-600 text-white py-3 rounded-md hover:bg-green-700 transition"
+            >
+              Log In
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- Footer -->
+    <footer class="bg-green-600 text-white text-center p-4">
+      © 2025 Sistem Informasi - Fakultas Teknologi Informasi
+    </footer>
+    <script src="/javascripts/toggle-password.js"></script>
+  </body>
+</html>
