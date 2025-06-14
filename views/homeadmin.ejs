@@ -4,6 +4,20 @@
     <meta charset="UTF-8" />
     <title>Home</title>
     <link rel="stylesheet" href="/stylesheets/output.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+      .collapse {
+        display: none;
+      }
+      .menu-arrow {
+        display: inline-block;
+        transition: transform 0.3s;
+        margin-left: 8px; /* Adjusts spacing to the left of the arrow */
+      }
+      .rotate-180 {
+        transform: rotate(180deg);
+      }
+      </style>
   </head>
   <body class="bg-gray-100">
     <!-- Header -->
@@ -54,32 +68,127 @@
             <li>
               <a
                 class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
-                >Home</a
+                href="#"
+                onclick="toggleMenu('submenu1')"
               >
+                <span
+                  class="inline-block transform rotate-0 transition-transform duration-300"
+                  id="arrow1"
+                  >▼</span
+                >
+                Manajemen Topik Tugas Akhir
+
+                <ul id="submenu1" class="collapse pl-5 space-y-2">
+                  <li>
+                    <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                      >Daftar Topik TA</a
+                    >
+                  </li>
+                  <li>
+                    <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                      >Validasi Dokumen Oleh Jurusan</a
+                    >
+                  </li>
+                  <li>
+                    <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                      >Galeri judul TA Yang Selesai</a
+                    >
+                  </li>
+                  <li>
+                    <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                      >Pencatatan Riwayat Konsultasi</a
+                    >
+                  </li>
+                  <li>
+                    <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                      >Daftar Topik TA Yang Tersedia</a
+                    >
+                  </li>
+                </ul>
+              </a>
             </li>
             <li>
               <a
                 class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
-                >Manajemen Topik Tugas Akhir</a
+                href="#"
+                onclick="toggleMenu('submenu2')"
               >
+                <span
+                  class="inline-block transform rotate-0 transition-transform duration-300"
+                  id="arrow2"
+                  >▼</span
+                >
+                Pengelolaan Proyek Tugas Akhir
+              </a>
+              <ul id="submenu2" class="collapse pl-5 space-y-2">
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Monitoring Beban Dosen</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Status Revisi</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Riwayat Konsultasi</a
+                  >
+                </li>
+              </ul>
             </li>
             <li>
               <a
                 class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
-                >Pengelolaan Proyek Tugas Akhir</a
+                href="#"
+                onclick="toggleMenu('submenu3')"
               >
+                <span
+                  class="inline-block transform rotate-0 transition-transform duration-300"
+                  id="arrow3"
+                  >▼</span
+                >
+                Manajemen Jadwal
+              </a>
+              <ul id="submenu3" class="collapse pl-5 space-y-2">
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Manajemen Jadwal Sidang Dan Seminar</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Kalender Sidang TA</a
+                  >
+                </li>
+              </ul>
             </li>
             <li>
               <a
                 class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
-                >Manajemen Jadwal</a
+                href="#"
+                onclick="toggleMenu('submenu4')"
               >
-            </li>
-            <li>
-              <a
-                class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
-                >Pengaturan Sistem dan Manajemen Pengguna</a
-              >
+                <span
+                  class="inline-block transform rotate-0 transition-transform duration-300"
+                  id="arrow4"
+                  >▼</span
+                >
+                Pengaturan Sistem Dan Manajemen Pengguna
+              </a>
+              <ul id="submenu4" class="collapse pl-5 space-y-2">
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Manajemen Jumlah Mahasiswa Dosen Pembimbing</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Manajemen Pengguna</a
+                  >
+                </li>
+              </ul>
             </li>
           </ul>
         </div>
