@@ -4,20 +4,18 @@
     <meta charset="UTF-8" />
     <title>Home</title>
     <link rel="stylesheet" href="/stylesheets/output.css" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/javascripts/toggle-navbar.js"></script>
     <style>
       .collapse {
-        display: none;
-      }
-      .menu-arrow {
-        display: inline-block;
-        transition: transform 0.3s;
-        margin-left: 8px; /* Adjusts spacing to the left of the arrow */
-      }
+            display: none;
+        }
       .rotate-180 {
-        transform: rotate(180deg);
-      }
-      </style>
+            transform: rotate(180deg);
+        }
+      .font-bold {
+            font-weight: bold;
+        }
+    </style>
   </head>
   <body class="bg-gray-100">
     <!-- Header -->
@@ -65,11 +63,28 @@
         <!-- Sidebar -->
         <div class="bg-white p-6 rounded-lg shadow-lg">
           <ul class="space-y-3">
+            <!-- Menu Home -->
             <li>
+              <a
+                id="homeMenu"
+                class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
+                href="#"
+                onclick="setActiveMenu('homeMenu')"
+                onload="setActiveMenu('homeMenu')" <!-- Set bold on load -->
+              >
+                <span class="inline-block mr-2">
+                  <!-- Logo Rumah SVG -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2 7-7 7 7 2 2m-2 5v4a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 00-1-1h-3a1 1 0 00-1 1z" />
+                  </svg>
+                </span>
+                Home
+              </a>
+            </li>
               <a
                 class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
                 href="#"
-                onclick="toggleMenu('submenu1')"
+                onclick="toggleMenu('submenu1','arrow1')"
               >
                 <span
                   class="inline-block transform rotate-0 transition-transform duration-300"
@@ -111,7 +126,7 @@
               <a
                 class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
                 href="#"
-                onclick="toggleMenu('submenu2')"
+                onclick="toggleMenu('submenu2','arrow2')"
               >
                 <span
                   class="inline-block transform rotate-0 transition-transform duration-300"
@@ -142,7 +157,7 @@
               <a
                 class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
                 href="#"
-                onclick="toggleMenu('submenu3')"
+                onclick="toggleMenu('submenu3','arrow3')"
               >
                 <span
                   class="inline-block transform rotate-0 transition-transform duration-300"
@@ -168,7 +183,7 @@
               <a
                 class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
                 href="#"
-                onclick="toggleMenu('submenu4')"
+                onclick="toggleMenu('submenu4','arrow4')"
               >
                 <span
                   class="inline-block transform rotate-0 transition-transform duration-300"
