@@ -8,22 +8,110 @@ datasource db {
 }
 
 model topikta {
-  id        Int      @id @default(autoincrement())
-  topik     String   @db.VarChar(255)
-  dosen     String   @db.VarChar(255)
-  createdAt DateTime @default(now()) @db.Timestamp(0)
+  id_topikta Int      @id @default(autoincrement()) // Ubah id menjadi id_topikta dan set sebagai PK
+  topik      String   @db.VarChar(255)
+  dosen      String   @db.VarChar(255)
+  waktu      DateTime @default(now()) @db.Timestamp(0) // Ubah createdAt menjadi waktu
+  pendaftaran Pendaftaran_TA[] // Relasi dengan Pendaftaran_TA
 }
 
 model user {
-  email      String    @id
-  nama       String
-  nomorInduk String    @unique(map: "User_nomorInduk_key")
-  role       user_role
-  password   String
+  email_user   String    @id @map("email") // Ubah email menjadi email_user
+  nama         String
+  nomorInduk   String    @unique(map: "User_nomorInduk_key")
+  role         user_role
+  password     String
+  pendaftrans  Pendaftaran_TA[] // Relation to Pendaftaran_TA
+  proposal     Proposal_TA[]     // Relation to Proposal_TA
+  konsul       Konsultasi[]      // Relation to Konsultasi
+  revisi       Revisi_Laporan[]  // Relation to Revisi_Laporan
+  seminar      Seminar_Hasil[]   // Relation to Seminar_Hasil
+  sidang       Sidang_TA[]       // Relation to Sidang_TA
+  timeline     Timeline_Project[] // Relation to Timeline_Project
+  kalender     Kalender_Sidang[]  // Relation to Kalender_Sidang
 }
 
 enum user_role {
   ADMIN
   MAHASISWA
   DOSEN
+}
+
+model Proposal_TA {
+  id_proposal    Int      @id @default(autoincrement())
+  email_user     String
+  file_proposal  String
+  tanggal_upload DateTime
+  status_review  String
+  feedback_dosen String
+  user           user     @relation(fields: [email_user], references: [email_user])
+}
+
+model Pendaftaran_TA {
+  id_pendaftaran   Int      @id @default(autoincrement())
+  email_user       String
+  id_topikta         Int
+  tanggal_daftar   DateTime
+  status_approval  String
+  id_dosen_pembimbing String
+  user             user     @relation(fields: [email_user], references: [email_user])
+  topikta            topikta  @relation(fields: [id_topikta], references: [id_topikta]) // Relasi dengan topikta
+}
+
+model Konsultasi {
+  id_konsultasi   Int      @id @default(autoincrement())
+  email_user      String
+  tanggal_konsultasi DateTime
+  topik_konsultasi String
+  feedback_dosen  String
+  status          String
+  user            user     @relation(fields: [email_user], references: [email_user])
+}
+
+model Revisi_Laporan {
+  id_revisi       Int      @id @default(autoincrement())
+  email_user      String
+  file_laporan    String
+  tanggal_upload  DateTime
+  feedback_dosen  String
+  status          String
+  user            user     @relation(fields: [email_user], references: [email_user])
+}
+
+model Seminar_Hasil {
+  id_semhas      Int      @id @default(autoincrement())
+  email_user      String
+  file_draft      String
+  tanggal_daftar  DateTime
+  status          String
+  jadwal          DateTime
+  user            user     @relation(fields: [email_user], references: [email_user])
+}
+
+model Sidang_TA {
+  id_sidang       Int      @id @default(autoincrement())
+  email_user      String
+  file_draft_sidang String
+  tanggal_daftar  DateTime
+  jadwal          DateTime
+  nilai_akhir     Float
+  user            user     @relation(fields: [email_user], references: [email_user])
+}
+
+model Kalender_Sidang {
+  id_kalender     Int      @id @default(autoincrement())
+  email_user      String
+  tanggal         DateTime
+  jenis_sidang    String
+  user            user     @relation(fields: [email_user], references: [email_user])
+}
+
+model Timeline_Project {
+  id_timeline     Int      @id @default(autoincrement())
+  email_user      String
+  tahapan         String
+  tanggal_mulai   DateTime
+  tanggal_selesai DateTime
+  status          String
+  user            user     @relation(fields: [email_user], references: [email_user]) // Relasi ke user
 }
