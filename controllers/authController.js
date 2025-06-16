@@ -9,7 +9,7 @@ exports.register = async (req, res) => {
   try {
     // Cek apakah email sudah terdaftar
     const userExists = await prisma.user.findUnique({
-      where: { email: email }
+      where: { email_user: email }
     });
 
     if (userExists) {
@@ -27,9 +27,9 @@ exports.register = async (req, res) => {
     // Menyimpan data pengguna baru
     const newUser = await prisma.user.create({
       data: {
-        nama,
+        email_user: email,
+        nama: nama,
         nomorInduk: nomor_induk,
-        email,
         password: hashedPassword,
         role: role
       }
@@ -57,9 +57,9 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Cari pengguna berdasarkan email
+    // Cari pengguna berdasarkan email_user
     const user = await prisma.user.findUnique({
-      where: { email: email }
+      where: { email_user: email }
     });
 
     if (!user) {
@@ -71,7 +71,7 @@ exports.login = async (req, res) => {
       `);
     }
 
-    // Bandingkan password yang dimasukkan dengan password yang disimpan di database
+    // Bandingkan password
     const passwordMatch = bcrypt.compareSync(password, user.password);
 
     if (!passwordMatch) {
@@ -85,12 +85,12 @@ exports.login = async (req, res) => {
 
     // Simpan data user di session
     req.session.user = {
-      email: user.email,
+      email: user.email_user,
       nama: user.nama,
       role: user.role
     };
 
-    // Redirect sesuai dengan role
+    // Redirect sesuai role
     switch (user.role) {
       case "MAHASISWA":
         return res.redirect("/homemahasiswa");
