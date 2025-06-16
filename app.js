@@ -9,6 +9,9 @@ const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
 
+const bodyParser = require('body-parser');
+const topikRoutes = require('./routes/topikRoutes');
+
 const app = express();
 
 // view engine setup
@@ -29,10 +32,17 @@ app.use(session({
   saveUninitialized: true
 }));
 
+// Middleware untuk parsing data
+app.use(bodyParser.urlencoded({ extended: true }));
+app.set('view engine', 'ejs');
+
 // Router utama
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/', authRouter); // Gunakan router untuk auth (signup & signin)
+
+// Menggunakan routing untuk topik
+app.use('/', topikRoutes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -49,5 +59,14 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
+// Route untuk halaman utama (Home)
+app.get('/', (req, res) => {
+  res.render('home'); // Render home.ejs atau halaman utama
+});
+
 module.exports = app;
+
+
+
+
 
