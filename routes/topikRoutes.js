@@ -4,7 +4,7 @@ const router = express.Router();
 
 // Rute untuk menampilkan halaman Daftar Topik TA
 router.get('/daftartopikta', (req, res) => {
-  res.render('daftartopikta'); // Render daftar-topik.ejs
+  res.render('admin/daftartopikta'); // Render daftar-topik.ejs
 });
 
 // Rute untuk meng-handle submit data dari form
