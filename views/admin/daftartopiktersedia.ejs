@@ -1,0 +1,74 @@
+
+  <head>
+    <meta charset="UTF-8" />
+    <title>Daftar Topik TA</title>
+    <link rel="stylesheet" href="/stylesheets/output.css" />
+  </head>
+  <body class="bg-gray-100">
+    <!-- Header -->
+    <header class="bg-green-600 text-white p-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold">SIMTASI</h1>
+        </div>
+        <div>
+          <button
+            class="text-white bg-green-700 px-4 py-2 rounded-full hover:bg-green-800"
+          >
+            <span
+              style="
+                background-image: url('../images/user_icon.png');
+                background-size: cover;
+                background-position: center;
+                width: 24px;
+                height: 24px;
+                display: inline-block;
+              "
+            ></span>
+          </button>
+        </div>
+      </div>
+    </header>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Sidebar -->
+        <%- include('../sidebar/sidebaradmin.ejs') %>
+    
+         <!-- Main Content -->
+        <div class="container mx-auto p-6">
+            <h2 class="text-2xl font-semibold text-green-600 mb-6">Daftar Topik TA Tersedia</h2>
+            
+            <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+            <table class="min-w-full table-auto w-full text-lg">
+                <thead>
+                    <tr class="bg-green-600 text-white">
+                    <th class="px-6 py-4">No</th>
+                    <th class="px-6 py-4">Topik</th>
+                    <th class="px-6 py-4">Dosen Pembimbing</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% topikList.forEach((topik, index) => { %>
+                    <tr class="bg-gray-100">
+                        <td class="px-6 py-4"><%= index + 1 %></td>
+                        <td class="px-6 py-4"><%= topik.topik %></td>
+                        <td class="px-6 py-4"><%= topik.dosen %></td>
+                    </tr>
+                    <% }) %>
+                </tbody>
+                </table>
+            </div>
+        </div>
+      </div>
+    </div>
+    <!-- Footer -->
+    <footer class="bg-green-600 text-white text-center p-4 mt-6">
+      <p>&copy; 2025 Sistem Informasi - Fakultas Teknologi Informasi</p>
+    </footer>
+    <!-- Check if the success parameter is passed in the URL -->
+    <script src="/javascripts/alert-daftartopik.js"></script>
+  </body>
+</html>

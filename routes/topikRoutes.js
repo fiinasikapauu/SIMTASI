@@ -11,4 +11,7 @@ router.get('/daftartopikta', (req, res) => {
 // Route untuk menangani POST Daftar Topik
 router.post('/daftartopikta', topikController.addTopik);
 
+// Route untuk menampilkan Daftar Topik
+router.get('/daftartopiktersedia', topikController.getTopikTersedia);
+
 module.exports = router;
