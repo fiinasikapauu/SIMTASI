@@ -1,14 +1,14 @@
-const form = document.getElementById('topikForm');
-  form.addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the form from submitting normally
+// public/javascripts/alert.js
+document.addEventListener('DOMContentLoaded', function () {
+  const urlParams = new URLSearchParams(window.location.search);
+  const success = urlParams.get('success');
 
-    // Simulate successful data input (you can replace this with an actual fetch or axios request)
-    setTimeout(() => {
-      // Show alert after submission
-      const alertBox = document.getElementById('alert');
-      alertBox.classList.remove('hidden');
-      setTimeout(() => {
-        alertBox.classList.add('hidden'); // Hide alert after 3 seconds
-      }, 3000);
-    }, 500);
-  });
+  if (success === 'true') {
+    Swal.fire({
+      icon: 'success',
+      title: 'Berhasil!',
+      text: 'Data berhasil disimpan!',
+      confirmButtonText: 'OK'
+    });
+  }
+});

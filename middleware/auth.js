@@ -2,6 +2,8 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+module.exports = prisma;
+
 module.exports.isLoggedIn = (req, res, next) => {
   // Cek apakah pengguna sudah login
   if (req.session && req.session.user) {
@@ -37,3 +39,5 @@ module.exports.isAdmin = (req, res, next) => {
     return res.redirect("/signin"); // Jika bukan admin, arahkan ke halaman login
   }
 };
+
+

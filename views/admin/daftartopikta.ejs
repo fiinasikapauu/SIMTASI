@@ -4,14 +4,7 @@
     <meta charset="UTF-8" />
     <title>Daftar Topik TA</title>
     <link rel="stylesheet" href="/stylesheets/output.css" />
-    <style>
-      .collapse {
-            display: none;
-        }
-      .rotate-180 {
-            transform: rotate(180deg);
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
   <body class="bg-gray-100">
     <!-- Header -->
@@ -51,7 +44,7 @@
           <h2 class="text-2xl font-semibold text-green-600 mb-6">Daftar Topik TA</h2>
 
           <!-- Form for inputting Topik TA -->
-          <form action="/daftar-topik" method="POST">
+          <form id="topikForm" action="/daftartopikta" method="POST">
             <div class="mb-4">
               <label for="topik" class="block text-gray-700">Nama Topik TA</label>
               <input
@@ -78,17 +71,17 @@
               type="submit"
               class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700"
             >
-              Submit
-            </button>
-          </form>
+                Submit
+              </button>
+            </form>
         </div>
       </div>
     </div>
-    <script src="/javascript/alert-daftartopik.js"></script>
-
     <!-- Footer -->
     <footer class="bg-green-600 text-white text-center p-4 mt-6">
       <p>&copy; 2025 Sistem Informasi - Fakultas Teknologi Informasi</p>
     </footer>
+    <!-- Check if the success parameter is passed in the URL -->
+    <script src="/javascripts/alert-daftartopik.js"></script>
   </body>
 </html>
