@@ -40,9 +40,7 @@ app.set('view engine', 'ejs');
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/', authRouter); // Gunakan router untuk auth (signup & signin)
-
-// Menggunakan routing untuk topik
-app.use('/', topikRoutes);
+app.use('/', topikRoutes);// Menggunakan routing untuk topik
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

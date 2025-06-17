@@ -17,12 +17,15 @@ router.get("/homeadmin", auth.isLoggedIn, auth.isAdmin, (req, res) => {
   res.render("admin/homeadmin", { user: req.session.user });
 });
 
-// Rute untuk menampilkan halaman Daftar Topik TA
-router.get('/uploadproposalta', (req, res) => {
-  res.render('mahasiswa/uploadproposalta'); // Render daftar-topik.ejs
+router.get("/uploadproposalta", (req, res) => {
+  res.render("mahasiswa/uploadproposalta", { user: req.session.user });
 });
 
-// Rute untuk meng-handle submit data dari form
-router.post('/uploadproposalta',);
+router.get("/uploadlaporankemajuan", (req, res) => {
+  res.render("mahasiswa/uploadlaporankemajuan", { user: req.session.user });
+});
 
+router.get("/uploadrevisilaporan", (req, res) => {
+  res.render("mahasiswa/uploadrevisilaporan", { user: req.session.user });
+});
 module.exports = router;
