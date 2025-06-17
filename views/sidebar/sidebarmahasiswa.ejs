@@ -1,0 +1,228 @@
+<script src="/javascripts/toggle-navbar.js"></script>
+    <style>
+      .collapse {
+            display: none;
+        }
+      .rotate-180 {
+            transform: rotate(180deg);
+        }
+    </style>
+
+<!-- Sidebar -->
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+          <ul class="space-y-3">
+            <!-- Menu Home -->
+            <li>
+              <a
+                id="homeMenu"
+                class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
+                href="homemahasiswa"
+                onclick="setActiveMenu('homeMenu')"
+              >
+                <span class="inline-block mr-2">
+                  <!-- Logo Rumah SVG -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2 7-7 7 7 2 2m-2 5v4a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 00-1-1h-3a1 1 0 00-1 1z" />
+                  </svg>
+                </span>
+                Home
+              </a>
+            </li>
+            <li>
+              <a
+                class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
+                href="#"
+                onclick="toggleMenu('submenu1','arrow1')"
+              >
+              <span
+                  class="inline-block transform rotate-0 transition-transform duration-300"
+                  id="arrow1"
+                  >▼</span
+                >
+                Manajemen Topik Tugas Akhir
+              </a>
+              <ul id="submenu1" class="collapse pl-5 space-y-2">
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Daftar Topik TA yang Tersedia</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Pendaftaran Topik TA Online</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Riwayat Pendaftaran Topik TA</a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a
+                class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
+                href="#"
+                onclick="toggleMenu('submenu2','arrow2')"
+              >
+                <span
+                  class="inline-block transform rotate-0 transition-transform duration-300"
+                  id="arrow2"
+                  >▼</span
+                >
+                Pengelolaan Proyek Tugas Akhir
+              </a>
+              <ul id="submenu2" class="collapse pl-5 space-y-2">
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Upload Proposal TA</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Timeline Project Pribadi</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Upload Laporan Kemajuan</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Progress Bar Project</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Reminder Deadline Bab/Part</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Tanya Jawab dengan Dosen dan Mahasiswa Lain</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Tracking Pengumpulan Revisi</a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a
+                class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
+                href="#"
+                onclick="toggleMenu('submenu3','arrow3')"
+              >
+                <span
+                  class="inline-block transform rotate-0 transition-transform duration-300"
+                  id="arrow3"
+                  >▼</span
+                >
+                Konsultasi dan Revisi
+              </a>
+              <ul id="submenu3" class="collapse pl-5 space-y-2">
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Booking Sesi Konsultasi Dosen</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Upload Revisi Laporan</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Review Antar Mahasiswa</a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a
+                class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
+                href="#"
+                onclick="toggleMenu('submenu4','arrow4')"
+              >
+                <span
+                  class="inline-block transform rotate-0 transition-transform duration-300"
+                  id="arrow4"
+                  >▼</span
+                >
+                Pengunggahan Laporan dan Dokumen
+              </a>
+              <ul id="submenu4" class="collapse pl-5 space-y-2">
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Upload Draft Seminar Hasil</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Upload Draft Sidang Akhir</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Format Template Laporan Otomatis</a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a
+                class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
+                href="#"
+                onclick="toggleMenu('submenu5','arrow5')"
+              >
+                <span
+                  class="inline-block transform rotate-0 transition-transform duration-300"
+                  id="arrow5"
+                  >▼</span
+                >
+                Persiapan Seminar dan Sidang
+              </a>
+              <ul id="submenu5" class="collapse pl-5 space-y-2">
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Kalender Sidang TA</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Sistem Daftar Seminar Hasil</a
+                  >
+                </li>
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Simulasi Tanya Jawab Sidang</a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a
+                class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
+                href="#"
+                onclick="toggleMenu('submenu6','arrow6')"
+              >
+              <span
+                  class="inline-block transform rotate-0 transition-transform duration-300"
+                  id="arrow6"
+                  >▼</span
+                >
+                Forum dan Tanya Jawab
+              </a>
+              <ul id="submenu6" class="collapse pl-5 space-y-2">
+                <li>
+                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
+                    >Tanya Jawab dengan Dosen dan Mahasiswa Lain</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
