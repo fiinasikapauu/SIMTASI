@@ -35,6 +35,21 @@ const addTopik = async (req, res) => {
   }
 };
 
+// Menampilkan Daftar Topik yang Tersedia
+const getTopikTersedia = async (req, res) => {
+  try {
+    const topikList = await prisma.topikta.findMany();
+    res.render('admin/daftartopiktersedia', { topikList });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: 'Terjadi kesalahan saat mengambil data',
+      success: false,
+    });
+  }
+};
+
 module.exports = {
   addTopik,
+  getTopikTersedia
 };
