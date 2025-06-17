@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <title>Daftar Topik TA</title>
     <link rel="stylesheet" href="/stylesheets/output.css" />
-    <script src="/javascripts/toggle-navbar.js"></script>
     <style>
       .collapse {
             display: none;
@@ -45,152 +44,7 @@
     <div class="container mx-auto p-6">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Sidebar -->
-        <div class="bg-white p-6 rounded-lg shadow-lg">
-          <ul class="space-y-3">
-            <!-- Menu Home -->
-            <li>
-              <a
-                id="homeMenu"
-                class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
-                href="/homeadmin"
-                onclick="setActiveMenu('homeMenu')"
-                onload="setActiveMenu('homeMenu')" <!-- Set bold on load -->
-              >
-                <span class="inline-block mr-2">
-                  <!-- Logo Rumah SVG -->
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2 7-7 7 7 2 2m-2 5v4a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 00-1-1h-3a1 1 0 00-1 1z" />
-                  </svg>
-                </span>
-                Home
-              </a>
-            </li>
-              <a
-                class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
-                href="#"
-                onclick="toggleMenu('submenu1','arrow1')"
-              >
-                <span
-                  class="inline-block transform rotate-0 transition-transform duration-300"
-                  id="arrow1"
-                  >▼</span
-                >
-                Manajemen Topik Tugas Akhir
-
-                <ul id="submenu1" class="collapse pl-5 space-y-2">
-                  <li>
-                    <a class="text-green-600 hover:text-blue-600 cursor-pointer"
-                      >Daftar Topik TA</a
-                    >
-                  </li>
-                  <li>
-                    <a class="text-green-600 hover:text-blue-600 cursor-pointer"
-                      >Validasi Dokumen Oleh Jurusan</a
-                    >
-                  </li>
-                  <li>
-                    <a class="text-green-600 hover:text-blue-600 cursor-pointer"
-                      >Galeri judul TA Yang Selesai</a
-                    >
-                  </li>
-                  <li>
-                    <a class="text-green-600 hover:text-blue-600 cursor-pointer"
-                      >Pencatatan Riwayat Konsultasi</a
-                    >
-                  </li>
-                  <li>
-                    <a class="text-green-600 hover:text-blue-600 cursor-pointer"
-                      >Daftar Topik TA Yang Tersedia</a
-                    >
-                  </li>
-                </ul>
-              </a>
-            </li>
-            <li>
-              <a
-                class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
-                href="#"
-                onclick="toggleMenu('submenu2','arrow2')"
-              >
-                <span
-                  class="inline-block transform rotate-0 transition-transform duration-300"
-                  id="arrow2"
-                  >▼</span
-                >
-                Pengelolaan Proyek Tugas Akhir
-              </a>
-              <ul id="submenu2" class="collapse pl-5 space-y-2">
-                <li>
-                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
-                    >Monitoring Beban Dosen</a
-                  >
-                </li>
-                <li>
-                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
-                    >Status Revisi</a
-                  >
-                </li>
-                <li>
-                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
-                    >Riwayat Konsultasi</a
-                  >
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a
-                class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
-                href="#"
-                onclick="toggleMenu('submenu3','arrow3')"
-              >
-                <span
-                  class="inline-block transform rotate-0 transition-transform duration-300"
-                  id="arrow3"
-                  >▼</span
-                >
-                Manajemen Jadwal
-              </a>
-              <ul id="submenu3" class="collapse pl-5 space-y-2">
-                <li>
-                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
-                    >Manajemen Jadwal Sidang Dan Seminar</a
-                  >
-                </li>
-                <li>
-                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
-                    >Kalender Sidang TA</a
-                  >
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a
-                class="text-green-600 hover:text-blue-600 cursor-pointer block transition-colors duration-300"
-                href="#"
-                onclick="toggleMenu('submenu4','arrow4')"
-              >
-                <span
-                  class="inline-block transform rotate-0 transition-transform duration-300"
-                  id="arrow4"
-                  >▼</span
-                >
-                Pengaturan Sistem Dan Manajemen Pengguna
-              </a>
-              <ul id="submenu4" class="collapse pl-5 space-y-2">
-                <li>
-                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
-                    >Manajemen Jumlah Mahasiswa Dosen Pembimbing</a
-                  >
-                </li>
-                <li>
-                  <a class="text-green-600 hover:text-blue-600 cursor-pointer"
-                    >Manajemen Pengguna</a
-                  >
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </div>
+        <%- include('../sidebar/sidebaradmin.ejs') %>
 
         <!-- Main Content Area -->
         <div class="col-span-2 bg-white p-6 rounded-lg shadow-lg">
@@ -230,6 +84,7 @@
         </div>
       </div>
     </div>
+    <script src="/javascript/alert-daftartopik.js"></script>
 
     <!-- Footer -->
     <footer class="bg-green-600 text-white text-center p-4 mt-6">
