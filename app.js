@@ -32,9 +32,10 @@ app.use(session({
   saveUninitialized: true
 }));
 
-// Middleware untuk parsing data
+// Menggunakan body-parser untuk menangani form submissions
 app.use(bodyParser.urlencoded({ extended: true }));
-app.set('view engine', 'ejs');
+app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Router utama
 app.use('/', indexRouter);
@@ -63,6 +64,7 @@ app.use(function (err, req, res, next) {
 app.get('/', (req, res) => {
   res.render('home'); // Render home.ejs atau halaman utama
 });
+
 
 module.exports = app;
 
