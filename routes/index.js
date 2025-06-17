@@ -17,4 +17,15 @@ router.get("/homeadmin", auth.isLoggedIn, auth.isAdmin, (req, res) => {
   res.render("admin/homeadmin", { user: req.session.user });
 });
 
+router.get("/uploadproposalta", (req, res) => {
+  res.render("mahasiswa/uploadproposalta", { user: req.session.user });
+});
+
+router.get("/uploadlaporankemajuan", (req, res) => {
+  res.render("mahasiswa/uploadlaporankemajuan", { user: req.session.user });
+});
+
+router.get("/uploadrevisilaporan", (req, res) => {
+  res.render("mahasiswa/uploadrevisilaporan", { user: req.session.user });
+});
 module.exports = router;
