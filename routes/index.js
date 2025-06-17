@@ -17,4 +17,12 @@ router.get("/homeadmin", auth.isLoggedIn, auth.isAdmin, (req, res) => {
   res.render("admin/homeadmin", { user: req.session.user });
 });
 
+// Rute untuk menampilkan halaman Daftar Topik TA
+router.get('/uploadproposalta', (req, res) => {
+  res.render('mahasiswa/uploadproposalta'); // Render daftar-topik.ejs
+});
+
+// Rute untuk meng-handle submit data dari form
+router.post('/uploadproposalta',);
+
 module.exports = router;
