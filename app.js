@@ -41,7 +41,8 @@ app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
-app.use('/', monitoringRoutes);  // Rute di bawah '/admin' akan menuju ke monitoringRoutes
+app.use('/admin', monitoringRoutes);  // Menggunakan '/admin' untuk semua rute di bawah monitoringRoutes
+
 
 
 // Router utama
