@@ -21,12 +21,20 @@ router.get("/uploadproposalta", (req, res) => {
   res.render("mahasiswa/uploadproposalta", { user: req.session.user });
 });
 
+router.get("/proposalta", (req, res) => {
+  res.render("dosen/proposalta", { user: req.session.user });
+});
+
 router.get("/uploadlaporankemajuan", (req, res) => {
   res.render("mahasiswa/uploadlaporankemajuan", { user: req.session.user });
 });
 
 router.get("/uploadrevisilaporan", (req, res) => {
   res.render("mahasiswa/uploadrevisilaporan", { user: req.session.user });
+});
+
+router.get("/revisilaporan", (req, res) => {
+  res.render("dosen/revisilaporan", { user: req.session.user });
 });
 
 router.get("/uploaddraftsemhas", (req, res) => {
