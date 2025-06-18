@@ -22,7 +22,7 @@ exports.register = async (req, res) => {
     }
 
     // Hash password sebelum disimpan
-    const hashedPassword = bcrypt.hashSync(password, 8);
+     
 
     // Menyimpan data pengguna baru
     const newUser = await prisma.user.create({
