@@ -267,6 +267,9 @@
   .mt-auto {
     margin-top: auto;
   }
+  .mr-4 {
+    margin-right: calc(var(--spacing) * 4);
+  }
   .mb-2 {
     margin-bottom: calc(var(--spacing) * 2);
   }
@@ -318,6 +321,9 @@
   .w-5 {
     width: calc(var(--spacing) * 5);
   }
+  .w-48 {
+    width: calc(var(--spacing) * 48);
+  }
   .w-full {
     width: 100%;
   }
@@ -332,6 +338,9 @@
   }
   .min-w-full {
     min-width: 100%;
+  }
+  .flex-1 {
+    flex: 1;
   }
   .table-auto {
     table-layout: auto;
