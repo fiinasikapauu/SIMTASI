@@ -21,6 +21,7 @@ model user {
   nomorInduk       String             @unique(map: "User_nomorInduk_key")
   role             user_role
   password         String
+  beban_bimbingan Int   @default(0) // Berikan nilai default, misalnya 0
   kalender_sidang  kalender_sidang[]
   konsultasi       konsultasi[]
   pendaftaran_ta   pendaftaran_ta[]
