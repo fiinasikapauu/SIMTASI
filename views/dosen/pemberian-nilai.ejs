@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemberian Nilai Laporan TA</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="bg-green-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold">SIMTASI</h1>
+            </div>
+            <div>
+                <button class="text-white bg-green-700 px-4 py-2 rounded-full hover:bg-green-800">
+                    <span style="background-image: url('../images/user_icon.png'); background-size: cover; background-position: center; width: 24px; height: 24px; display: inline-block;"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="w-full h-64 bg-center bg-cover bg-no-repeat" style="background-image: url(../images/background.jpg)">
+        <h1 class="text-white text-5xl font-bold text-center p-6">Sistem Informasi Monitoring Tugas Akhir Mahasiswa</h1>
+        <p class="text-white text-2xl font-normal text-center">Kelola pendaftaran dan progres Tugas Akhir Anda dengan mudah dan terstruktur. Platform terintegrasi untuk mahasiswa, dosen, dan administrasi.</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Sidebar -->
+            <%- include('../sidebar/sidebardosen.ejs') %>
+
+            <!-- Main Table -->
+            <div class="col-span-2 bg-white p-6 rounded-lg shadow-lg">
+                <h1 class="text-2xl font-semibold mb-4">Pemberian Nilai Laporan Tugas Akhir</h1>
+                <h2 class="text-xl mb-4">Daftar Mahasiswa</h2>
+                <table class="min-w-full bg-white border border-gray-300">
+                    <thead>
+                        <tr>
+                            <th class="p-3 text-left">Nama Mahasiswa</th>
+                            <th class="p-3 text-left">NIM</th>
+                            <th class="p-3 text-left">Nilai</th>
+                            <th class="p-3 text-left">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% mahasiswa.forEach((mhs) => { %>
+                        <tr>
+                            <td class="p-3 border-b"><%= mhs.nama %></td>
+                            <td class="p-3 border-b"><%= mhs.nomorInduk %></td>
+                            <td class="p-3 border-b">
+                               <form action="/sidang/submit-nilai" method="POST">
+  <input type="hidden" name="nomorInduk" value="<%= mhs.nomorInduk %>">
+  <input type="hidden" name="id_sidang" value="<%= mhs.id_sidang %>"> <!-- Menambahkan id_sidang -->
+  <input type="number" name="nilai_akhir" required placeholder="Masukkan Nilai">
+  <button type="submit">Submit Nilai</button>
+</form>
+                            </td>
+                            <td class="p-3 border-b"></td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript untuk alert -->
+    <script>
+        function showAlert() {
+            alert("Nilai berhasil ditambahkan!");
+            return true; // Memastikan form tetap disubmit setelah alert
+        }
+    </script>
+
+</body>
+
+</html>

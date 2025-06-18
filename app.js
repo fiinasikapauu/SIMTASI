@@ -8,9 +8,12 @@ const session = require('express-session');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
+const topikRoutes = require('./routes/topikRoutes');
+const bookingRoutes = require('./routes/bookingRoutes'); // Import booking routes
 
 const bodyParser = require('body-parser');
-const topikRoutes = require('./routes/topikRoutes');
+const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
+
 
 const app = express();
 
@@ -37,11 +40,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
+
 // Router utama
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/', authRouter); // Gunakan router untuk auth (signup & signin)
-app.use('/', topikRoutes);// Menggunakan routing untuk topik
+app.use('/', topikRoutes); // Menggunakan routing untuk topik
+app.use('/', bookingRoutes); // Gunakan routing untuk booking konsultasi dosen
+
+app.get('/bookingkonsul', (req, res) => {
+  res.render('mahasiswa/bookingkonsul'); // Pastikan nama file di sini sama dengan nama file EJS
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -63,16 +73,4 @@ app.get('/', (req, res) => {
   res.render('home'); // Render home.ejs atau halaman utama
 });
 
-
-// Rute untuk halaman Booking Sesi Konsultasi Dosen
-app.get('/bookingkonsul', (req, res) => {
-  res.render('bookingkonsul'); // 'booking' adalah nama file EJS tanpa ekstensi
-});
-
-
 module.exports = app;
-
-
-
-
-
