@@ -16,7 +16,7 @@ model topikta {
 }
 
 model user {
-  email_user       String             @id @map("email")
+  email_user       String             @id 
   nama             String
   nomorInduk       String             @unique(map: "User_nomorInduk_key")
   role             user_role
