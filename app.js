@@ -12,6 +12,7 @@ const authRouter = require('./routes/auth');
 const bodyParser = require('body-parser');
 const topikRoutes = require('./routes/topikRoutes');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
+const seminarRoutes = require('./routes/seminarRoutes');
 
 const app = express();
 
@@ -45,6 +46,8 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/', authRouter); // Gunakan router untuk auth (signup & signin)
 app.use('/', topikRoutes);// Menggunakan routing untuk topik
+
+app.use('/sistemdaftarsemhas', seminarRoutes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
