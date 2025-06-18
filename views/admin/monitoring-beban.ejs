@@ -1,0 +1,83 @@
+<!-- views/admin/monitoring-beban.ejs -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Beban Dosen</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+  <!-- Header -->
+  <header class="bg-green-600 text-white p-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <div>
+        <h1 class="text-3xl font-bold">SIMTASI</h1>
+      </div>
+      <div>
+        <button class="text-white bg-green-700 px-4 py-2 rounded-full hover:bg-green-800">
+          <span style="background-image: url('../images/user_icon.png'); background-size: cover; background-position: center; width: 24px; height: 24px; display: inline-block;"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Layout dengan Sidebar Kiri dan Konten Kanan -->
+  <div class="flex">
+
+   
+      <%- include('../sidebar/sidebaradmin.ejs') %> <!-- Menyisipkan sidebar di sini -->
+    
+    <!-- Konten Utama -->
+    <div class="flex-1 p-6">
+      
+      <!-- Monitoring Beban Dosen -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Monitoring Beban Dosen</h2>
+
+        <!-- Hapus bagian alert -->
+        <!-- Alert Message sudah dihapus -->
+
+        <!-- Formulir untuk mengupdate beban bimbingan dosen -->
+        <form action="/update-bean-bimbingan" method="POST">
+          <% dosenList.forEach(dosen => { %>
+            <div class="flex items-center mb-4">
+              <!-- Label dan Input berada dalam satu baris -->
+              <label for="beban_<%= dosen.email_user %>" class="text-xl mr-4"><%= dosen.nama %></label>
+              <input type="text" name="beban_<%= dosen.email_user %>" id="beban_<%= dosen.email_user %>" value="<%= dosen.beban_bimbingan %>" class="mt-2 p-2 border rounded-md w-48">
+            </div>
+          <% }); %>
+          <button type="submit" class="mt-4 p-2 bg-green-600 text-white rounded-lg">Submit</button>
+        </form>
+      </div>
+
+    </div> <!-- End of Main Content -->
+
+  </div> <!-- End of Layout -->
+
+  <!-- Footer -->
+  <footer class="bg-green-600 text-white text-center p-4 mt-6">
+    <p>&copy; 2025 Sistem Informasi - Fakultas Teknologi Informasi</p>
+  </footer>
+
+  <!-- JavaScript untuk menampilkan alert setelah submit -->
+  <script>
+    // Menangani submit form dengan alert biasa
+    const form = document.getElementById('updateBebanForm');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();  // Mencegah submit form agar bisa menampilkan alert terlebih dahulu
+        
+        // Menampilkan alert keberhasilan atau kegagalan
+        alert("Beban bimbingan dosen telah berhasil disubmit!");
+
+        // Mengirimkan form setelah menampilkan alert
+        setTimeout(function() {
+            form.submit();  // Melanjutkan pengiriman form setelah 2 detik
+        }, 2000);  // Waktu delay 2 detik
+    });
+  </script>
+
+</body>
+</html>

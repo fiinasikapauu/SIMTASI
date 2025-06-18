@@ -11,8 +11,10 @@ const authRouter = require('./routes/auth');
 const topikRoutes = require('./routes/topikRoutes');
 const bookingRoutes = require('./routes/bookingRoutes'); // Import booking routes
 
+
 const bodyParser = require('body-parser');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
+const monitoringRoutes = require('./routes/monitoringRoutes');  // Pastikan path yang benar
 
 const app = express();
 
@@ -40,6 +42,8 @@ app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
+app.use('/', monitoringRoutes);  // Rute di bawah '/admin' akan menuju ke monitoringRoutes
+
 
 // Router utama
 app.use('/', indexRouter);
