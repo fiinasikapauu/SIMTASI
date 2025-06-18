@@ -44,24 +44,24 @@
               <h2 class="text-2xl font-semibold text-green-600 mb-6">Daftar Topik TA Tersedia</h2>
               
               <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
-                  <table class="border-separate border-spacing-2 md:border-spacing-4 border border-gray-400 dark:border-gray-500 min-w-full table-auto w-full text-lg border-collapse">
+                  <table class="border-separate border border-gray-400 dark:border-gray-500 min-w-full table-auto w-full text-lg border-collapse">
                       <thead>
                           <tr class="bg-green-600 text-white">
                               <th class="px-3 py-2 text-center border-r border border-gray-300 dark:border-gray-600">No</th>
-                              <th class="px-6 py-4 text-center border-r border border-gray-300 dark:border-gray-600">Topik</th>
-                              <th class="px-6 py-4 text-center border-r border border-gray-300 dark:border-gray-600">Dosen Pembimbing</th>
-                              <th class="px-6 py-4 text-center">Aksi</th>
+                              <th class="px-3 py-2 text-center border-r border border-gray-300 dark:border-gray-600">Topik</th>
+                              <th class="px-3 py-2 text-center border-r border border-gray-300 dark:border-gray-600">Dosen Pembimbing</th>
+                              <th class="px-3 py-2 text-center">Aksi</th>
                           </tr>
                       </thead>
                       <tbody>
                           <% topikList.forEach((topik, index) => { %>
                           <tr class="bg-gray-100 border-b border-gray-300">
                               <td class="px-3 py-2 text-center"><%= index + 1 %></td>
-                              <td class="px-6 py-4"><%= topik.topik %></td>
-                              <td class="px-6 py-4"><%= topik.dosen %></td>
-                              <td class="px-6 py-4 text-center">
+                              <td class="px-3 py-2"><%= topik.topik %></td>
+                              <td class="px-3 py-2"><%= topik.dosen %></td>
+                              <td class="px-3 py-2 text-center">
                                   <!-- Tombol hapus -->
-                                  <button class="bg-green-600 text-white py-4 px-6 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-300 deleteBtn" data-id="<%= topik.id_topikta %>">
+                                  <button class="w-full bg-green-600 text-white px-2 py-3 rounded-md hover:bg-green-700 transition deleteBtn" data-id="<%= topik.id_topikta %>">
                                       <i class="fa fa-trash"></i> Hapus
                                   </button>
                               </td>
