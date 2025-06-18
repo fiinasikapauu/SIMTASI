@@ -16,7 +16,7 @@ model topikta {
 }
 
 model user {
-  email_user       String             @id @map("email")
+  email_user       String             @id
   nama             String
   nomorInduk       String             @unique(map: "User_nomorInduk_key")
   role             user_role
@@ -45,8 +45,8 @@ model konsultasi {
   id_konsultasi      Int      @id @default(autoincrement())
   email_user         String
   tanggal_konsultasi DateTime
-  dosen_pembimbing   String
   status             String
+  dosen_pembimbing   String
   user               user     @relation(fields: [email_user], references: [email_user], map: "Konsultasi_email_user_fkey")
 
   @@index([email_user], map: "Konsultasi_email_user_fkey")
