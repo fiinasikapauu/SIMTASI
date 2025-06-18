@@ -12,6 +12,7 @@ const topikRoutes = require('./routes/topikRoutes');
 const bookingRoutes = require('./routes/bookingRoutes'); // Import booking routes
 
 const bodyParser = require('body-parser');
+const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
 
 const app = express();
 
@@ -37,6 +38,8 @@ app.use(session({
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
 
 // Router utama
 app.use('/', indexRouter);
