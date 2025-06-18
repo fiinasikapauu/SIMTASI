@@ -1,22 +1,22 @@
-const prisma = require('../middleware/auth');
+const prisma = require('../middleware/auth'); // Prisma client atau database connection
 
 const getMonitoringData = async (req, res) => {
   try {
-    // Ambil data jumlah mahasiswa per dosen
+    // Ambil data dosen dan jumlah mahasiswa yang dibimbing
     const data = await prisma.$queryRaw`
-      SELECT
+      SELECT 
         u.nama AS nama_dosen,
-        COUNT(p.id_pendaftaran) AS jumlah_mahasiswa
-      FROM
-        Pendaftaran_TA p
-      JOIN
-        User u ON p.id_dosen_pembimbing = u.email_user
-      WHERE
+        COALESCE(COUNT(p.id_pendaftaran), 0) AS jumlah_mahasiswa
+      FROM 
+        User u
+      LEFT JOIN 
+        Pendaftaran_TA p ON p.id_dosen_pembimbing = u.email_user
+      WHERE 
         u.role = 'DOSEN'
-      GROUP BY
+      GROUP BY 
         u.nama
     `;
-
+    
     res.render('admin/monitoringbebandosen', { data });
   } catch (error) {
     console.error(error);
