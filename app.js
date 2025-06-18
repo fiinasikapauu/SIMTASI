@@ -13,6 +13,8 @@ const bookingRoutes = require('./routes/bookingRoutes'); // Import booking route
 
 const bodyParser = require('body-parser');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
+=========
+>>>>>>>>> Temporary merge branch 2
 
 const app = express();
 
