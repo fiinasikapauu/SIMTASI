@@ -28,4 +28,8 @@ router.get("/uploadlaporankemajuan", (req, res) => {
 router.get("/uploadrevisilaporan", (req, res) => {
   res.render("mahasiswa/uploadrevisilaporan", { user: req.session.user });
 });
+
+router.get("/uploaddraftsemhas", (req, res) => {
+  res.render("mahasiswa/uploaddraftsemhas", { user: req.session.user });
+});
 module.exports = router;
