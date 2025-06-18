@@ -2,6 +2,7 @@
 const express = require('express');
 const topikController = require('../controllers/topikController');
 const router = express.Router();
+const monitoringController = require('../controllers/monitoringController');
 
 // Route untuk menangani GET Daftar Topik
 router.get('/daftartopikta', (req, res) => {
@@ -19,5 +20,8 @@ router.get('/topiktatersedia', topikController.getTopikTATersedia);
 
 // Route untuk menangani DELETE Daftar Topik
 router.delete('/daftartopiktersedia/:id_topikta', topikController.deleteTopik);
+
+// Route untuk menangani GET Monitoring Beban Dosen
+router.get('/monitoringbebandosen', monitoringController.getMonitoringData);
 
 module.exports = router;

@@ -24,11 +24,7 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <div class="w-full h-64 bg-center bg-cover bg-no-repeat" style="background-image: url(../images/background.jpg)">
-        <h1 class="text-white text-5xl font-bold text-center p-6">Sistem Informasi Monitoring Tugas Akhir Mahasiswa</h1>
-        <p class="text-white text-2xl font-normal text-center">Kelola pendaftaran dan progres Tugas Akhir Anda dengan mudah dan terstruktur. Platform terintegrasi untuk mahasiswa, dosen, dan administrasi.</p>
-    </div>
+    
 
     <!-- Main Content -->
     <div class="container mx-auto p-6">
@@ -54,14 +50,14 @@
                         <tr>
                             <td class="p-3 border-b"><%= mhs.nama %></td>
                             <td class="p-3 border-b"><%= mhs.nomorInduk %></td>
-                            <td class="p-3 border-b">
-                               <form action="/sidang/submit-nilai" method="POST">
-  <input type="hidden" name="nomorInduk" value="<%= mhs.nomorInduk %>">
-  <input type="hidden" name="id_sidang" value="<%= mhs.id_sidang %>"> <!-- Menambahkan id_sidang -->
-  <input type="number" name="nilai_akhir" required placeholder="Masukkan Nilai">
-  <button type="submit">Submit Nilai</button>
-</form>
-                            </td>
+                            <<td class="p-3 border-b">
+    <form action="/sidang/submit-nilai" method="POST" class="flex items-center space-x-2">
+        <input type="hidden" name="nomorInduk" value="<%= mhs.nomorInduk %>">
+        <input type="hidden" name="id_sidang" value="<%= mhs.id_sidang %>">
+        <input type="number" name="nilai_akhir" required placeholder="Masukkan Nilai" class="p-2 border border-gray-300 rounded">
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit Nilai</button>
+    </form>
+</td>
                             <td class="p-3 border-b"></td>
                         </tr>
                         <% }) %>
@@ -70,6 +66,11 @@
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="bg-green-600 text-white text-center p-4 mt-6">
+      <p>&copy; 2025 Sistem Informasi - Fakultas Teknologi Informasi</p>
+    </footer>
 
     <!-- JavaScript untuk alert -->
     <script>
