@@ -4,14 +4,18 @@ const prismaClient = new prisma();
 // Render halaman booking konsultasi
 const renderBookingPage = async (req, res) => {
   try {
-    // Ambil data dosen dari database
-    const dosen = await prismaClient.user.findMany({
-      where: {
-        role: 'DOSEN'
-      }
+    // Ambil data dosen pembimbing dari model topikta
+    const topikta = await prismaClient.topikta.findMany({
+      select: {
+        dosen: true,  // Ambil hanya nama dosen
+      },
+      distinct: ['dosen'],  // Pastikan dosen yang ditampilkan unik
     });
 
-    res.render('mahasiswa/bookingkonsul', { dosen });
+    // Ekstrak dosen unik
+    const dosenList = topikta.map(item => item.dosen);
+
+    res.render('mahasiswa/bookingkonsul', { dosen: dosenList });
   } catch (error) {
     console.error(error);
     res.status(500).send('Terjadi kesalahan.');
@@ -21,22 +25,26 @@ const renderBookingPage = async (req, res) => {
 // Menangani pengiriman form booking
 const createBooking = async (req, res) => {
   const { dosen, tanggal, waktu } = req.body;
+  const emailUser = req.user.email; // Ambil email dari session pengguna yang login
 
   try {
-    // Simpan data booking ke database
-    const booking = await prismaClient.konsultasi.create({
+    // Simpan data booking ke tabel `konsultasi`
+    await prismaClient.konsultasi.create({
       data: {
-        email_user: req.user.email, // Ambil email pengguna yang login
+        email_user: emailUser, // Menggunakan email dari session pengguna
         dosen_pembimbing: dosen,
-        tanggal_konsultasi: new Date(`${tanggal}T${waktu}:00`),
+        tanggal_konsultasi: new Date(`${tanggal}T${waktu}:00`), // Format waktu yang valid
         status: 'Pending',
       }
     });
 
-    res.send('Booking konsultasi berhasil!');
+    // Mengirim response sukses ke frontend
+    res.json({ success: true, message: 'Booking Sesi Konsultasi Berhasil!' });
+
   } catch (error) {
     console.error(error);
-    res.status(500).send('Terjadi kesalahan saat melakukan booking.');
+    // Jika terjadi error, kirimkan response error ke frontend
+    res.status(500).json({ success: false, message: 'Terjadi kesalahan saat melakukan booking.' });
   }
 };
 
