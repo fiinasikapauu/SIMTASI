@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar Seminar Hasil</title>
+  <link rel="stylesheet" href="/stylesheets/output.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="bg-gray-100 font-sans">
+
+  <!-- Header -->
+  <header class="bg-green-600 text-white p-4 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-3xl font-bold">SIMTASI</h1>
+      <div>
+        <button class="text-white bg-green-700 px-4 py-2 rounded-full hover:bg-green-800 focus:outline-none">
+          <span
+            style="background-image: url('../images/user_icon.png'); background-size: cover; background-position: center; width: 24px; height: 24px; display: inline-block;"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container mx-auto p-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <!-- Sidebar -->
+      <%- include('../sidebar/sidebarmahasiswa.ejs') %>
+
+      <!-- Form Pendaftaran Seminar -->
+      <div class="col-span-3 bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-3xl font-semibold text-green-600 mb-6">Sistem Daftar Seminar Hasil</h2>
+
+        <div class="max-w-4xl mx-auto px-4 py-10">
+          <!-- Form Pendaftaran Seminar -->
+          <form action="/sistemdaftarseminar/daftar-seminar" method="POST" class="space-y-6"> <!-- Update action ke /sistemdaftarseminar/daftar-seminar -->
+            <!-- Nama Lengkap -->
+            <div class="mb-4">
+              <label for="nama" class="block text-lg font-medium text-green-600 mb-2">Nama Lengkap</label>
+              <input type="text" id="nama" name="nama" class="w-full p-4 rounded-lg bg-green-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Masukkan Nama Lengkap" required>
+            </div>
+
+            <!-- NIM -->
+            <div class="mb-4">
+              <label for="nim" class="block text-lg font-medium text-green-600 mb-2">NIM</label>
+              <input type="text" id="nim" name="nim" class="w-full p-4 rounded-lg bg-green-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Masukkan NIM" required>
+            </div>
+
+            <!-- Tanggal Seminar -->
+            <div class="mb-4">
+              <label for="tanggal" class="block text-lg font-medium text-green-600 mb-2">Pilih Tanggal Seminar</label>
+              <select id="tanggal" name="tanggal" class="w-full p-4 rounded-lg bg-green-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                <option disabled selected>--Pilih Tanggal Seminar--</option>
+                <option value="2025-06-25">25 Juni 2025</option>
+                <option value="2025-06-26">26 Juni 2025</option>
+                <option value="2025-06-27">27 Juni 2025</option>
+              </select>
+            </div>
+
+            <!-- Tombol Daftar -->
+            <div>
+              <button type="submit" class="w-full p-4 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 focus:outline-none">Daftar Seminar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-green-600 text-white text-center p-4 mt-6">
+    <p>&copy; 2025 Sistem Informasi - Fakultas Teknologi Informasi</p>
+  </footer>
+
+</body>
+
+</html>

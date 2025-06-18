@@ -14,7 +14,6 @@ const bookingRoutes = require('./routes/bookingRoutes'); // Import booking route
 
 const bodyParser = require('body-parser');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
-const monitoringRoutes = require('./routes/monitoringRoutes');  // Pastikan path yang benar
 
 const app = express();
 
@@ -55,6 +54,8 @@ app.use('/', bookingRoutes); // Gunakan routing untuk booking konsultasi dosen
 app.get('/bookingkonsul', (req, res) => {
   res.render('mahasiswa/bookingkonsul'); // Pastikan nama file di sini sama dengan nama file EJS
 });
+
+app.use('/sistemdaftarsemhas', seminarRoutes);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
