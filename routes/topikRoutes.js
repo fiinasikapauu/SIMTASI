@@ -14,4 +14,10 @@ router.post('/daftartopikta', topikController.addTopik);
 // Route untuk menampilkan Daftar Topik
 router.get('/daftartopiktersedia', topikController.getTopikTersedia);
 
+// Route untuk menampilkan Daftar Topik
+router.get('/topiktatersedia', topikController.getTopikTATersedia);
+
+// Route untuk menangani DELETE Daftar Topik
+router.delete('/daftartopiktersedia/:id_topikta', topikController.deleteTopik);
+
 module.exports = router;

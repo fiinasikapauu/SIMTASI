@@ -36,6 +36,20 @@ const addTopik = async (req, res) => {
 };
 
 // Menampilkan Daftar Topik yang Tersedia
+const getTopikTATersedia = async (req, res) => {
+  try {
+    const topikList = await prisma.topikta.findMany();
+    res.render('mahasiswa/topiktatersedia', { topikList });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: 'Terjadi kesalahan saat mengambil data',
+      success: false,
+    });
+  }
+};
+
+// Menampilkan Daftar Topik yang Tersedia
 const getTopikTersedia = async (req, res) => {
   try {
     const topikList = await prisma.topikta.findMany();
@@ -49,7 +63,34 @@ const getTopikTersedia = async (req, res) => {
   }
 };
 
+// Fungsi untuk menghapus topik
+const deleteTopik = async (req, res) => {
+  const { id_topikta } = req.params;
+
+  try {
+    // Menghapus data topik berdasarkan ID
+    const deletedTopik = await prisma.topikta.delete({
+      where: {
+        id_topikta: Number(id_topikta),
+      },
+    });
+
+    res.json({
+      message: 'Topik berhasil dihapus!',
+      success: true,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: 'Terjadi kesalahan saat menghapus topik',
+      success: false,
+    });
+  }
+};
+
 module.exports = {
   addTopik,
-  getTopikTersedia
+  getTopikTersedia,
+  getTopikTATersedia,
+  deleteTopik
 };
