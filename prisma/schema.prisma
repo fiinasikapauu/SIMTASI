@@ -16,11 +16,12 @@ model topikta {
 }
 
 model user {
-  email_user       String             @id @map("email")
+  email_user       String             @id 
   nama             String
   nomorInduk       String             @unique(map: "User_nomorInduk_key")
   role             user_role
   password         String
+  beban_bimbingan Int   @default(0) // Berikan nilai default, misalnya 0
   kalender_sidang  kalender_sidang[]
   konsultasi       konsultasi[]
   pendaftaran_ta   pendaftaran_ta[]
@@ -45,7 +46,8 @@ model konsultasi {
   id_konsultasi      Int      @id @default(autoincrement())
   email_user         String
   tanggal_konsultasi DateTime
-  dosen_pembimbing   String
+  topik_konsultasi   String
+  feedback_dosen     String
   status             String
   user               user     @relation(fields: [email_user], references: [email_user], map: "Konsultasi_email_user_fkey")
 
