@@ -52,6 +52,14 @@ app.get('/bookingkonsul', (req, res) => {
   res.render('mahasiswa/bookingkonsul'); // Pastikan nama file di sini sama dengan nama file EJS
 });
 
+// Middleware untuk mendefinisikan req.user berdasarkan req.session.user
+app.use((req, res, next) => {
+  if (req.session && req.session.user) {
+    req.user = req.session.user;  // Menyimpan data user dari session ke req.user
+  }
+  next();  // Lanjutkan ke middleware berikutnya
+});
+
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
