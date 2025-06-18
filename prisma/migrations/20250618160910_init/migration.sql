@@ -38,7 +38,7 @@ CREATE TABLE `konsultasi` (
     `email_user` VARCHAR(191) NOT NULL,
     `tanggal_konsultasi` DATETIME(3) NOT NULL,
     `topik_konsultasi` VARCHAR(191) NOT NULL,
-    `feedback_dosen` VARCHAR(191) NOT NULL,
+    `dosen_pembimbing` VARCHAR(191) NOT NULL,
     `status` VARCHAR(191) NOT NULL,
 
     INDEX `Konsultasi_email_user_fkey`(`email_user`),
