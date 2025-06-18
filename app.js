@@ -64,6 +64,12 @@ app.get('/', (req, res) => {
 });
 
 
+// Rute untuk halaman Booking Sesi Konsultasi Dosen
+app.get('/bookingkonsul', (req, res) => {
+  res.render('bookingkonsul'); // 'booking' adalah nama file EJS tanpa ekstensi
+});
+
+
 module.exports = app;
 
 
