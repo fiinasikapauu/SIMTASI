@@ -7,6 +7,6 @@ const bebanDosenController = require('../controllers/bebanDosenController');
 router.get('/monitoring-beban-dosen', bebanDosenController.getMonitoringBeban);
 
 // Route untuk memperbarui beban bimbingan dosen
-router.post('/update-bean-bimbingan', bebanDosenController.updateBebanBimbingan);
+router.post('/update-beban-bimbingan', bebanDosenController.updateBebanBimbingan);
 
 module.exports = router;

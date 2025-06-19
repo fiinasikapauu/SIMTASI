@@ -1,4 +1,5 @@
-const prisma = require('../middleware/auth'); // Pastikan prisma diimpor dengan benar
+const prisma = require('@prisma/client').PrismaClient;
+const prismaClient = new prisma();
 
 const getApprovalData = async (req, res) => {
     try {
