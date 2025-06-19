@@ -4,10 +4,11 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const session = require('express-session');
+const multer = require('multer');
 const app = express();
 
 app.use(session({
-  secret: 'rahasiaTA',
+  secret: 'rahasiaTA', 
   resave: false,
   saveUninitialized: true,
     cookie: { 
@@ -53,7 +54,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('public'));
 
 // Konfigurasi session
-
+ 
 
 // Menggunakan body-parser untuk menangani form submissions
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -78,7 +79,17 @@ app.use('/', bookingRoutes); // Gunakan routing untuk booking konsultasi dosen
 
 app.get('/bookingkonsul', (req, res) => {
   res.render('mahasiswa/bookingkonsul'); // Pastikan nama file di sini sama dengan nama file EJS
-});
+}); 
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Static files
+app.use('/stylesheets', express.static(path.join(__dirname, 'public/stylesheets')));
+app.use('/javascripts', express.static(path.join(__dirname, 'public/javascripts')));
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
+app.use('/uploads/proposals', express.static(path.join(__dirname, 'uploads/proposals')));
+app.use('/uploads/revisi_laporan', express.static(path.join(__dirname, 'uploads/revisi_laporan')));
+app.use('/uploads/laporan_kemajuan', express.static(path.join(__dirname, 'uploads/laporan_kemajuan')));
 
 app.get('/approvaldospem', (req, res) => {
   if (!req.session.userEmail) {
@@ -92,6 +103,32 @@ app.get('/approvaldospem', (req, res) => {
 app.use(function (req, res, next) {
   next(createError(404));
 });
+
+app.use((error, req, res, next) => {
+  console.error(error);
+  
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        success: false,
+        message: 'File terlalu besar. Maksimal 10MB.'
+      });
+    }
+  }
+  
+  if (error.message === 'Hanya file PDF, DOC, dan DOCX yang diperbolehkan!') {
+    return res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+  
+  res.status(500).json({
+    success: false,
+    message: 'Terjadi kesalahan server'
+  });
+});
+
 
 // error handler
 app.use(function (err, req, res, next) {
