@@ -25,7 +25,8 @@ const renderBookingPage = async (req, res) => {
 // Menangani pengiriman form booking
 const createBooking = async (req, res) => {
   const { dosen, tanggal, waktu } = req.body;
-  const emailUser = req.user.email; // Ambil email dari session pengguna yang login
+  console.log(req.session)
+  const emailUser = req.session.user.email; // Ambil email dari session pengguna yang login
 
   try {
     // Simpan data booking ke tabel `konsultasi`
@@ -34,6 +35,7 @@ const createBooking = async (req, res) => {
         email_user: emailUser, // Menggunakan email dari session pengguna
         dosen_pembimbing: dosen,
         tanggal_konsultasi: new Date(`${tanggal}T${waktu}:00`), // Format waktu yang valid
+        topik_konsultasi : '-',
         status: 'Pending',
       }
     });
