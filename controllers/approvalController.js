@@ -1,5 +1,4 @@
-const prisma = require('@prisma/client').PrismaClient;
-const prismaClient = new prisma();
+const prisma = require('../middleware/auth'); 
 
 const getApprovalData = async (req, res) => {
     try {
