@@ -2,13 +2,13 @@ const express = require('express');
 const router = express.Router();
 const roleController = require('../controllers/roleController');
 
-// Rute untuk menampilkan semua user dan role-nya
-router.get('/', roleController.getRoles);  // Perhatikan penggunaan '/' di sini, bukan '/roles'
+// Menampilkan halaman roles
+router.get('/roles', roleController.getRoles);
 
-// Rute untuk mengedit role user
-router.post('/edit/:id', roleController.editRole);
+// Mengedit role
+router.post('/roles/edit/:id', roleController.editRole);
 
-// Rute untuk menghapus user berdasarkan email_user
-router.post('/delete/:email', roleController.deleteRole); 
+// Menghapus role
+router.post('/roles/delete/:email', roleController.deleteRole);
 
 module.exports = router;

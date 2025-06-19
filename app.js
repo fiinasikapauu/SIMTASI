@@ -16,6 +16,8 @@ app.use(session({
   }
 }));
 
+
+const feedbackRoutes = require('./routes/feedbackRoutes'); // Tambahan route feedback
 const roleRoutes = require('./routes/roleRoutes'); // Updated route
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -26,9 +28,6 @@ const monitoringRoutes = require('./routes/monitoringRoutes');  // Pastikan path
 const seminarRoutes = require('./routes/seminarRoutes');
 const bodyParser = require('body-parser');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
-
-
-
 
 app.use(session({
   secret: 'rahasiaTA', // Secret key untuk meng-hash session
@@ -44,6 +43,10 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Menambahkan middleware untuk menangani data form
+app.use(express.urlencoded({ extended: true }));
+
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('public'));
@@ -56,9 +59,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/feedback', feedbackRoutes); // Route baru untuk feedback
+
 app.use('/roles', roleRoutes);
 app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
 app.use(monitoringRoutes); // Pastikan route digunakan dengan benar
+app.use(feedbackRoutes); // Ini akan membuat route /feedback tersedia
 
 // Router utama
 app.use('/', indexRouter);

@@ -4,8 +4,13 @@ const prisma = new PrismaClient();
 // Get all users and their roles
 exports.getRoles = async (req, res) => {
     try {
-        const users = await prisma.user.findMany(); // Get all users
-        res.render('admin/roles', { users }); // Render from 'views/admin/roles.ejs'
+        const users = await prisma.user.findMany({
+            select: {
+                email_user: true,
+                role: true
+            }
+        });
+        res.render('admin/roles', { users });
     } catch (error) {
         console.log(error);
         res.status(500).send('Server Error');
@@ -14,10 +19,10 @@ exports.getRoles = async (req, res) => {
 
 // Edit user role
 exports.editRole = async (req, res) => {
-    const { id } = req.params;
-    const { role } = req.body; // Role can be 'ADMIN', 'MAHASISWA', 'DOSEN'
-    
-    // Ensure the role is valid according to the enum
+    const id = decodeURIComponent(req.params.id);  // Mengambil email_user dan mendekodekannya
+    const { role } = req.body;  // Role yang dipilih oleh admin
+
+    // Memastikan role yang dimasukkan valid
     if (!Object.values(user_role).includes(role)) {
         return res.status(400).send('Invalid role');
     }
@@ -27,25 +32,26 @@ exports.editRole = async (req, res) => {
             where: { email_user: id },
             data: { role: role },
         });
-        res.redirect('/roles?message=editSuccess'); // Pastikan ada query string
+
+        res.redirect('/roles?message=editSuccess');
     } catch (error) {
         console.log(error);
         res.status(500).send('Server Error');
     }
 };
 
-// Hapus user berdasarkan email
+// Hapus user berdasarkan email_user
 exports.deleteRole = async (req, res) => {
-    const { email } = req.params;  // Ambil email dari URL
-    console.log(`Mencoba menghapus user dengan email: ${email}`);  // Log email yang akan dihapus
-    
+    const { email } = req.params;  // Mengambil email_user dari URL
+
     try {
         await prisma.user.delete({
-            where: { email_user: email }, // Hapus user berdasarkan email_user
+            where: { email_user: email },
         });
-        res.redirect('/roles?message=deleteSuccess');  // Redirect dengan pesan sukses
+
+        res.redirect('/roles?message=deleteSuccess');
     } catch (error) {
         console.log(error);
-        res.status(500).send('Kesalahan Server');
+        res.status(500).send('Server Error');
     }
 };
