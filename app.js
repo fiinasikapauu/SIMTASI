@@ -58,6 +58,7 @@ app.use('/feedback', feedbackRoutes); // Route baru untuk feedback
 app.use('/roles', roleRoutes);
 app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
 app.use(monitoringRoutes); // Pastikan route digunakan dengan benar
+app.use('/', seminarRoutes)
 
 // Router utama
 app.use('/', indexRouter);
