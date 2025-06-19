@@ -28,6 +28,7 @@ const monitoringRoutes = require('./routes/monitoringRoutes');  // Pastikan path
 const seminarRoutes = require('./routes/seminarRoutes');
 const bodyParser = require('body-parser');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
+const kalenderRoutes = require('./routes/kalenderRoutes');
 
 app.use(session({
   secret: 'rahasiaTA', // Secret key untuk meng-hash session
@@ -59,12 +60,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 app.use(express.static(path.join(__dirname, 'public')));
 
+
 app.use('/feedback', feedbackRoutes); // Route baru untuk feedback
 
 app.use('/roles', roleRoutes);
 app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
 app.use(monitoringRoutes); // Pastikan route digunakan dengan benar
-app.use(feedbackRoutes); // Ini akan membuat route /feedback tersedia
+app.use('/', seminarRoutes)
+app.use('/', kalenderRoutes)
 
 // Router utama
 app.use('/', indexRouter);
