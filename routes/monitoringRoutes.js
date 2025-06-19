@@ -4,9 +4,9 @@ const router = express.Router();
 const bebanDosenController = require('../controllers/bebanDosenController');
 //fatih
 // Route untuk mengambil data monitoring beban dosen
-router.get('/monitoring-beban-dosen', bebanDosenController.getMonitoringBeban);
+router.get('/monitoring-beban', bebanDosenController.getMonitoringBeban);
 
 // Route untuk memperbarui beban bimbingan dosen
-router.post('/update-bean-bimbingan', bebanDosenController.updateBebanBimbingan);
+router.post('/monitoring-beban', bebanDosenController.updateBebanBimbingan);
 
 module.exports = router;

@@ -29,6 +29,12 @@ const seminarRoutes = require('./routes/seminarRoutes');
 const bodyParser = require('body-parser');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
 
+app.use(session({
+  secret: 'rahasiaTA', // Secret key untuk meng-hash session
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // jika Anda menggunakan HTTP, jika menggunakan HTTPS set ke true
+}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -70,6 +76,14 @@ app.use('/', bookingRoutes); // Gunakan routing untuk booking konsultasi dosen
 app.get('/bookingkonsul', (req, res) => {
   res.render('mahasiswa/bookingkonsul'); // Pastikan nama file di sini sama dengan nama file EJS
 });
+
+app.get('/approvaldospem', (req, res) => {
+  if (!req.session.userEmail) {
+    return res.redirect('/login');  // Jika belum login, redirect ke halaman login
+  }
+  res.render('dosen/approvaldospem');
+});
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
