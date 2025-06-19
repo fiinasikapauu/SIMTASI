@@ -4,6 +4,17 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const session = require('express-session');
+const app = express();
+
+app.use(session({
+  secret: 'rahasiaTA',
+  resave: false,
+  saveUninitialized: true,
+    cookie: { 
+    secure: false,          // Pastikan secure di-set ke false jika menggunakan http (bukan https)
+    httpOnly: true          // Hanya dapat diakses melalui http, untuk mencegah XSS
+  }
+}));
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
@@ -15,7 +26,7 @@ const seminarRoutes = require('./routes/seminarRoutes');
 const bodyParser = require('body-parser');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
 
-const app = express();
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -29,11 +40,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('public'));
 
 // Konfigurasi session
-app.use(session({
-  secret: 'rahasiaTA',
-  resave: false,
-  saveUninitialized: true
-}));
+
 
 // Menggunakan body-parser untuk menangani form submissions
 app.use(bodyParser.urlencoded({ extended: true }));
