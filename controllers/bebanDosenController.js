@@ -1,7 +1,7 @@
 // controllers/bebanDosenController.js
 const prisma = require('@prisma/client').PrismaClient;
 const prismaClient = new prisma();
-
+//fatih
 // Mengambil data dosen dan beban bimbingan
 exports.getMonitoringBeban = async (req, res) => {
     try {

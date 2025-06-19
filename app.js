@@ -16,6 +16,7 @@ app.use(session({
   }
 }));
 
+const roleRoutes = require('./routes/roleRoutes'); // Updated route
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
@@ -25,6 +26,7 @@ const monitoringRoutes = require('./routes/monitoringRoutes');  // Pastikan path
 const seminarRoutes = require('./routes/seminarRoutes');
 const bodyParser = require('body-parser');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
+
 
 
 
@@ -47,6 +49,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/roles', roleRoutes);
 app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
 app.use(monitoringRoutes); // Pastikan route digunakan dengan benar
 app.use('/', seminarRoutes); 
