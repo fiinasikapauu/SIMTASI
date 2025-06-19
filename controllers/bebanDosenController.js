@@ -1,54 +1,61 @@
-// controllers/bebanDosenController.js
-const prisma = require('@prisma/client').PrismaClient;
-const prismaClient = new prisma();
-//fatih
-// Mengambil data dosen dan beban bimbingan
-exports.getMonitoringBeban = async (req, res) => {
+const { PrismaClient, user_role } = require('@prisma/client');
+const prisma = new PrismaClient();
+
+// Get all users and their roles
+exports.getRoles = async (req, res) => {
     try {
-        const dosenList = await prismaClient.user.findMany({
-            where: {
-                role: 'DOSEN',
-            },
+        const users = await prisma.user.findMany({
+            select: {
+                email_user: true,
+                role: true
+            }
         });
 
-        // Render halaman EJS dengan data dosen
-        res.render('admin/monitoring-beban', { dosenList, status: null });
+        res.render('admin/roles', { users });
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Terjadi Kesalahan Internal');
+        console.log(error);
+        res.status(500).send('Server Error');
     }
 };
 
-// Memperbarui beban bimbingan
-exports.updateBebanBimbingan = async (req, res) => {
+// Edit user role
+exports.editRole = async (req, res) => {
+    const { id } = req.params;  // email_user
+    const { role } = req.body;  // Role yang dipilih admin
+
+    if (!Object.values(user_role).includes(role)) {
+        return res.status(400).send('Invalid role');
+    }
+
     try {
-        const updatedData = req.body;
-        
-        // Memperbarui beban bimbingan dosen berdasarkan email_user
-        for (const email in updatedData) {
-            if (email.startsWith('beban_')) {
-                const email_user = email.split('_')[1];
-                const beban_bimbingan = updatedData[email];
+        // Debugging log untuk memastikan data diterima dengan benar
+        console.log(`Editing user: ${id} with role: ${role}`);
 
-                await prismaClient.user.update({
-                    where: { email_user },
-                    data: { beban_bimbingan: parseInt(beban_bimbingan) },
-                });
-            }
-        }
+        await prisma.user.update({
+            where: { email_user: id },
+            data: { role: role },
+        });
 
-        // Kirim status sukses ke EJS
-        const dosenList = await prismaClient.user.findMany({
-            where: {
-                role: 'DOSEN',
-            },
-        });
-        res.render('admin/monitoring-beban', {
-            dosenList,
-            status: 'success',  // Status berhasil
-        });
+        // Redirect dengan query string 'editSuccess'
+        res.redirect('/roles?message=editSuccess');
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Terjadi Kesalahan Internal');
+        console.log(error);
+        res.status(500).send('Server Error');
+    }
+};
+
+// Delete user role
+exports.deleteRole = async (req, res) => {
+    const { email } = req.params;  // email_user
+
+    try {
+        await prisma.user.delete({
+            where: { email_user: email },
+        });
+
+        res.redirect('/roles?message=deleteSuccess');
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('Server Error');
     }
 };
