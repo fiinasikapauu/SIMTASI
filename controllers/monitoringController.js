@@ -16,7 +16,7 @@ const getMonitoringData = async (req, res) => {
     `;
     
     // Mengirim data ke view untuk ditampilkan
-    res.render('admin/monitoringbebandosen', { data });
+    res.render('admin/bebandosen', { data });
   } catch (error) {
     console.error(error);
     res.status(500).send('Terjadi kesalahan dalam mengambil data.');

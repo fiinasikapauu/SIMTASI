@@ -3,6 +3,7 @@ const express = require('express');
 const topikController = require('../controllers/topikController');
 const router = express.Router();
 const monitoringController = require('../controllers/monitoringController');
+const approvalController = require('../controllers/approvalController');
 
 // Route untuk menangani GET Daftar Topik
 router.get('/daftartopikta', (req, res) => {
@@ -22,6 +23,12 @@ router.get('/topiktatersedia', topikController.getTopikTATersedia);
 router.delete('/daftartopiktersedia/:id_topikta', topikController.deleteTopik);
 
 // Route untuk menangani GET Monitoring Beban Dosen
-router.get('/monitoringbebandosen', monitoringController.getMonitoringData);
+router.get('/bebandosen', monitoringController.getMonitoringData);
+
+// Route untuk mengambil data mahasiswa yang perlu disetujui dosen
+router.get('/approvaldospem', approvalController.getApprovalData);
+
+// Route untuk menerima dan memproses persetujuan dosen
+router.post('/approvaldospem', approvalController.updateApprovalStatus);
 
 module.exports = router;
