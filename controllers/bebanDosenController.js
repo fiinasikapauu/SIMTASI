@@ -1,61 +1,52 @@
-const { PrismaClient, user_role } = require('@prisma/client');
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Get all users and their roles
-exports.getRoles = async (req, res) => {
-    try {
-        const users = await prisma.user.findMany({
-            select: {
-                email_user: true,
-                role: true
-            }
-        });
+// Fungsi untuk mengambil data monitoring beban dosen
+exports.getMonitoringBeban = async (req, res) => {
+  try {
+    // Mengambil data beban dosen dari database
+    const bebanDosen = await prisma.dosen.findMany({
+      include: {
+        bimbingan: true,  // Mengambil data bimbingan dosen
+      }
+    });
 
-        res.render('admin/roles', { users });
-    } catch (error) {
-        console.log(error);
-        res.status(500).send('Server Error');
-    }
+    // Menampilkan data monitoring beban dosen
+    res.render('monitoring-beban-dosen', { bebanDosen });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
 };
 
-// Edit user role
-exports.editRole = async (req, res) => {
-    const { id } = req.params;  // email_user
-    const { role } = req.body;  // Role yang dipilih admin
+// Fungsi untuk memperbarui beban bimbingan dosen
+exports.updateBebanBimbingan = async (req, res) => {
+  const { dosenId, bebanBaru } = req.body;  // Mendapatkan data dosenId dan bebanBaru dari form
 
-    if (!Object.values(user_role).includes(role)) {
-        return res.status(400).send('Invalid role');
-    }
+  if (!dosenId || !bebanBaru) {
+    return res.status(400).send('Data yang diperlukan tidak lengkap');
+  }
 
-    try {
-        // Debugging log untuk memastikan data diterima dengan benar
-        console.log(`Editing user: ${id} with role: ${role}`);
+  try {
+    // Memperbarui beban bimbingan dosen
+    const updatedDosen = await prisma.dosen.update({
+      where: { email_user: dosenId },
+      data: {
+        bebanBimbingan: bebanBaru,  // Memperbarui nilai beban
+      },
+    });
 
-        await prisma.user.update({
-            where: { email_user: id },
-            data: { role: role },
-        });
-
-        // Redirect dengan query string 'editSuccess'
-        res.redirect('/roles?message=editSuccess');
-    } catch (error) {
-        console.log(error);
-        res.status(500).send('Server Error');
-    }
-};
-
-// Delete user role
-exports.deleteRole = async (req, res) => {
-    const { email } = req.params;  // email_user
-
-    try {
-        await prisma.user.delete({
-            where: { email_user: email },
-        });
-
-        res.redirect('/roles?message=deleteSuccess');
-    } catch (error) {
-        console.log(error);
-        res.status(500).send('Server Error');
-    }
+    // Mengirim respons sukses dalam bentuk JSON
+    res.json({
+      success: true,
+      message: 'Beban bimbingan dosen berhasil diperbarui!',
+      updatedDosen,
+    });
+  } catch (error) {
+    console.error(error);
+    res.json({
+      success: false,
+      message: 'Terjadi kesalahan saat memperbarui beban dosen.',
+    });
+  }
 };
