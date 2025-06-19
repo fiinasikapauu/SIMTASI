@@ -26,9 +26,11 @@
   <!-- Layout dengan Sidebar Kiri dan Konten Kanan -->
   <div class="flex">
 
-   
+    <!-- Sidebar -->
+ 
       <%- include('../sidebar/sidebaradmin.ejs') %> <!-- Menyisipkan sidebar di sini -->
     
+
     <!-- Konten Utama -->
     <div class="flex-1 p-6">
       
@@ -40,7 +42,7 @@
         <!-- Alert Message sudah dihapus -->
 
         <!-- Formulir untuk mengupdate beban bimbingan dosen -->
-        <form action="/update-bean-bimbingan" method="POST">
+        <form id="updateBebanForm" action="/update-bean-bimbingan" method="POST">
           <% dosenList.forEach(dosen => { %>
             <div class="flex items-center mb-4">
               <!-- Label dan Input berada dalam satu baris -->
@@ -68,8 +70,8 @@
 
     form.addEventListener('submit', function(event) {
         event.preventDefault();  // Mencegah submit form agar bisa menampilkan alert terlebih dahulu
-        
-        // Menampilkan alert keberhasilan atau kegagalan
+
+        // Menampilkan alert keberhasilan
         alert("Beban bimbingan dosen telah berhasil disubmit!");
 
         // Mengirimkan form setelah menampilkan alert
