@@ -58,6 +58,7 @@ model pendaftaran_ta {
   id_pendaftaran      Int      @id @default(autoincrement())
   email_user          String
   id_topikta          Int
+  judul_ta            String
   tanggal_daftar      DateTime
   status_approval     String
   id_dosen_pembimbing String
