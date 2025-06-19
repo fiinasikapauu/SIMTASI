@@ -4,7 +4,19 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const session = require('express-session');
+const app = express();
 
+app.use(session({
+  secret: 'rahasiaTA',
+  resave: false,
+  saveUninitialized: true,
+    cookie: { 
+    secure: false,          // Pastikan secure di-set ke false jika menggunakan http (bukan https)
+    httpOnly: true          // Hanya dapat diakses melalui http, untuk mencegah XSS
+  }
+}));
+
+const roleRoutes = require('./routes/roleRoutes'); // Updated route
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const authRouter = require('./routes/auth');
@@ -15,7 +27,8 @@ const seminarRoutes = require('./routes/seminarRoutes');
 const bodyParser = require('body-parser');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
 
-const app = express();
+
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -29,17 +42,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('public'));
 
 // Konfigurasi session
-app.use(session({
-  secret: 'rahasiaTA',
-  resave: false,
-  saveUninitialized: true
-}));
+
 
 // Menggunakan body-parser untuk menangani form submissions
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/roles', roleRoutes);
 app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
 app.use(monitoringRoutes); // Pastikan route digunakan dengan benar
 
