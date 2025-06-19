@@ -11,6 +11,7 @@ const getPemberianNilai = async (req, res) => {
       select: {
         nama: true,
         nomorInduk: true, // Mengambil nomorInduk
+        email_user: true, // Pastikan email_user juga diambil
       },
     });
 
@@ -21,14 +22,15 @@ const getPemberianNilai = async (req, res) => {
   }
 };
 
-// Controller untuk menerima nilai yang diberikan oleh dosen
+// Controller untuk menerima nilai yang diberikan oleh dosen dan memperbarui nilai
 const submitNilai = async (req, res) => {
-  const { nomorInduk, nilai_akhir } = req.body;
+  const { nomorInduk, updatedData } = req.body; // Ambil updatedData dari body
+
 
   // Validasi input nilai dan nomorInduk
-  if (!nomorInduk || isNaN(nilai_akhir) || nilai_akhir < 0 || nilai_akhir > 100) {
-    console.error("Invalid input data:", { nomorInduk, nilai_akhir });
-    return res.status(400).send('Nilai tidak valid atau nomorInduk tidak ditemukan');
+  if (!nomorInduk || !updatedData || Object.keys(updatedData).length === 0) {
+    console.error("Invalid input data:", { nomorInduk, updatedData });
+    return res.status(400).send('Nilai tidak valid atau updatedData tidak ditemukan');
   }
 
   try {
@@ -46,19 +48,22 @@ const submitNilai = async (req, res) => {
       console.error('Mahasiswa tidak ditemukan dengan nomor induk:', nomorInduk);
       return res.status(404).send('Mahasiswa dengan nomor induk tersebut tidak ditemukan');
     }
+    // Pastikan updatedData ada dan berisi data yang diperlukan
+    if (updatedData[user.email_user]) { // Cek apakah data ada di updatedData
+      const nilai_akhir = updatedData[user.email_user]; // Ambil nilai_akhir dari updatedData berdasarkan email_user
 
-    // Menyimpan nilai ke sidang_ta dengan email_user yang sesuai
-    const sidang = await prismaClient.sidang_ta.create({
-      data: {
-        email_user: user.email_user, // Menggunakan email_user dari user yang ditemukan
-        nilai_akhir: parseFloat(nilai_akhir), // Konversi nilai ke tipe data float
-        tanggal_daftar: new Date(), // Tanggal saat nilai diberikan
-        jadwal: new Date(), // Misalnya jadwal diset ke tanggal saat ini
-        // file_draft_sidang dapat dikosongkan jika tidak digunakan pada tahap ini
-      },
-    });
+      // Update nilai di tabel sidang_ta berdasarkan email_user
+      await prismaClient.sidang_ta.update({
+        where: { email_user: user.email_user }, // Mencari berdasarkan email_user
+        data: { nilai_akhir: parseFloat(nilai_akhir) }, // Konversi nilai_akhir menjadi tipe float
+      });
 
-    console.log("Nilai berhasil disubmit untuk mahasiswa dengan nomor induk:", nomorInduk);
+      console.log("Nilai berhasil diperbarui untuk mahasiswa dengan nomor induk:", nomorInduk);
+    } else {
+      console.error("Data nilai untuk email_user tidak ditemukan dalam updatedData");
+      return res.status(400).send('Data nilai untuk email_user tidak ditemukan dalam updatedData');
+    }
+
     res.redirect('/sidang/pemberian-nilai'); // Redirect kembali ke halaman pemberian nilai
   } catch (error) {
     console.error("Error saat mengirim nilai:", error);
