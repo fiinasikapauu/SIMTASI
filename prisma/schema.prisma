@@ -30,6 +30,7 @@ model user {
   seminar_hasil    seminar_hasil[]
   sidang_ta        sidang_ta[]
   timeline_project timeline_project[]
+  feedback         feedback[]         // Relasi balik ke model feedback
 }
 
 model kalender_sidang {
@@ -127,6 +128,16 @@ model timeline_project {
   user            user     @relation(fields: [email_user], references: [email_user], map: "Timeline_Project_email_user_fkey")
 
   @@index([email_user], map: "Timeline_Project_email_user_fkey")
+}
+
+model feedback {
+  id_feedback   Int      @id @default(autoincrement())
+  email_user    String
+  tanggal       DateTime
+  feedback_text String
+  user          user     @relation(fields: [email_user], references: [email_user], map: "Feedback_email_user_fkey")
+
+  @@index([email_user], map: "Feedback_email_user_fkey")
 }
 
 enum user_role {
