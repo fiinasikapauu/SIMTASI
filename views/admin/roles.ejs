@@ -5,16 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manajemen Pengguna</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
-    <!-- Tambahkan SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const message = urlParams.get('message');
-            console.log(message);  // Debugging: memastikan query string diterima
-
             if (message === 'editSuccess') {
-                // Menampilkan SweetAlert untuk Edit Success
                 Swal.fire({
                     title: 'Berhasil!',
                     text: 'Role user berhasil diubah!',
@@ -22,7 +18,6 @@
                     confirmButtonText: 'OK'
                 });
             } else if (message === 'deleteSuccess') {
-                // Menampilkan SweetAlert untuk Delete Success
                 Swal.fire({
                     title: 'Berhasil!',
                     text: 'User berhasil dihapus!',
@@ -41,11 +36,6 @@
       <div>
         <h1 class="text-3xl font-bold">SIMTASI</h1>
       </div>
-      <div>
-        <button class="text-white bg-green-700 px-4 py-2 rounded-full hover:bg-green-800">
-          <span style="background-image: url('../images/user_icon.png'); background-size: cover; background-position: center; width: 24px; height: 24px; display: inline-block;"></span>
-        </button>
-      </div>
     </div>
   </header>
 
@@ -53,52 +43,57 @@
   <div class="flex flex-1">
     <div class="container mx-auto p-6">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <%- include('../sidebar/sidebaradmin.ejs') %>
-   <div class="col-span-2 bg-white p-6 rounded-lg shadow-lg">
-        
-      <h1 class="text-2xl font-bold text-green-600">Manajemen Pengguna</h1>
+        <%- include('../sidebar/sidebaradmin.ejs') %>
+        <div class="col-span-2 bg-white p-6 rounded-lg shadow-lg">
+            <h1 class="text-2xl font-bold text-green-600">Manajemen Pengguna</h1>
 
-      <table class="min-w-full bg-white border border-gray-300 rounded-md shadow-lg">
-        <thead>
-          <tr>
-            <th class="px-4 py-2 text-left border-b">#</th>
-            <th class="px-4 py-2 text-left border-b">Username</th>
-            <th class="px-4 py-2 text-left border-b">Role</th>
-            <th class="px-4 py-2 text-left border-b">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% users.forEach((user, index) => { %>
-            <tr>
-              <td class="px-4 py-2 border-b"><%= index + 1 %></td>
-              <td class="px-4 py-2 border-b"><%= user.email_user %></td>
-              <td class="px-4 py-2 border-b">
-                <form action="/roles/edit/<%= user.email_user %>" method="POST" class="inline-block">
-                  <select name="role" class="border border-gray-300 rounded-md px-2 py-1">
-                    <option value="ADMIN" <%= user.role === 'ADMIN' ? 'selected' : '' %>>Admin</option>
-                    <option value="DOSEN" <%= user.role === 'DOSEN' ? 'selected' : '' %>>Dosen</option>
-                    <option value="MAHASISWA" <%= user.role === 'MAHASISWA' ? 'selected' : '' %>>Mahasiswa</option>
-                  </select>
-                  <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded">Edit</button>
-                </form>
-              </td>
-              <td class="px-4 py-2 border-b">
-                <form action="/roles/delete/<%= user.email_user %>" method="POST" class="inline-block">
-                  <button type="submit" class="bg-red-500 text-white px-4 py-1 rounded">Hapus</button>
-                </form>
-              </td>
-            </tr>
-          <% }) %>
-        </tbody>
-      </table>
+            <table class="min-w-full bg-white border border-gray-300 rounded-md shadow-lg">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-2 text-left border-b">No</th>
+                        <th class="px-4 py-2 text-left border-b">Username</th>
+                        <th class="px-4 py-2 text-left border-b">Role</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach((user, index) => { %>
+                        <tr>
+                            <td class="px-4 py-2 border-b"><%= index + 1 %></td>
+                            <td class="px-4 py-2 border-b"><%= user.email_user %></td>
+                            <td class="px-4 py-2 border-b">
+                                <!-- Form untuk Edit -->
+                                <form action="/roles/edit/<%= encodeURIComponent(user.email_user) %>" method="POST" class="inline-block">
+                                    <select name="role" class="border border-gray-300 rounded-md px-2 py-1">
+                                        <option value="ADMIN" <%= user.role === 'ADMIN' ? 'selected' : '' %>>Admin</option>
+                                        <option value="DOSEN" <%= user.role === 'DOSEN' ? 'selected' : '' %>>Dosen</option>
+                                        <option value="MAHASISWA" <%= user.role === 'MAHASISWA' ? 'selected' : '' %>>Mahasiswa</option>
+                                    </select>
+                                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-md ml-9 hover:bg-green-600">Edit</button>
+                                </form>
+                            </td>
+                            <td class="px-4 py-2 border-b text-left">
+                                <!-- Tombol Edit dan Hapus berada berdampingan -->
+                                <div class="flex gap-4 justify-start items-center">
+                                    <!-- Tombol Hapus -->
+                                    <form action="/roles/delete/<%= encodeURIComponent(user.email_user) %>" method="POST" class="inline-block">
+                                        <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">Hapus</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+      </div>
     </div>
-  </div>
-  </div>
   </div>
 
   <!-- Footer -->
-  <footer class="bg-green-500 text-white text-center p-4 mt-6">
+  <footer class="bg-green-600 text-white text-center p-4 mt-6">
     <p>&copy; 2025 Sistem Informasi - Fakultas Teknologi Informasi</p>
   </footer>
 
 </body>
+</html>
