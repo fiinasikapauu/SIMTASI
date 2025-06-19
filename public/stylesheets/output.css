@@ -11,6 +11,7 @@
     --color-red-700: oklch(50.5% 0.213 27.518);
     --color-green-50: oklch(98.2% 0.018 155.826);
     --color-green-100: oklch(96.2% 0.044 156.743);
+    --color-green-200: oklch(92.5% 0.084 155.995);
     --color-green-500: oklch(72.3% 0.219 149.579);
     --color-green-600: oklch(62.7% 0.194 149.214);
     --color-green-700: oklch(52.7% 0.154 150.069);
@@ -26,11 +27,8 @@
     --color-gray-800: oklch(27.8% 0.033 256.848);
     --color-white: #fff;
     --spacing: 0.25rem;
-    --container-3xs: 16rem;
-    --container-2xs: 18rem;
     --container-sm: 24rem;
     --container-md: 28rem;
-    --container-3xl: 48rem;
     --container-4xl: 56rem;
     --container-7xl: 80rem;
     --text-sm: 0.875rem;
@@ -313,9 +311,6 @@
   .h-full {
     height: 100%;
   }
-  .min-h-screen {
-    min-height: 100vh;
-  }
   .w-1 {
     width: calc(var(--spacing) * 1);
   }
@@ -328,17 +323,11 @@
   .w-48 {
     width: calc(var(--spacing) * 48);
   }
-  .w-64 {
-    width: calc(var(--spacing) * 64);
-  }
   .w-full {
     width: 100%;
   }
   .max-w-4xl {
     max-width: var(--container-4xl);
-  }
-  .max-w-7xl {
-    max-width: var(--container-7xl);
   }
   .max-w-md {
     max-width: var(--container-md);
@@ -351,9 +340,6 @@
   }
   .flex-1 {
     flex: 1;
-  }
-  .flex-grow {
-    flex-grow: 1;
   }
   .table-auto {
     table-layout: auto;
@@ -502,6 +488,9 @@
   }
   .bg-green-100 {
     background-color: var(--color-green-100);
+  }
+  .bg-green-200 {
+    background-color: var(--color-green-200);
   }
   .bg-green-500 {
     background-color: var(--color-green-500);
@@ -702,13 +691,6 @@
       }
     }
   }
-  .hover\:bg-red-700 {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-red-700);
-      }
-    }
-  }
   .hover\:bg-white {
     &:hover {
       @media (hover: hover) {
@@ -739,11 +721,6 @@
   .focus\:ring-green-500 {
     &:focus {
       --tw-ring-color: var(--color-green-500);
-    }
-  }
-  .focus\:ring-red-500 {
-    &:focus {
-      --tw-ring-color: var(--color-red-500);
     }
   }
   .focus\:outline-none {

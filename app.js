@@ -42,7 +42,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
 app.use(monitoringRoutes); // Pastikan route digunakan dengan benar
-
+app.use('/', seminarRoutes); 
 // Router utama
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
