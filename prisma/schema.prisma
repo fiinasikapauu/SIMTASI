@@ -30,6 +30,7 @@ model user {
   seminar_hasil    seminar_hasil[]
   sidang_ta        sidang_ta[]
   timeline_project timeline_project[]
+  laporan_kemajuan laporan_kemajuan[]
 }
 
 model kalender_sidang {
@@ -127,6 +128,19 @@ model timeline_project {
   user            user     @relation(fields: [email_user], references: [email_user], map: "Timeline_Project_email_user_fkey")
 
   @@index([email_user], map: "Timeline_Project_email_user_fkey")
+}
+
+model laporan_kemajuan {
+  id_laporan        Int      @id @default(autoincrement())
+  email_user        String
+  file_laporan      String
+  original_filename  String   @db.VarChar(255)
+  tanggal_upload    DateTime
+  status_review     String
+  feedback_dosen    String
+  user              user     @relation(fields: [email_user], references: [email_user], map: "Laporan_Kemajuan_email_user_fkey")
+
+  @@index([email_user], map: "Laporan_Kemajuan_email_user_fkey")
 }
 
 enum user_role {
