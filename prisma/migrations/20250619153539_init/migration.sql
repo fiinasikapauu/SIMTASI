@@ -50,6 +50,7 @@ CREATE TABLE `pendaftaran_ta` (
     `id_pendaftaran` INTEGER NOT NULL AUTO_INCREMENT,
     `email_user` VARCHAR(191) NOT NULL,
     `id_topikta` INTEGER NOT NULL,
+    `judul_ta` VARCHAR(191) NOT NULL,
     `tanggal_daftar` DATETIME(3) NOT NULL,
     `status_approval` VARCHAR(191) NOT NULL,
     `id_dosen_pembimbing` VARCHAR(191) NOT NULL,
