@@ -1,49 +1,55 @@
-// Menggunakan SweetAlert untuk konfirmasi
-document.querySelectorAll('.approvalBtn').forEach(button => {
-    button.addEventListener('click', async (event) => {
-        const idPendaftaran = event.target.getAttribute('data-id');
-        const statusApproval = event.target.getAttribute('data-status');
-        
-        try {
-            const response = await fetch(`/approvaldospem`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    approvalData: [
-                        {
-                            id_pendaftaran: idPendaftaran,
-                            status_approval: statusApproval
-                        }
-                    ]
-                }),
-            });
+document.querySelectorAll('.approvalBtn').forEach((btn) => {
+    btn.addEventListener('click', async (event) => {
+        const approvalStatus = event.target.dataset.status;
+        const idPendaftaran = event.target.dataset.id;
 
-            const data = await response.json();
-            
-            if (data.success) {
-                // Tampilkan SweetAlert dengan pesan sukses
-                Swal.fire({
-                    title: 'Berhasil!',
-                    text: `Status persetujuan untuk mahasiswa ini telah diubah menjadi ${statusApproval}`,
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    // Reload halaman untuk menampilkan perubahan
-                    window.location.reload();
+        // Menampilkan SweetAlert konfirmasi
+        const swalResponse = await Swal.fire({
+            title: `Apakah Anda yakin?`,
+            text: `Anda akan mengubah status persetujuan menjadi ${approvalStatus}`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya',
+            cancelButtonText: 'Batal'
+        });
+
+        if (swalResponse.isConfirmed) {
+            try {
+                // Kirim request untuk update status persetujuan
+                const response = await fetch(`/approvaldospem`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        approvalData: [
+                            {
+                                id_pendaftaran: idPendaftaran,
+                                status_approval: approvalStatus,
+                            }
+                        ]
+                    })
                 });
-            } else {
-                throw new Error('Gagal memperbarui status');
+
+                const result = await response.json();
+                if (result.success) {
+                    // Menampilkan alert berhasil dan menunggu untuk ditutup
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: `Status persetujuan berhasil diperbarui menjadi ${approvalStatus}`,
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        showConfirmButton: true, // Menambahkan tombol OK
+                        allowOutsideClick: false // Tidak memungkinkan klik di luar untuk menutup
+                    }).then(() => {
+                        location.reload(); // Reload untuk menampilkan data terbaru
+                    });
+                } else {
+                    Swal.fire('Gagal!', `Terjadi kesalahan saat memperbarui status`, 'error');
+                }
+            } catch (error) {
+                Swal.fire('Gagal!', `Terjadi kesalahan saat memperbarui status`, 'error');
             }
-        } catch (error) {
-            // Menampilkan SweetAlert error jika gagal
-            Swal.fire({
-                title: 'Gagal!',
-                text: 'Terjadi kesalahan saat memperbarui status persetujuan',
-                icon: 'error',
-                confirmButtonText: 'Coba Lagi'
-            });
         }
     });
 });

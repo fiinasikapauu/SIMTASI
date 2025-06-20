@@ -1,36 +1,53 @@
-const prisma = require('../middleware/auth'); 
+const prisma = require('../middleware/auth'); // Prisma client atau database connection
 
+// Controller untuk mengambil data persetujuan mahasiswa
 const getApprovalData = async (req, res) => {
-    try {
-    const dosenEmail = req.session.userEmail; // Ambil email dosen yang login dari session
+  try {
+    // Mendapatkan email dosen yang login dari session
+    const dosenEmail = req.session.user.email; // Pastikan mengambil email dari session user
 
-    console.log("Fetching data for dosen with email:", dosenEmail);
+    if (!dosenEmail) {
+      return res.status(403).send('Dosen belum login');
+    }
+
+    // Query untuk mengambil data mahasiswa yang memilih dosen yang sedang login
     const data = await prisma.pendaftaran_ta.findMany({
-        where: {
-        id_dosen_pembimbing: dosenEmail,
-        status_approval: "Menunggu",  // Filtering students with null approval
-        },
-        include: {
+      where: {
+        status_approval: "Menunggu",  // Menampilkan mahasiswa yang statusnya belum disetujui
+        id_dosen_pembimbing: dosenEmail, // Memfilter mahasiswa yang memilih dosen ini
+      },
+      include: {
         user: true,
         topikta: true,
-        },
+      },
     });
-    console.log("Data fetched:", data); // Log the fetched data to see what's returned
+
     res.render('dosen/approvaldospem', { mahasiswaList: data });
-    } catch (error) {
-    console.error('Error fetching data:', error);
+  } catch (error) {
+    console.error(error);
     res.status(500).send('Terjadi kesalahan dalam mengambil data.');
-    }
+  }
 };
-// Controller untuk memperbarui status persetujuan mahasiswa
+
 const updateApprovalStatus = async (req, res) => {
   const { approvalData } = req.body;  // Data persetujuan yang dikirimkan dari frontend
 
   try {
     // Melakukan iterasi melalui approvalData dan memperbarui status untuk setiap mahasiswa
     for (const approval of approvalData) {
+      // Pastikan id_pendaftaran dikirim sebagai angka
+      const idPendaftaran = parseInt(approval.id_pendaftaran, 10);
+
+      // Pastikan idPendaftaran adalah angka dan bukan NaN
+      if (isNaN(idPendaftaran)) {
+        return res.status(400).json({
+          message: 'ID Pendaftaran tidak valid',
+          success: false
+        });
+      }
+
       await prisma.pendaftaran_ta.update({
-        where: { id_pendaftaran: approval.id_pendaftaran },  // Menemukan mahasiswa berdasarkan ID mereka
+        where: { id_pendaftaran: idPendaftaran },  // Menemukan mahasiswa berdasarkan ID mereka
         data: { status_approval: approval.status_approval },  // Memperbarui status persetujuan
       });
     }
@@ -47,6 +64,7 @@ const updateApprovalStatus = async (req, res) => {
     });
   }
 };
+
 
 module.exports = {
   getApprovalData,

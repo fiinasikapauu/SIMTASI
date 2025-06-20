@@ -4,10 +4,11 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const session = require('express-session');
+const multer = require('multer');
 const app = express();
 
 app.use(session({
-  secret: 'rahasiaTA',
+  secret: 'rahasiaTA', 
   resave: false,
   saveUninitialized: true,
     cookie: { 
@@ -29,12 +30,21 @@ const seminarRoutes = require('./routes/seminarRoutes');
 const bodyParser = require('body-parser');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
 const kalenderAdminRoutes = require('./routes/kalenderAdminRoutes');
+const cors = require('cors');
+
+app.use(cors({
+  origin: 'http://localhost:3000', // Frontend URL
+  credentials: true
+}));
 
 app.use(session({
-  secret: 'rahasiaTA', // Secret key untuk meng-hash session
+  secret: 'rahasiaTA',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } // jika Anda menggunakan HTTP, jika menggunakan HTTPS set ke true
+  cookie: {
+    secure: process.env.NODE_ENV === 'production', // Menggunakan https di production
+    httpOnly: true  // Cookie hanya bisa diakses oleh server
+  }
 }));
 
 // view engine setup
@@ -49,25 +59,30 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/favicon.ico', express.static(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 app.use(express.static('public'));
-
-// Konfigurasi session
-
+// Menonaktifkan request untuk favicon.ico
+app.get('/favicon.ico', (req, res) => res.status(204).end())
 
 // Menggunakan body-parser untuk menangani form submissions
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
-app.use(express.static(path.join(__dirname, 'public')));
 
+
+app.use(monitoringRoutes); 
 
 app.use('/feedback', feedbackRoutes); // Route baru untuk feedback
 
-app.use('/roles', roleRoutes);
+app.use('/', roleRoutes);
 app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
+
+
+
+app.use(feedbackRoutes); // Ini akan membuat route /feedback tersedia
+
 app.use(monitoringRoutes); // Pastikan route digunakan dengan benar
 app.use('/', seminarRoutes)
-app.use('/', kalenderAdminRoutes)
+app.use('/', kalenderRoutes)
 
 // Router utama
 app.use('/', indexRouter);
@@ -78,7 +93,7 @@ app.use('/', bookingRoutes); // Gunakan routing untuk booking konsultasi dosen
 
 app.get('/bookingkonsul', (req, res) => {
   res.render('mahasiswa/bookingkonsul'); // Pastikan nama file di sini sama dengan nama file EJS
-});
+}); 
 
 app.get('/approvaldospem', (req, res) => {
   if (!req.session.userEmail) {
@@ -87,22 +102,37 @@ app.get('/approvaldospem', (req, res) => {
   res.render('dosen/approvaldospem');
 });
 
-//endpoint defult (Kalender Sidang Admin)
-app.get('/kalender-sidang', (req, res)=>{
-  res.render('admin/kalender-sidang');
-});
-
-app.post('/kalender-sidang/save', (req, res) => {
-  const { tanggal, jenis_sidang, email_user } = req.body;
-  // Simpan data ke database
-  // ...
-  res.json({ success: true }); // Mengirim respons sukses
-});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
 });
+
+app.use((error, req, res, next) => {
+  console.error(error);
+  
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        success: false,
+        message: 'File terlalu besar. Maksimal 10MB.'
+      });
+    }
+  }
+  
+  if (error.message === 'Hanya file PDF, DOC, dan DOCX yang diperbolehkan!') {
+    return res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+  
+  res.status(500).json({
+    success: false,
+    message: 'Terjadi kesalahan server'
+  });
+});
+
 
 // error handler
 app.use(function (err, req, res, next) {

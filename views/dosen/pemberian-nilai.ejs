@@ -51,7 +51,7 @@
                             <td class="p-3 border-b"><%= mhs.nama %></td>
                             <td class="p-3 border-b"><%= mhs.nomorInduk %></td>
                             <<td class="p-3 border-b">
-    <form action="/sidang/submit-nilai" method="POST" class="flex items-center space-x-2">
+    <form action="/sidang/pemberian-nilai" method="POST" class="flex items-center space-x-2">
         <input type="hidden" name="nomorInduk" value="<%= mhs.nomorInduk %>">
         <input type="hidden" name="id_sidang" value="<%= mhs.id_sidang %>">
         <input type="number" name="nilai_akhir" required placeholder="Masukkan Nilai" class="p-2 border border-gray-300 rounded">
