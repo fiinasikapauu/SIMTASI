@@ -61,11 +61,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 app.use(express.static(path.join(__dirname, 'public')));
 
-<<<<<<<<< Temporary merge branch 1
 
-=========
-app.use('/', monitoringRoutes);  // Tanpa '/api', langsung menggunakan '/' untuk path
->>>>>>>>> Temporary merge branch 2
+
+app.use(monitoringRoutes); 
+
 app.use('/feedback', feedbackRoutes); // Route baru untuk feedback
 
 app.use('/', roleRoutes);
