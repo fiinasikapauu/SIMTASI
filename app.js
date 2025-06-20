@@ -62,13 +62,20 @@ app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+app.use('/', monitoringRoutes);  // Tanpa '/api', langsung menggunakan '/' untuk path
 app.use('/feedback', feedbackRoutes); // Route baru untuk feedback
 
-app.use('/roles', roleRoutes);
+app.use('/', roleRoutes);
 app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
+
+
+
+app.use(feedbackRoutes); // Ini akan membuat route /feedback tersedia
+
 app.use(monitoringRoutes); // Pastikan route digunakan dengan benar
 app.use('/', seminarRoutes)
 app.use('/', kalenderRoutes)
+
 
 // Router utama
 app.use('/', indexRouter);
