@@ -48,7 +48,6 @@ model konsultasi {
   id_konsultasi      Int      @id @default(autoincrement())
   email_user         String
   tanggal_konsultasi DateTime
-  topik_konsultasi   String
   dosen_pembimbing   String
   status             String
   user               user     @relation(fields: [email_user], references: [email_user], map: "Konsultasi_email_user_fkey")
@@ -147,6 +146,7 @@ model feedback {
   id_feedback   Int      @id @default(autoincrement())
   email_user    String
   tanggal       DateTime
+  topik_konsultasi String  // Menambahkan field untuk topik konsultasi
   feedback_text String
   user          user     @relation(fields: [email_user], references: [email_user], map: "Feedback_email_user_fkey")
 

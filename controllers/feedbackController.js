@@ -21,16 +21,18 @@ exports.getMahasiswa = async (req, res) => {
   }
 };
 
-// Menyimpan feedback yang diisi
+// Menyimpan feedback dan topik konsultasi yang diisi
 exports.saveFeedback = async (req, res) => {
-  const { email_user, tanggal, feedback_text } = req.body;
+  const { email_user, tanggal, feedback_text, topik_konsultasi } = req.body;
   
   try {
+    // Menyimpan feedback
     await prisma.feedback.create({
       data: {
         email_user,
         tanggal: new Date(tanggal), // Mengkonversi tanggal dari form
         feedback_text,
+        topik_konsultasi,  // Menyimpan topik konsultasi
       },
     });
     // Mengarahkan kembali ke halaman feedback setelah berhasil dengan status query parameter
