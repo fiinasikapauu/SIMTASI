@@ -13,7 +13,8 @@ exports.getMahasiswa = async (req, res) => {
         nama: true,
       },
     });
-    res.render('dosen/feedback', { mahasiswa }); // Render form feedback
+    const { status } = req.query; // ambil status dari query
+    res.render('dosen/feedback', { mahasiswa, status }); // kirim status ke view
   } catch (error) {
     console.error(error);
     res.status(500).send('Server error');
