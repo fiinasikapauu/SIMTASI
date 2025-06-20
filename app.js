@@ -17,6 +17,11 @@ app.use(session({
   }
 }));
 
+// Middleware agar variabel user selalu tersedia di semua view
+app.use((req, res, next) => {
+  res.locals.user = req.user || null;
+  next();
+});
 
 const feedbackRoutes = require('./routes/feedbackRoutes'); // Tambahan route feedback
 const roleRoutes = require('./routes/roleRoutes'); // Updated route

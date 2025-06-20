@@ -10,19 +10,7 @@
 
 <body class="bg-gray-100">
   <!-- Header -->
-  <header class="bg-green-600 text-white p-4">
-    <div class="container mx-auto flex justify-between items-center">
-      <div>
-        <h1 class="text-3xl font-bold">SIMTASI</h1>
-      </div>
-      <div>
-        <button class="text-white bg-green-700 px-4 py-2 rounded-full hover:bg-green-800">
-          <span
-            style="background-image: url('../images/user_icon.png'); background-size: cover; background-position: center; width: 24px; height: 24px; display: inline-block;"></span>
-        </button>
-      </div>
-    </div>
-  </header>
+  <%- include('../partial/header.ejs') %>
 
   <!-- Main Content -->
   <div class="container mx-auto p-6">
@@ -75,6 +63,7 @@
                   <th class="py-2 px-4 text-left font-medium">Tanggal Upload</th>
                   <th class="py-2 px-4 text-left font-medium">Status</th>
                   <th class="py-2 px-4 text-left font-medium">Feedback</th>
+                  <th class="py-2 px-4 text-left font-medium">Aksi</th>
                 </tr>
               </thead>
               <tbody id="fileTableBody">
@@ -109,6 +98,9 @@
                         <% } else { %>
                           <span class="text-gray-700 font-normal"><%= item.feedback_dosen.length > 40 ? item.feedback_dosen.substring(0, 40) + '...' : item.feedback_dosen %></span>
                         <% } %>
+                      </td>
+                      <td class="py-2 px-4 text-center">
+                        <button class="delete-laporan-btn bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded transition" data-id="<%= item.id_laporan %>" data-file="<%= item.file_laporan %>">Delete</button>
                       </td>
                     </tr>
                   <% }) %>
@@ -188,6 +180,43 @@
             text: 'File sedang didownload...',
             timer: 2000,
             showConfirmButton: false
+          });
+        }
+      });
+
+      // Handle delete laporan kemajuan
+      const fileTableBody = document.getElementById('fileTableBody');
+      fileTableBody.addEventListener('click', async function(e) {
+        const deleteBtn = e.target.closest('.delete-laporan-btn');
+        if (deleteBtn) {
+          const id = deleteBtn.getAttribute('data-id');
+          Swal.fire({
+            title: 'Yakin hapus laporan?',
+            text: 'Laporan yang dihapus tidak dapat dikembalikan!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              try {
+                const response = await fetch(`/laporankemajuan/${id}`, {
+                  method: 'DELETE',
+                  credentials: 'same-origin',
+                  headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                if (result.success) {
+                  Swal.fire('Terhapus!', 'Laporan berhasil dihapus.', 'success').then(() => location.reload());
+                } else {
+                  Swal.fire('Gagal', result.message || 'Gagal menghapus laporan', 'error');
+                }
+              } catch (err) {
+                Swal.fire('Error', 'Terjadi kesalahan saat menghapus laporan', 'error');
+              }
+            }
           });
         }
       });
