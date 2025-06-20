@@ -29,7 +29,7 @@ const monitoringRoutes = require('./routes/monitoringRoutes');  // Pastikan path
 const seminarRoutes = require('./routes/seminarRoutes');
 const bodyParser = require('body-parser');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
-const kalenderRoutes = require('./routes/kalenderRoutes');
+const kalenderAdminRoutes = require('./routes/kalenderAdminRoutes');
 const cors = require('cors');
 
 app.use(cors({
@@ -84,7 +84,6 @@ app.use(monitoringRoutes); // Pastikan route digunakan dengan benar
 app.use('/', seminarRoutes)
 app.use('/', kalenderRoutes)
 
-
 // Router utama
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -96,15 +95,13 @@ app.get('/bookingkonsul', (req, res) => {
   res.render('mahasiswa/bookingkonsul'); // Pastikan nama file di sini sama dengan nama file EJS
 }); 
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.get('/approvaldospem', (req, res) => {
+  if (!req.session.userEmail) {
+    return res.redirect('/login');  // Jika belum login, redirect ke halaman login
+  }
+  res.render('dosen/approvaldospem');
+});
 
-// Static files
-app.use('/stylesheets', express.static(path.join(__dirname, 'public/stylesheets')));
-app.use('/javascripts', express.static(path.join(__dirname, 'public/javascripts')));
-app.use('/images', express.static(path.join(__dirname, 'public/images')));
-app.use('/uploads/proposals', express.static(path.join(__dirname, 'uploads/proposals')));
-app.use('/uploads/revisi_laporan', express.static(path.join(__dirname, 'uploads/revisi_laporan')));
-app.use('/uploads/laporan_kemajuan', express.static(path.join(__dirname, 'uploads/laporan_kemajuan')));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
