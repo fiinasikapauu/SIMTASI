@@ -12,4 +12,7 @@ router.get("/signin", (req, res) => res.render("signin"));
 // Handle user login
 router.post("/signin", authController.login);
 
+// Handle user logout
+router.get('/logout', authController.logout);
+
 module.exports = router;

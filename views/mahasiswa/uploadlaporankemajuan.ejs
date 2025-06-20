@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Upload Kemajuan</title>
+  <title>Upload Laporan Kemajuan</title>
   <link rel="stylesheet" href="/stylesheets/output.css" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -36,8 +36,8 @@
 
         <div class="max-w-4xl mx-auto px-4 py-10">
           <!-- Form Upload File -->
-          <form action="/upload" method="POST" enctype="multipart/form-data">
-            <label for="laporanFile" class="block text-lg font-medium text-green-600 mb-4">Pilih File Laporan
+          <form action="/uploadlaporankemajuan" method="POST" enctype="multipart/form-data" id="uploadLaporanForm">
+            <label for="laporanFile" class="block text-lg font-medium text-green-600 mb-4">Pilih File Laporan Kemajuan
               (PDF/DOC)</label>
             <!-- Box untuk upload -->
             <div class="border-2 border-green-500 p-6 rounded-lg text-left bg-green-100">
@@ -66,19 +66,55 @@
           </form>
 
           <!-- Tabel untuk Menampilkan Data Upload -->
-          <div class="mt-6">
-            <h3 class="text-2xl font-semibold text-green-600 mb-4">File Laporan Mahasiswa</h3>
-            <table class="min-w-full table-auto border-collapse bg-white shadow-lg ">
+          <div class="mt-6 overflow-x-auto">
+            <h3 class="text-2xl font-semibold text-green-600 mb-4">Daftar Laporan Kemajuan Yang Diupload</h3>
+            <table class="min-w-full table-auto border-collapse bg-white">
               <thead class="bg-green-500 text-white">
                 <tr>
-                  <th class="py-3 px-6 text-left">File Laporan</th>
-                  <th class="py-3 px-6 text-left">Tanggal Upload</th>
-                  <th class="py-3 px-6 text-left">Status Review</th>
-                  <th class="py-3 px-6 text-left">Feedback Dosen</th>
+                  <th class="py-2 px-4 text-left font-medium">File Laporan</th>
+                  <th class="py-2 px-4 text-left font-medium">Tanggal Upload</th>
+                  <th class="py-2 px-4 text-left font-medium">Status</th>
+                  <th class="py-2 px-4 text-left font-medium">Feedback</th>
                 </tr>
               </thead>
               <tbody id="fileTableBody">
-                <!-- Data Table will be inserted here dynamically -->
+                <% if (typeof laporanList !== 'undefined' && laporanList.length > 0) { %>
+                  <% laporanList.forEach(function(item) { %>
+                    <tr class="border-b border-gray-200 text-sm">
+                      <td class="py-2 px-4 whitespace-nowrap">
+                        <a href="/downloadlaporankemajuan/<%= item.id_laporan %>" 
+                           download="<%= item.file_laporan.split('/').pop() %>"
+                           class="text-green-700 underline hover:text-green-900 font-normal truncate block max-w-xs file-download-link file-link cursor-pointer" 
+                           title="Klik untuk download: <%= item.file_laporan.split('/').pop() %>">
+                          📄 <%= item.file_laporan.split('/').pop() %>
+                        </a>
+                      </td>
+                      <td class="py-2 px-4 whitespace-nowrap text-gray-600"><%= item.tanggal_upload_formatted %></td>
+                      <td class="py-2 px-4">
+                        <% if(item.status_review === 'Menunggu Review'){ %>
+                          <span class="inline-block text-yellow-800 text-xs font-semibold px-2 py-1 rounded">Menunggu Review</span>
+                        <% } else if(item.status_review === 'Disetujui'){ %>
+                          <span class="inline-block bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded">Disetujui</span>
+                        <% } else if(item.status_review === 'Ditolak'){ %>
+                          <span class="inline-block text-red-800 text-xs font-semibold px-2 py-1 rounded">Ditolak</span>
+                        <% } else if(item.status_review === 'Revisi'){ %>
+                          <span class="inline-block text-orange-800 text-xs font-semibold px-2 py-1 rounded">Revisi</span>
+                        <% } else { %>
+                          <span class="inline-block text-gray-800 text-xs font-semibold px-2 py-1 rounded"><%= item.status_review %></span>
+                        <% } %>
+                      </td>
+                      <td class="py-2 px-4 max-w-xs truncate" title="<%= item.feedback_dosen %>">
+                        <% if(!item.feedback_dosen || item.feedback_dosen === '-') { %>
+                          <span class="italic text-gray-400">Belum ada feedback</span>
+                        <% } else { %>
+                          <span class="text-gray-700 font-normal"><%= item.feedback_dosen.length > 40 ? item.feedback_dosen.substring(0, 40) + '...' : item.feedback_dosen %></span>
+                        <% } %>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr><td colspan="4" class="text-center py-4 text-gray-400">Belum ada laporan kemajuan diupload</td></tr>
+                <% } %>
               </tbody>
             </table>
           </div>
@@ -93,17 +129,68 @@
   </footer>
 
   <script>
-    // Display the selected file name
-    const inputFile = document.getElementById('laporanFile');
-    const fileNameDisplay = document.getElementById('fileName');
+    document.addEventListener('DOMContentLoaded', function() {
+      // Display the selected file name
+      const inputFile = document.getElementById('laporanFile');
+      const fileNameDisplay = document.getElementById('fileName');
+      inputFile.addEventListener('change', () => {
+        if (inputFile.files.length > 0) {
+          fileNameDisplay.textContent = inputFile.files[0].name;
+        } else {
+          fileNameDisplay.textContent = "No file chosen";
+        }
+      });
 
-    // Enable button when a file is selected
-    inputFile.addEventListener('change', () => {
-      if (inputFile.files.length > 0) {
-        fileNameDisplay.textContent = inputFile.files[0].name;
-      } else {
-        fileNameDisplay.textContent = "No file chosen";
-      }
+      // Handle form submission
+      document.getElementById('uploadLaporanForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        const fileInput = document.getElementById('laporanFile');
+        if (fileInput.files.length === 0) {
+          Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Pilih file terlebih dahulu!' });
+          return;
+        }
+        Swal.fire({
+          title: 'Mengupload...',
+          text: 'Mohon tunggu, file sedang diupload',
+          allowOutsideClick: false,
+          showConfirmButton: false,
+          willOpen: () => { Swal.showLoading(); }
+        });
+        formData.append('laporanFile', fileInput.files[0]);
+        try {
+          const response = await fetch('/uploadlaporankemajuan', {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin'
+          });
+          const result = await response.json();
+          if (result.success) {
+            Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Laporan kemajuan berhasil diupload!' }).then(() => {
+              location.reload();
+            });
+          } else {
+            Swal.fire({ icon: 'error', title: 'Gagal Upload', text: result.message || 'Terjadi kesalahan saat upload' });
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan saat upload file' });
+        }
+      });
+
+      // SweetAlert download notification
+      document.getElementById('fileTableBody').addEventListener('click', function(e) {
+        const link = e.target.closest('a[download]');
+        if (link) {
+          Swal.fire({
+            icon: 'info',
+            title: 'Download Dimulai',
+            text: 'File sedang didownload...',
+            timer: 2000,
+            showConfirmButton: false
+          });
+        }
+      });
     });
   </script>
 </body>
