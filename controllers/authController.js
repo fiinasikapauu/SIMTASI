@@ -6,6 +6,18 @@ exports.register = async (req, res) => {
   const { nama, nomor_induk, email, password } = req.body;
   const role = "MAHASISWA"; // Sesuaikan dengan role yang diinginkan
 
+
+const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+if (!emailRegex.test(email)) {
+  return res.send(`
+    <script>
+        alert('Email tidak valid');
+        window.location.href = '/signin';
+    </script>
+  `);
+}
+
+
   try {
     // Cek apakah email sudah terdaftar
     const userExists = await prisma.user.findUnique({
