@@ -1,25 +1,20 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monitoring Beban Dosen</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
-    <!-- SweetAlert2 CDN -->
+    <!-- Menggunakan CDN Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- SweetAlert CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-100">
-
   <!-- Header -->
   <header class="bg-green-600 text-white p-4">
     <div class="container mx-auto flex justify-between items-center">
       <div>
         <h1 class="text-3xl font-bold">SIMTASI</h1>
-      </div>
-      <div>
-        <button class="text-white bg-green-600 px-4 py-2 rounded-full hover:bg-green-600">
-          <span style="background-image: url('../images/user_icon.png'); background-size: cover; background-position: center; width: 24px; height: 24px; display: inline-block;"></span>
-        </button>
       </div>
     </div>
   </header>
@@ -32,82 +27,67 @@
 
     <!-- Main Content -->
     <div class="flex-1 p-6">
-      
+      <!-- Content -->
       <!-- Monitoring Beban Dosen -->
       <div class="bg-white rounded-lg shadow-lg p-6">
         <h2 class="text-2xl font-bold mb-4">Monitoring Beban Dosen</h2>
-
-        <!-- Displaying SweetAlert after status -->
-        <% if (status) { %>
-            <% status.forEach(item => { %>
-                <script>
-                    Swal.fire({
-                        title: '<%= item.email_user %>',
-                        text: '<%= item.message %>',
-                        icon: item.status === 'success' ? 'success' : 'error',
-                        confirmButtonText: 'OK'
-                    });
-                </script>
+        
+        <table class="min-w-full bg-white border border-gray-300">
+          <thead>
+            <tr>
+              <th class="py-2 px-4 text-left">No</th>
+              <th class="py-2 px-4 text-left">Nama Dosen</th>
+              <th class="py-2 px-4 text-left">Beban Bimbingan</th>
+              <th class="py-2 px-4 text-left">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% dosen.forEach(function(dosen, index) { %>
+              <tr>
+                <td class="py-2 px-4"><%= index + 1 %></td>
+                <td class="py-2 px-4"><%= dosen.nama %></td>
+                <form action="/admin/updateBeban/<%= dosen.email_user %>" method="POST" class="submitForm">
+                  <td class="py-2 px-4">
+                    <input type="number" name="beban_bimbingan" value="<%= dosen.beban_bimbingan %>" class="border rounded px-2 py-1" min="0">
+                  </td>
+                  <td class="py-2 px-4">
+                    <!-- Ganti nama tombol menjadi Submit -->
+                    <button type="submit" class="bg-green-600 text-white py-1 px-3 rounded">Submit</button>
+                  </td>
+                </form>
+              </tr>
             <% }); %>
-        <% } %>
-
-        <!-- Table for monitoring load -->
-        <form id="updateBebanForm" action="/update-bean-bimbingan" method="POST">
-            <table class="w-full table-auto border-collapse mb-6">
-                <thead>
-                    <tr class="bg-green-600 text-white">
-                        <th class="px-4 py-2">No</th>
-                        <th class="px-4 py-2">Nama Dosen</th>
-                        <th class="px-4 py-2">Beban Bimbingan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% dosenList.forEach((dosen, index) => { %>
-                        <tr class="border-b">
-                            <td class="px-4 py-2"><%= index + 1 %></td>
-                            <td class="px-4 py-2"><%= dosen.nama %></td>
-                            <td class="px-4 py-2">
-                                <input type="text" name="beban_<%= dosen.email_user %>" value="<%= dosen.beban_bimbingan %>" class="p-2 border rounded w-full">
-                            </td>
-                        </tr>
-                    <% }); %>
-                </tbody>
-            </table>
-
-            <!-- Submit Button -->
-            <button type="submit" class="mt-4 p-2 bg-green-600 text-white rounded-lg w-full">Submit</button>
-        </form>
+          </tbody>
+        </table>
       </div>
-
-    </div> <!-- End of Main Content -->
-
-  </div> <!-- End of Layout -->
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="bg-green-600 text-white text-center p-4 mt-6">
     <p>&copy; 2025 Sistem Informasi - Fakultas Teknologi Informasi</p>
   </footer>
 
+  <!-- SweetAlert JavaScript -->
   <script>
-    // SweetAlert2 Confirmation Before Submit
-    const form = document.getElementById('updateBebanForm');
+    // Menangani form submit dan menampilkan SweetAlert
+    const form = document.querySelectorAll('.submitForm');
     
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();  // Prevent default form submission
+    form.forEach((item) => {
+        item.addEventListener('submit', function(event) {
+            event.preventDefault();  // Mencegah submit biasa
 
-        // Show SweetAlert2 confirmation before form submission
-        Swal.fire({
-            title: 'Beban Bimbingan Dosen',
-            text: 'Apakah Anda yakin ingin mengupdate data?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, Perbarui',
-            cancelButtonText: 'Tidak'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Submit the form if confirmed
-                form.submit();
-            }
+            // Tampilkan SweetAlert
+            Swal.fire({
+                icon: 'success',
+                title: 'Submit Berhasil!',
+                text: 'Beban bimbingan dosen berhasil disubmit.',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.submit(); // Submit form setelah klik OK di SweetAlert
+                }
+            });
         });
     });
   </script>

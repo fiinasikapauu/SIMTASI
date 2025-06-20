@@ -1,52 +1,38 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Fungsi untuk mengambil data monitoring beban dosen
-exports.getMonitoringBeban = async (req, res) => {
-  try {
-    // Mengambil data beban dosen dari database
-    const bebanDosen = await prisma.dosen.findMany({
-      include: {
-        bimbingan: true,  // Mengambil data bimbingan dosen
-      }
-    });
+const bebanDosenController = {
+    // Mengambil data dosen beserta beban bimbingannya
+    async getBebanDosen(req, res) {
+        try {
+            const dosen = await prisma.user.findMany({
+                where: {
+                    role: 'DOSEN',
+                },
+            });
 
-    // Menampilkan data monitoring beban dosen
-    res.render('monitoring-beban-dosen', { bebanDosen });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Server error');
-  }
+            res.render('admin/monitoring-beban', { dosen: dosen });
+        } catch (error) {
+            res.status(500).send(error.message);
+        }
+    },
+
+    // Mengupdate beban bimbingan dosen
+    async updateBebanDosen(req, res) {
+        const { id } = req.params;
+        const { beban_bimbingan } = req.body;
+
+        try {
+            await prisma.user.update({
+                where: { email_user: id },
+                data: { beban_bimbingan: parseInt(beban_bimbingan) },
+            });
+
+            res.redirect('/admin/monitoring-beban');
+        } catch (error) {
+            res.status(500).send(error.message);
+        }
+    },
 };
 
-// Fungsi untuk memperbarui beban bimbingan dosen
-exports.updateBebanBimbingan = async (req, res) => {
-  const { dosenId, bebanBaru } = req.body;  // Mendapatkan data dosenId dan bebanBaru dari form
-
-  if (!dosenId || !bebanBaru) {
-    return res.status(400).send('Data yang diperlukan tidak lengkap');
-  }
-
-  try {
-    // Memperbarui beban bimbingan dosen
-    const updatedDosen = await prisma.dosen.update({
-      where: { email_user: dosenId },
-      data: {
-        bebanBimbingan: bebanBaru,  // Memperbarui nilai beban
-      },
-    });
-
-    // Mengirim respons sukses dalam bentuk JSON
-    res.json({
-      success: true,
-      message: 'Beban bimbingan dosen berhasil diperbarui!',
-      updatedDosen,
-    });
-  } catch (error) {
-    console.error(error);
-    res.json({
-      success: false,
-      message: 'Terjadi kesalahan saat memperbarui beban dosen.',
-    });
-  }
-};
+module.exports = bebanDosenController;
