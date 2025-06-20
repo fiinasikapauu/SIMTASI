@@ -97,14 +97,6 @@ app.use('/uploads/proposals', express.static(path.join(__dirname, 'uploads/propo
 app.use('/uploads/revisi_laporan', express.static(path.join(__dirname, 'uploads/revisi_laporan')));
 app.use('/uploads/laporan_kemajuan', express.static(path.join(__dirname, 'uploads/laporan_kemajuan')));
 
-app.get('/approvaldospem', (req, res) => {
-  if (!req.session.userEmail) {
-    return res.redirect('/login');  // Jika belum login, redirect ke halaman login
-  }
-  res.render('dosen/approvaldospem');
-});
-
-
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));

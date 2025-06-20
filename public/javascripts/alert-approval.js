@@ -33,8 +33,17 @@ document.querySelectorAll('.approvalBtn').forEach((btn) => {
 
                 const result = await response.json();
                 if (result.success) {
-                    Swal.fire('Berhasil!', `Status persetujuan berhasil diperbarui menjadi ${approvalStatus}`, 'success');
-                    location.reload(); // Reload untuk menampilkan data terbaru
+                    // Menampilkan alert berhasil dan menunggu untuk ditutup
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: `Status persetujuan berhasil diperbarui menjadi ${approvalStatus}`,
+                        icon: 'success',
+                        confirmButtonText: 'OK',
+                        showConfirmButton: true, // Menambahkan tombol OK
+                        allowOutsideClick: false // Tidak memungkinkan klik di luar untuk menutup
+                    }).then(() => {
+                        location.reload(); // Reload untuk menampilkan data terbaru
+                    });
                 } else {
                     Swal.fire('Gagal!', `Terjadi kesalahan saat memperbarui status`, 'error');
                 }
