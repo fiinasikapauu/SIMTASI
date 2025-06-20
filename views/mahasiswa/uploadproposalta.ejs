@@ -6,56 +6,11 @@
   <title>Proposal Tugas Akhir</title>
   <link rel="stylesheet" href="/stylesheets/output.css" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <style>
-    /* Additional styles for modal */
-    .modal-overlay {
-      backdrop-filter: blur(4px);
-    }
-    
-    .modal-content {
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    
-    .file-link:hover {
-      color: #059669 !important;
-      text-decoration: underline;
-    }
-    
-    /* Loading spinner */
-    .loading-spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #059669;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
 </head>
 
 <body class="bg-gray-100">
   <!-- Header -->
-  <header class="bg-green-600 text-white p-4">
-    <div class="container mx-auto flex justify-between items-center">
-      <div>
-        <h1 class="text-3xl font-bold">SIMTASI</h1>
-      </div>
-      <div>
-        <button class="text-white bg-green-700 px-4 py-2 rounded-full hover:bg-green-800">
-          <span
-            style="background-image: url('../images/user_icon.png'); background-size: cover; background-position: center; width: 24px; height: 24px; display: inline-block;"></span>
-        </button>
-        <a href="/logout" class="ml-4 bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-full transition">Logout</a>
-      </div>
-    </div>
-  </header>
+  <%- include('../partial/header.ejs') %>
 
   <!-- Main Content -->
   <div class="container mx-auto p-6">
@@ -108,6 +63,7 @@
                   <th class="py-2 px-4 text-left font-medium">Tanggal Upload</th>
                   <th class="py-2 px-4 text-left font-medium">Status</th>
                   <th class="py-2 px-4 text-left font-medium">Feedback</th>
+                  <th class="py-2 px-4 text-left font-medium">Aksi</th>
                 </tr>
               </thead>
               <tbody id="fileTableBody">
@@ -142,6 +98,9 @@
                         <% } else { %>
                           <span class="text-gray-700 font-normal"><%= item.feedback_dosen.length > 40 ? item.feedback_dosen.substring(0, 40) + '...' : item.feedback_dosen %></span>
                         <% } %>
+                      </td>
+                      <td class="py-2 px-4 text-center">
+                        <button class="delete-proposal-btn bg-red-500 hover:bg-red-700 text-white px-3 py-1 rounded transition" data-id="<%= item.id_proposal %>" data-file="<%= item.file_proposal %>">Delete</button>
                       </td>
                     </tr>
                   <% }) %>
@@ -250,6 +209,43 @@
             text: 'File sedang didownload...',
             timer: 2000,
             showConfirmButton: false
+          });
+        }
+      });
+
+      // Handle delete proposal
+      const fileTableBody = document.getElementById('fileTableBody');
+      fileTableBody.addEventListener('click', async function(e) {
+        const deleteBtn = e.target.closest('.delete-proposal-btn');
+        if (deleteBtn) {
+          const id = deleteBtn.getAttribute('data-id');
+          Swal.fire({
+            title: 'Yakin hapus proposal?',
+            text: 'Proposal yang dihapus tidak dapat dikembalikan!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              try {
+                const response = await fetch(`/proposal/${id}`, {
+                  method: 'DELETE',
+                  credentials: 'same-origin',
+                  headers: { 'Content-Type': 'application/json' }
+                });
+                const result = await response.json();
+                if (result.success) {
+                  Swal.fire('Terhapus!', 'Proposal berhasil dihapus.', 'success').then(() => location.reload());
+                } else {
+                  Swal.fire('Gagal', result.message || 'Gagal menghapus proposal', 'error');
+                }
+              } catch (err) {
+                Swal.fire('Error', 'Terjadi kesalahan saat menghapus proposal', 'error');
+              }
+            }
           });
         }
       });

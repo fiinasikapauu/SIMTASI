@@ -69,4 +69,22 @@ router.post('/uploadrevisilaporan', requireAuth, revisiLaporanController.uploadR
 
 router.get('/downloadrevisi/:id', requireAuth, revisiLaporanController.downloadRevisi);
 
+// Route untuk menghapus proposal
+router.delete('/proposal/:id', requireAuth, proposalController.deleteProposal);
+
+// Route untuk menghapus laporan kemajuan
+router.delete('/laporankemajuan/:id', requireAuth, laporanKemajuanController.deleteLaporanKemajuan);
+
+// Route untuk menghapus revisi laporan
+router.delete('/deleterevisilaporan/:id', requireAuth, revisiLaporanController.deleteRevisiLaporan);
+
+// Route untuk export PDF daftar proposal mahasiswa
+router.get('/proposalta/exportpdf', auth.isLoggedIn, auth.isDosen, proposalController.exportProposalPdf);
+
+// Route untuk export PDF daftar laporan kemajuan mahasiswa
+router.get('/laporankemajuan/exportpdf', auth.isLoggedIn, auth.isDosen, laporanKemajuanController.exportLaporanKemajuanPdf);
+
+// Route untuk export PDF daftar revisi laporan mahasiswa
+router.get('/revisilaporan/exportpdf', auth.isLoggedIn, auth.isDosen, revisiLaporanController.exportRevisiLaporanPdf);
+
 module.exports = router;

@@ -3,6 +3,8 @@ const prisma = new PrismaClient();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { Prisma } = require('@prisma/client');
+const PDFDocument = require('pdfkit');
 
 // Konfigurasi multer untuk upload file
 const storage = multer.diskStorage({
@@ -357,6 +359,128 @@ const updateProposalFeedback = async (req, res) => {
   }
 };
 
+// Controller untuk menghapus proposal
+const deleteProposal = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const emailUser = req.session.user?.email;
+
+    if (!emailUser) {
+      return res.status(401).json({
+        success: false,
+        message: 'User tidak terautentikasi'
+      });
+    }
+
+    // Cari proposal berdasarkan ID dan email user
+    const proposal = await prisma.proposal_ta.findFirst({
+      where: {
+        id_proposal: parseInt(id),
+        email_user: emailUser
+      }
+    });
+
+    if (!proposal) {
+      return res.status(404).json({
+        success: false,
+        message: 'Proposal tidak ditemukan'
+      });
+    }
+
+    // Hapus file dari sistem
+    const filePath = path.join('uploads/proposals/', proposal.file_proposal);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    // Hapus data dari database
+    try {
+      await prisma.proposal_ta.delete({
+        where: { id_proposal: parseInt(id) }
+      });
+    } catch (err) {
+      if (err instanceof Prisma.NotFoundError) {
+        return res.status(404).json({
+          success: false,
+          message: 'Proposal sudah dihapus atau tidak ditemukan.'
+        });
+      }
+      throw err;
+    }
+
+    res.json({
+      success: true,
+      message: 'Proposal berhasil dihapus'
+    });
+  } catch (error) {
+    console.error('Error deleting proposal:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan saat menghapus proposal'
+    });
+  }
+};
+
+// Controller untuk export PDF daftar proposal mahasiswa
+const exportProposalPdf = async (req, res) => {
+  try {
+    if (!req.session.user || req.session.user.role !== 'DOSEN') {
+      return res.status(403).send('Unauthorized');
+    }
+    const proposals = await prisma.proposal_ta.findMany({
+      include: { user: { select: { nama: true } } },
+      orderBy: { tanggal_upload: 'desc' }
+    });
+    const doc = new PDFDocument({ margin: 25, size: 'A4' });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="daftar_proposal_mahasiswa.pdf"');
+    doc.pipe(res);
+    doc.fontSize(14).font('Helvetica-Bold').text('Daftar Proposal Mahasiswa', { align: 'center' });
+    doc.moveDown(1);
+    // Kolom: No, Nama, File, Status, Feedback
+    const col = [30, 65, 200, 340, 420, 540];
+    const rowHeight = 18;
+    let y = doc.y;
+    // Header
+    doc.fontSize(9).font('Helvetica-Bold');
+    doc.rect(col[0], y, col[5]-col[0], rowHeight).stroke();
+    doc.text('No', col[0], y + 4, { width: col[1]-col[0], align: 'center' });
+    doc.text('Nama Mahasiswa', col[1], y + 4, { width: col[2]-col[1], align: 'center' });
+    doc.text('File Proposal', col[2], y + 4, { width: col[3]-col[2], align: 'center' });
+    doc.text('Status', col[3], y + 4, { width: col[4]-col[3], align: 'center' });
+    doc.text('Feedback', col[4], y + 4, { width: col[5]-col[4], align: 'center' });
+    // Garis vertikal header
+    for (let i = 0; i < col.length; i++) {
+      doc.moveTo(col[i], y).lineTo(col[i], y + rowHeight).stroke();
+    }
+    y += rowHeight;
+    // Isi tabel
+    doc.font('Helvetica').fontSize(8);
+    proposals.forEach((item, idx) => {
+      doc.rect(col[0], y, col[5]-col[0], rowHeight).stroke();
+      doc.text(idx + 1, col[0], y + 4, { width: col[1]-col[0], align: 'center' });
+      doc.text((item.user?.nama || '-').substring(0, 30), col[1]+2, y + 4, { width: col[2]-col[1]-4, align: 'left' });
+      doc.text((item.file_proposal || '-').substring(0, 25), col[2]+2, y + 4, { width: col[3]-col[2]-4, align: 'left' });
+      doc.text((item.status_review || '-').substring(0, 15), col[3]+2, y + 4, { width: col[4]-col[3]-4, align: 'left' });
+      doc.text((item.feedback_dosen || '-').substring(0, 30), col[4]+2, y + 4, { width: col[5]-col[4]-4, align: 'left' });
+      // Garis vertikal isi
+      for (let i = 0; i < col.length; i++) {
+        doc.moveTo(col[i], y).lineTo(col[i], y + rowHeight).stroke();
+      }
+      y += rowHeight;
+      // Page break jika melebihi batas
+      if (y + rowHeight > doc.page.height - 40) {
+        doc.addPage();
+        y = 40;
+      }
+    });
+    doc.end();
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+    res.status(500).send('Gagal membuat PDF');
+  }
+};
+
 // Helper function untuk menentukan class CSS berdasarkan status
 function getStatusClass(status) {
   switch (status) {
@@ -379,5 +503,7 @@ module.exports = {
   getProposalData,
   downloadProposal,
   getAllProposalsForDosen,
-  updateProposalFeedback
+  updateProposalFeedback,
+  deleteProposal,
+  exportProposalPdf
 };
