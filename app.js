@@ -28,7 +28,7 @@ const monitoringRoutes = require('./routes/monitoringRoutes');  // Pastikan path
 const seminarRoutes = require('./routes/seminarRoutes');
 const bodyParser = require('body-parser');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
-const kalenderRoutes = require('./routes/kalenderRoutes');
+const kalenderAdminRoutes = require('./routes/kalenderAdminRoutes');
 
 app.use(session({
   secret: 'rahasiaTA', // Secret key untuk meng-hash session
@@ -67,7 +67,7 @@ app.use('/roles', roleRoutes);
 app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
 app.use(monitoringRoutes); // Pastikan route digunakan dengan benar
 app.use('/', seminarRoutes)
-app.use('/', kalenderRoutes)
+app.use('/', kalenderAdminRoutes)
 
 // Router utama
 app.use('/', indexRouter);
@@ -87,6 +87,17 @@ app.get('/approvaldospem', (req, res) => {
   res.render('dosen/approvaldospem');
 });
 
+//endpoint defult (Kalender Sidang Admin)
+app.get('/kalender-sidang', (req, res)=>{
+  res.render('admin/kalender-sidang');
+});
+
+app.post('/kalender-sidang/save', (req, res) => {
+  const { tanggal, jenis_sidang, email_user } = req.body;
+  // Simpan data ke database
+  // ...
+  res.json({ success: true }); // Mengirim respons sukses
+});
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
