@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bebanDosenController = require('../controllers/bebanDosenController');
 
+
 // Menampilkan data dosen dan beban bimbingan
 router.get('/admin/monitoring-beban', bebanDosenController.getBebanDosen);
 
