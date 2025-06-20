@@ -7,6 +7,7 @@ const session = require('express-session');
 const multer = require('multer');
 const app = express();
 
+
 app.use(session({
   secret: 'rahasiaTA', 
   resave: false,
@@ -22,7 +23,9 @@ const feedbackRoutes = require('./routes/feedbackRoutes'); // Tambahan route fee
 const roleRoutes = require('./routes/roleRoutes'); // Updated route
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
+const daftartaonlineRoutes = require('./routes/daftartaonlineRoutes');
 const authRouter = require('./routes/auth');
+const jadwalRoutes = require('./routes/jadwal');
 const topikRoutes = require('./routes/topikRoutes');
 const bookingRoutes = require('./routes/bookingRoutes'); // Import booking routes
 const monitoringRoutes = require('./routes/monitoringRoutes');  // Pastikan path ini benar
@@ -31,6 +34,7 @@ const bodyParser = require('body-parser');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
 const kalenderRoutes = require('./routes/kalenderRoutes');
 const cors = require('cors');
+
 
 app.use(cors({
   origin: 'http://localhost:3000', // Frontend URL
@@ -70,8 +74,9 @@ app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 
 
 app.use(monitoringRoutes); 
-
+app.use(daftartaonlineRoutes); // Pastikan rute ini sudah didaftarkan
 app.use('/feedback', feedbackRoutes); // Route baru untuk feedback
+app.use('/jadwal', jadwalRoutes); // Menghubungkan route jadwal
 
 app.use('/', roleRoutes);
 app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
@@ -91,6 +96,7 @@ app.use('/users', usersRouter);
 app.use('/', authRouter); // Gunakan router untuk auth (signup & signin)
 app.use('/', topikRoutes); // Menggunakan routing untuk topik
 app.use('/', bookingRoutes); // Gunakan routing untuk booking konsultasi dosen
+
 
 app.get('/bookingkonsul', (req, res) => {
   res.render('mahasiswa/bookingkonsul'); // Pastikan nama file di sini sama dengan nama file EJS

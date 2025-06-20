@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manajemen Jadwal Sidang dan Seminar</title>
+  <!-- Link CDN untuk Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+  <div class="min-h-screen flex items-center justify-center p-6">
+    <div class="container mx-auto max-w-3xl bg-white p-8 rounded-lg shadow-lg">
+      <h1 class="text-3xl font-bold text-center text-indigo-600 mb-6">Manajemen Jadwal Sidang dan Seminar</h1>
+
+      <!-- Form untuk menentukan jadwal -->
+      <form action="/jadwal/submit" method="POST" class="space-y-6">
+        <!-- Jenis Jadwal -->
+        <div>
+          <label for="jenis_jadwal" class="block text-sm font-medium text-gray-700">Jenis Jadwal</label>
+          <select id="jenis_jadwal" name="jenis_jadwal"
+            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+            <option value="Sidang">Sidang</option>
+            <option value="Seminar">Seminar</option>
+          </select>
+        </div>
+
+        <!-- Tanggal -->
+        <div>
+          <label for="tanggal" class="block text-sm font-medium text-gray-700">Tanggal</label>
+          <input type="date" id="tanggal" name="tanggal"
+            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+        </div>
+
+        <!-- Waktu -->
+        <div>
+          <label for="waktu" class="block text-sm font-medium text-gray-700">Waktu</label>
+          <input type="time" id="waktu" name="waktu"
+            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
+        </div>
+
+        <!-- Tombol Submit -->
+        <div>
+          <button type="submit"
+            class="w-full bg-indigo-600 text-white py-3 px-4 rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
+            Simpan Jadwal
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+
+</html>
