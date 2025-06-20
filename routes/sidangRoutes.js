@@ -6,6 +6,6 @@ const { getPemberianNilai, submitNilai } = require('../controllers/sidangControl
 router.get('/pemberian-nilai', getPemberianNilai);
 
 // Menangani pengiriman nilai
-router.post('/submit-nilai', submitNilai);
+router.post('/pemberian-nilai', submitNilai);
 
 module.exports = router;

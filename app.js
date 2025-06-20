@@ -30,12 +30,21 @@ const seminarRoutes = require('./routes/seminarRoutes');
 const bodyParser = require('body-parser');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
 const kalenderRoutes = require('./routes/kalenderRoutes');
+const cors = require('cors');
+
+app.use(cors({
+  origin: 'http://localhost:3000', // Frontend URL
+  credentials: true
+}));
 
 app.use(session({
-  secret: 'rahasiaTA', // Secret key untuk meng-hash session
+  secret: 'rahasiaTA',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } // jika Anda menggunakan HTTP, jika menggunakan HTTPS set ke true
+  cookie: {
+    secure: process.env.NODE_ENV === 'production', // Menggunakan https di production
+    httpOnly: true  // Cookie hanya bisa diakses oleh server
+  }
 }));
 
 // view engine setup
@@ -50,17 +59,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/favicon.ico', express.static(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 app.use(express.static('public'));
-
-// Konfigurasi session
- 
+// Menonaktifkan request untuk favicon.ico
+app.get('/favicon.ico', (req, res) => res.status(204).end())
 
 // Menggunakan body-parser untuk menangani form submissions
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
-app.use(express.static(path.join(__dirname, 'public')));
-
 
 app.use('/feedback', feedbackRoutes); // Route baru untuk feedback
 
