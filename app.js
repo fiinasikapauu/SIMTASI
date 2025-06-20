@@ -82,7 +82,7 @@ app.use(feedbackRoutes); // Ini akan membuat route /feedback tersedia
 
 app.use(monitoringRoutes); // Pastikan route digunakan dengan benar
 app.use('/', seminarRoutes)
-app.use('/', kalenderRoutes)
+app.use('/', kalenderAdminRoutes)
 
 // Router utama
 app.use('/', indexRouter);
