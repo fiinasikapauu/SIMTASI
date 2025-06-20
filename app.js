@@ -62,7 +62,9 @@ app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.use('/', monitoringRoutes);  // Tanpa '/api', langsung menggunakan '/' untuk path
+
+app.use(monitoringRoutes); 
+
 app.use('/feedback', feedbackRoutes); // Route baru untuk feedback
 
 app.use('/', roleRoutes);

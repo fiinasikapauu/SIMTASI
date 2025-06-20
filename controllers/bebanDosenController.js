@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const bebanDosenController = {
-    // Mengambil data dosen beserta beban bimbingannya
+    // Fungsi untuk menampilkan data dosen dan beban bimbingan
     async getBebanDosen(req, res) {
         try {
             const dosen = await prisma.user.findMany({
@@ -17,7 +17,7 @@ const bebanDosenController = {
         }
     },
 
-    // Mengupdate beban bimbingan dosen
+    // Fungsi untuk mengupdate beban bimbingan dosen
     async updateBebanDosen(req, res) {
         const { id } = req.params;
         const { beban_bimbingan } = req.body;
@@ -28,7 +28,7 @@ const bebanDosenController = {
                 data: { beban_bimbingan: parseInt(beban_bimbingan) },
             });
 
-            res.redirect('/admin/monitoring-beban');
+            res.redirect('/admin/monitoring-beban?success=true');
         } catch (error) {
             res.status(500).send(error.message);
         }
