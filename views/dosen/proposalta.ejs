@@ -8,29 +8,7 @@
   </head>
   <body class="bg-gray-100">
     <!-- Header -->
-    <header class="bg-green-600 text-white p-4">
-      <div class="container mx-auto flex justify-between items-center">
-        <div>
-          <h1 class="text-3xl font-bold">SIMTASI</h1>
-        </div>
-        <div>
-          <button
-            class="text-white bg-green-700 px-4 py-2 rounded-full hover:bg-green-800"
-          >
-            <span
-              style="
-                background-image: url('../images/user_icon.png');
-                background-size: cover;
-                background-position: center;
-                width: 24px;
-                height: 24px;
-                display: inline-block;
-              "
-            ></span>
-          </button>
-        </div>
-      </div>
-    </header>
+    <%- include('../partial/header.ejs') %>
 
     <!-- Main Content -->
     <div class="container mx-auto p-6">
@@ -87,6 +65,9 @@
                 <% } %>
             </tbody>
         </table>
+        <div class="flex justify-end mt-4">
+            <button id="exportPdfBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded shadow">Export PDF</button>
+        </div>
     </div>
 
     <!-- Form Feedback yang muncul setelah memilih data -->
@@ -221,6 +202,32 @@
           text: 'Terjadi kesalahan saat menyimpan feedback',
           confirmButtonText: 'OK'
         });
+      }
+    });
+    // Export PDF
+    document.getElementById('exportPdfBtn').addEventListener('click', async function() {
+      Swal.fire({
+        title: 'Membuat PDF...',
+        text: 'Mohon tunggu, file sedang digenerate',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => { Swal.showLoading(); }
+      });
+      try {
+        const response = await fetch('/proposalta/exportpdf', { method: 'GET' });
+        if (!response.ok) throw new Error('Gagal mengunduh PDF');
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'daftar_proposal_mahasiswa.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        Swal.close();
+      } catch (err) {
+        Swal.fire('Error', 'Gagal mengunduh PDF', 'error');
       }
     });
     </script>
