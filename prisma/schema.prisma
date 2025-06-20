@@ -135,7 +135,6 @@ model laporan_kemajuan {
   id_laporan        Int      @id @default(autoincrement())
   email_user        String
   file_laporan      String
-  original_filename  String   @db.VarChar(255)
   tanggal_upload    DateTime
   status_review     String
   feedback_dosen    String
