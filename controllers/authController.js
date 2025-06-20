@@ -99,6 +99,7 @@ exports.login = async (req, res) => {
     req.session.user = {
       email: user.email_user,
       nama: user.nama,
+      nomorInduk: user.nomorInduk,
       role: user.role
     };
 
