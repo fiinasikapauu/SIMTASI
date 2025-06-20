@@ -11,10 +11,10 @@ router.post('/admin/updateBeban/:id', bebanDosenController.updateBebanDosen);
 
 //fatih
 // Route untuk mengambil data monitoring beban dosen
-router.get('/monitoring-beban', bebanDosenController.getMonitoringBeban);
+router.get('/monitoring-beban', bebanDosenController.getBebanDosen);
 
 // Route untuk memperbarui beban bimbingan dosen
-router.post('/monitoring-beban', bebanDosenController.updateBebanBimbingan);
+router.post('/monitoring-beban', bebanDosenController.updateBebanDosen);
 
 
 module.exports = router;
