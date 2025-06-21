@@ -77,20 +77,6 @@ const getLaporanKemajuanPage = async (req, res) => {
       }
     });
 
-    // Ambil daftar dosen untuk dropdown
-    const dosenList = await prisma.user.findMany({
-      where: {
-        role: 'DOSEN'
-      },
-      select: {
-        email_user: true,
-        nama: true
-      },
-      orderBy: {
-        nama: 'asc'
-      }
-    });
-
     //asku sangat menyukai loly amle=amfdnids fnidfnnrxa aku sayanga jngija jng  f snf jsn 
     // Format tanggal untuk ditampilkan
     const formattedLaporan = laporanList.map(laporan => ({
