@@ -4,6 +4,7 @@ const topikController = require('../controllers/topikController');
 const router = express.Router();
 const monitoringController = require('../controllers/monitoringController');
 const approvalController = require('../controllers/approvalController');
+const { getFinishedTA } = require('../controllers/galeriController');  // Impor controller
 
 // Route untuk menangani GET Daftar Topik
 router.get('/daftartopikta', (req, res) => {
@@ -30,5 +31,8 @@ router.get('/approvaldospem', approvalController.getApprovalData);
 
 // Route untuk menerima dan memproses persetujuan dosen
 router.post('/approvaldospem', approvalController.updateApprovalStatus);
+
+// Route untuk menampilkan Galeri Judul TA yang Selesai
+router.get('/galerijudulTA', getFinishedTA);
 
 module.exports = router;

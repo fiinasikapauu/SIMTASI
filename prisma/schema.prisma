@@ -66,7 +66,7 @@ model pendaftaran_ta {
   id_dosen_pembimbing String
   user                user     @relation(fields: [email_user], references: [email_user], map: "Pendaftaran_TA_email_user_fkey")
   topikta             topikta  @relation(fields: [id_topikta], references: [id_topikta], map: "Pendaftaran_TA_id_topikta_fkey")
-
+  
   @@index([email_user], map: "Pendaftaran_TA_email_user_fkey")
   @@index([id_topikta], map: "Pendaftaran_TA_id_topikta_fkey")
 }
