@@ -65,7 +65,7 @@ model pendaftaran_ta {
   status_approval     String
   id_dosen_pembimbing String
 
-  // relasi
+  // Relasi
   user        user        @relation(fields: [email_user], references: [email_user])
   topikta     topikta     @relation(fields: [id_topikta], references: [id_topikta])
   sidang_ta   sidang_ta?  @relation("PendaftaranSidang") // <-- cukup field relasi saja
@@ -120,8 +120,8 @@ model sidang_ta {
   nilai_akhir       Float
   user              user     @relation(fields: [email_user], references: [email_user], map: "Sidang_TA_email_user_fkey")
 
+  pendaftaran_ta   pendaftaran_ta @relation("PendaftaranSidang", fields: [id_pendaftaran], references: [id_pendaftaran])
   @@index([email_user])
-  // tidak perlu @@index([id_pendaftaran]) karena @unique sudah otomatis membuat index
 }
 
 
