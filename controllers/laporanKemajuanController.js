@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const PDFDocument = require('pdfkit');
+const { defineDmmfProperty } = require('@prisma/client/runtime/library');
 
 // Konfigurasi multer untuk upload file
 const storage = multer.diskStorage({
@@ -62,6 +63,7 @@ const getLaporanKemajuanPage = async (req, res) => {
       }
     });
 
+    //asku sangat menyukai loly amle=amfdnids fnidfnnrxa aku sayanga jngija jng  f snf jsn 
     // Format tanggal untuk ditampilkan
     const formattedLaporan = laporanList.map(laporan => ({
       ...laporan,

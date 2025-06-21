@@ -24,6 +24,7 @@ app.use((req, res, next) => {
   next();
 });
 
+
 const feedbackRoutes = require('./routes/feedbackRoutes'); // Tambahan route feedback
 const roleRoutes = require('./routes/roleRoutes'); // Updated route
 const indexRouter = require('./routes/index');
@@ -39,6 +40,7 @@ const seminarRoutes = require('./routes/seminarRoutes');
 const bodyParser = require('body-parser');
 const pemberianNilaiRoute = require("./routes/pemberianNilai");
 const kalenderAdminRoutes = require('./routes/kalenderAdminRoutes');
+const riwayatRoutes = require('./routes/riwayatfeedbackdosenRoutes');
 const cors = require('cors');
 
 
@@ -80,15 +82,13 @@ app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 
 
 app.use(monitoringRoutes); 
-app.use(daftartaonlineRoutes); // Pastikan rute ini sudah didaftarkan
-app.use("/draftsidang", draftSidangRoute);
+
 app.use('/feedback', feedbackRoutes); // Route baru untuk feedback
-app.use("/jadwal", jadwalRoute);
 
 app.use('/', roleRoutes);
 app.use("/sidang/pemberian-nilai", pemberianNilaiRoute);
 
-
+app.use(riwayatRoutes);
 
 app.use(feedbackRoutes); // Ini akan membuat route /feedback tersedia
 
