@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Pastikan direktori upload ada
-const uploadDir = path.join(__dirname, '../uploads/draftsemhas');
+const uploadDir = path.join(__dirname, '../uploads/draftsidang');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -23,19 +23,19 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Controller untuk menampilkan halaman
-const getDraftSemhasPage = async (req, res) => {
+const getDraftSidangPage = async (req, res) => {
   try {
     const emailUser = req.session.user?.email;
-    const drafts = await prisma.draft_semhas.findMany({
+    const drafts = await prisma.draft_sidang.findMany({
       where: { email_user: emailUser },
-      orderBy: { tanggal_upload: 'desc' },
+      orderBy: { tgl_upload: 'desc' },
     });
-    res.render('mahasiswa/uploaddraftsemhas', {
+    res.render('mahasiswa/uploaddraftsidang', {
       user: req.session.user,
       drafts: drafts.map((d) => ({
         ...d,
-        tanggal_upload_formatted: d.tanggal_upload
-          ? new Date(d.tanggal_upload).toLocaleDateString('id-ID', {
+        tgl_upload_formatted: d.tgl_upload
+          ? new Date(d.tgl_upload).toLocaleDateString('id-ID', {
               day: '2-digit',
               month: 'long',
               year: 'numeric',
@@ -49,7 +49,7 @@ const getDraftSemhasPage = async (req, res) => {
   }
 };
 
-const uploadDraftSemhas = async (req, res) => {
+const uploadDraftSidang = async (req, res) => {
   try {
     const emailUser = req.session.user?.email;
     if (!emailUser) {
@@ -61,25 +61,25 @@ const uploadDraftSemhas = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: 'File draft seminar hasil harus diupload',
+        message: 'File draft sidang harus diupload',
       });
     }
-    const newDraftSemhas = await prisma.draft_semhas.create({
+    const newDraftSidang = await prisma.draft_sidang.create({
       data: {
         email_user: emailUser,
-        file_draft: req.file.filename,
-        tanggal_upload: new Date(),
-        status: 'Menunggu',
-        tanggapan_dosen: '-',
+        file_draft_sidang: req.file.filename,
+        tgl_upload: new Date(),
+        status_draft: 'Menunggu',
+        balasan_dosen: '-',
       },
     });
     res.json({
       success: true,
-      message: 'Draft seminar hasil berhasil diupload',
-      data: newDraftSemhas,
+      message: 'Draft sidang berhasil diupload',
+      data: newDraftSidang,
     });
   } catch (error) {
-    console.error('Error uploading draft seminar hasil:', error);
+    console.error('Error uploading draft sidang:', error);
     if (req.file) {
       const filePath = path.join(uploadDir, req.file.filename);
       if (fs.existsSync(filePath)) {
@@ -88,13 +88,13 @@ const uploadDraftSemhas = async (req, res) => {
     }
     res.status(500).json({
       success: false,
-      message: 'Terjadi kesalahan saat mengupload draft seminar hasil',
+      message: 'Terjadi kesalahan saat mengupload draft sidang',
       error: error.message,
     });
   }
 };
 
-const deleteDraftSemhas = async (req, res) => {
+const deleteDraftSidang = async (req, res) => {
   const { id } = req.params;
   const emailUser = req.session.user?.email;
 
@@ -104,8 +104,8 @@ const deleteDraftSemhas = async (req, res) => {
     }
 
     // Temukan record terlebih dahulu untuk mendapatkan nama file
-    const draft = await prisma.draft_semhas.findUnique({
-      where: { id_semhas: parseInt(id) },
+    const draft = await prisma.draft_sidang.findUnique({
+      where: { id_draftsidang: parseInt(id) },
     });
 
     if (!draft || draft.email_user !== emailUser) {
@@ -113,12 +113,12 @@ const deleteDraftSemhas = async (req, res) => {
     }
 
     // Hapus record dari database TERLEBIH DAHULU
-    await prisma.draft_semhas.delete({
-      where: { id_semhas: parseInt(id) },
+    await prisma.draft_sidang.delete({
+      where: { id_draftsidang: parseInt(id) },
     });
 
     // Kemudian, coba hapus file dari filesystem secara asynchronous
-    const filePath = path.join(uploadDir, draft.file_draft);
+    const filePath = path.join(uploadDir, draft.file_draft_sidang);
     fs.unlink(filePath, (err) => {
       if (err) {
         // Jika gagal, catat error di server tapi jangan kirim error ke client
@@ -139,8 +139,8 @@ const deleteDraftSemhas = async (req, res) => {
 };
 
 module.exports = {
-  getDraftSemhasPage,
-  uploadDraftSemhas,
-  deleteDraftSemhas,
+  getDraftSidangPage,
+  uploadDraftSidang,
+  deleteDraftSidang,
   upload,
 };

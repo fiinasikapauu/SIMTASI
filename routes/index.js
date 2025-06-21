@@ -45,13 +45,6 @@ router.get("/uploadrevisilaporan", requireAuth, revisiLaporanController.getRevis
 router.get("/revisilaporan", auth.isLoggedIn, auth.isDosen, revisiLaporanController.getAllRevisiForDosen);
 router.post("/revisilaporan/feedback", auth.isLoggedIn, auth.isDosen, revisiLaporanController.updateRevisiFeedback);
 
-router.get("/uploaddraftsemhas", (req, res) => {
-  res.render("mahasiswa/uploaddraftsemhas", { user: req.session.user });
-});
-
-router.get("/uploaddraftsidang", (req, res) => {
-  res.render("mahasiswa/uploaddraftsidang", { user: req.session.user });
-});
 
 // Route untuk menampilkan halaman proposal
 router.get('/proposal', requireAuth, proposalController.getProposalPage);

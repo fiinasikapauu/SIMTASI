@@ -1,259 +1,302 @@
 <!DOCTYPE html>
 <html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Draft Sidang</title>
+    <link rel="stylesheet" href="/stylesheets/output.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      /* Additional styles for modal */
+      .modal-overlay {
+        backdrop-filter: blur(4px);
+      }
+      
+      .modal-content {
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      
+      .file-link:hover {
+        color: #059669 !important;
+        text-decoration: underline;
+      }
+      
+      /* Loading spinner */
+      .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #059669;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Draft Sidang</title>
-  <link rel="stylesheet" href="/stylesheets/output.css" />
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <style>
-    /* Additional styles for modal */
-    .modal-overlay {
-      backdrop-filter: blur(4px);
-    }
-    
-    .modal-content {
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    
-    .file-link:hover {
-      color: #059669 !important;
-      text-decoration: underline;
-    }
-    
-    /* Loading spinner */
-    .loading-spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #059669;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
-</head>
+  <body class="bg-gray-100">
+    <!-- Header -->
+    <%- include('../partial/header.ejs') %>
 
-<body class="bg-gray-100">
-  <!-- Header -->
-  <header class="bg-green-600 text-white p-4">
-    <div class="container mx-auto flex justify-between items-center">
-      <div>
-        <h1 class="text-3xl font-bold">SIMTASI</h1>
-      </div>
-      <div>
-        <button class="text-white bg-green-700 px-4 py-2 rounded-full hover:bg-green-800">
-          <span
-            style="background-image: url('../images/user_icon.png'); background-size: cover; background-position: center; width: 24px; height: 24px; display: inline-block;"></span>
-        </button>
-      </div>
-    </div>
-  </header>
+    <!-- Main Content -->
+    <div class="container mx-auto p-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Sidebar -->
+        <%- include('../sidebar/sidebarmahasiswa.ejs') %>
 
-  <!-- Main Content -->
-  <div class="container mx-auto p-6">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Sidebar -->
-      <%- include('../sidebar/sidebarmahasiswa.ejs') %>
+        <!-- Main Content Area -->
+        <div class="col-span-2 bg-white p-6 rounded-lg shadow-lg">
+          <h2 class="text-5xl font-semibold text-green-600 mb-6">Draft Sidang</h2>
 
-      <!-- Main Content Area -->
-      <div class="col-span-2 bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-5xl font-semibold text-green-600 mb-6">Draft Sidang</h2>
+          <div class="max-w-4xl mx-auto px-4 py-10">
+            <!-- Form Upload File -->
+            <form action="/uploaddraftsidang" method="POST" enctype="multipart/form-data" id="uploadForm">
+              <label for="draftSidangFile" class="block text-lg font-medium text-green-600 mb-4">Pilih File Draft Sidang
+                (PDF/DOC)</label>
+              <!-- Box untuk upload -->
+              <div class="border-2 border-green-500 p-6 rounded-lg text-left bg-green-100">
+                <!-- Flex container untuk tombol dan status -->
+                <div class="flex flex-row items-center">
+                  <!-- Tombol Choose File -->
+                  <label for="draftSidangFile"
+                    class="bg-green-500 text-white px-6 py-3 rounded-lg cursor-pointer hover:bg-green-700 transition">
+                    Choose File Draft Sidang
+                  </label>
+                  <input type="file" id="draftSidangFile" name="draftSidangFile" accept=".pdf,.doc,.docx" class="hidden"
+                    required>
 
-        <div class="max-w-4xl mx-auto px-4 py-10">
-          <!-- Form Upload File -->
-          <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
-            <label for="draftSidangFile" class="block text-lg font-medium text-green-600 mb-4">Pilih File Draft Sidang
-              (PDF/DOC)</label>
-            <!-- Box untuk upload -->
-            <div class="border-2 border-green-500 p-6 rounded-lg text-left bg-green-100">
-              <!-- Flex container untuk tombol dan status -->
-              <div class="flex flex-row items-center">
-                <!-- Tombol Choose File -->
-                <label for="draftSidangFile"
-                  class="bg-green-500 text-white px-6 py-3 rounded-lg cursor-pointer hover:bg-green-700 transition">
-                  Choose File Draft Sidang
-                </label>
-                <input type="file" id="draftSidangFile" name="draftSidangFile" accept=".pdf,.doc,.docx" class="hidden"
-                  required>
-
-                <!-- Status nama file -->
-                <p id="fileName" class="mt-4 text-sm text-gray-600 ml-4 text-center mb-4">No file chosen</p>
+                  <!-- Status nama file -->
+                  <p id="fileName" class="mt-4 text-sm text-gray-600 ml-4 text-center mb-4">No file chosen</p>
+                </div>
               </div>
-            </div>
 
-            <!-- Tombol Upload -->
-            <div class="flex justify-center mt-6">
-              <button type="submit"
-                class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition w-full">
-                Upload Draft Sidang
-              </button>
-            </div>
-          </form>
+              <!-- Tombol Upload -->
+              <div class="flex justify-center mt-6">
+                <button type="submit"
+                  class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition w-full">
+                  Upload Draft Sidang
+                </button>
+              </div>
+            </form>
 
-          <!-- Tabel untuk Menampilkan Data Upload -->
-          <div class="mt-6 overflow-x-auto">
-            <h3 class="text-2xl font-semibold text-green-600 mb-4">Daftar Draft Sidang Yang Diupload</h3>
-            <table class="min-w-full table-auto border-collapse bg-white">
-              <thead class="bg-green-500 text-white">
-                <tr>
-                  <th class="py-2 px-4 text-left font-medium">File Draft Sidang</th>
-                  <th class="py-2 px-4 text-left font-medium">Tanggal Upload</th>
-                  <th class="py-2 px-4 text-left font-medium">Status</th>
-                  <th class="py-2 px-4 text-left font-medium">Feedback</th>
-                </tr>
-              </thead>
-              <tbody id="fileTableBody">
-                <% if (typeof proposals !== 'undefined' && proposals.length > 0) { %>
-                  <% proposals.forEach(function(item) { %>
-                    <tr class="border-b border-gray-200 text-sm">
-                      <td class="py-2 px-4 whitespace-nowrap">
-                        <a href="/uploads/draftsidang/<%= item.file_draftsidang %>" 
-                           download="<%= item.file_draftsidang.split('/').pop() %>"
-                           class="text-green-700 underline hover:text-green-900 font-normal truncate block max-w-xs file-download-link file-link cursor-pointer" 
-                           title="Klik untuk download: <%= item.file_draftsidang.split('/').pop() %>">
-                          📄 <%= item.file_draftsidang.split('/').pop() %>
-                        </a>
-                      </td>
-                      <td class="py-2 px-4 whitespace-nowrap text-gray-600"><%= item.tanggal_upload_formatted %></td>
-                      <td class="py-2 px-4">
-                        <% if(item.status_review === 'Menunggu Review'){ %>
-                          <span class="inline-block bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded">Menunggu Review</span>
-                        <% } else if(item.status_review === 'Disetujui'){ %>
-                          <span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">Disetujui</span>
-                        <% } else if(item.status_review === 'Ditolak'){ %>
-                          <span class="inline-block bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded">Ditolak</span>
-                        <% } else if(item.status_review === 'Revisi'){ %>
-                          <span class="inline-block bg-orange-100 text-orange-800 text-xs font-semibold px-2 py-1 rounded">Revisi</span>
-                        <% } else { %>
-                          <span class="inline-block bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-1 rounded"><%= item.status_review %></span>
-                        <% } %>
-                      </td>
-                      <td class="py-2 px-4 max-w-xs truncate" title="<%= item.feedback_dosen %>">
-                        <% if(!item.feedback_dosen || item.feedback_dosen === '-') { %>
-                          <span class="italic text-gray-400">Belum ada feedback</span>
-                        <% } else { %>
-                          <span class="text-gray-700 font-normal"><%= item.feedback_dosen.length > 40 ? item.feedback_dosen.substring(0, 40) + '...' : item.feedback_dosen %></span>
-                        <% } %>
-                      </td>
-                    </tr>
-                  <% }) %>
-                <% } else { %>
-                  <tr><td colspan="4" class="text-center py-4 text-gray-400">Belum ada draft sidang diupload</td></tr>
-                <% } %>
-              </tbody>
-            </table>
+            <!-- Tabel untuk Menampilkan Data Upload -->
+            <div class="mt-6 overflow-x-auto">
+              <h3 class="text-2xl font-semibold text-green-600 mb-4">Daftar Draft Sidang Yang Diupload</h3>
+              <table class="min-w-full table-auto border-collapse bg-white">
+                <thead class="bg-green-500 text-white">
+                  <tr>
+                    <th class="py-2 px-4 text-left font-medium">File Draft Sidang</th>
+                    <th class="py-2 px-4 text-left font-medium">Tanggal Upload</th>
+                    <th class="py-2 px-4 text-left font-medium">Status</th>
+                    <th class="py-2 px-4 text-left font-medium">Balasan Dosen</th>
+                    <th class="py-2 px-4 text-left font-medium">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="fileTableBody">
+                  <% if (typeof drafts !== 'undefined' && drafts.length > 0) { %>
+                    <% drafts.forEach(function(item) { %>
+                      <tr class="border-b border-gray-200 text-sm">
+                        <td class="py-2 px-4 whitespace-nowrap">
+                          <a href="/uploads/draftsidang/<%= item.file_draft_sidang %>" 
+                            download="<%= item.file_draft_sidang.split('/').pop() %>"
+                            class="text-green-700 underline hover:text-green-900 font-normal truncate block max-w-xs file-download-link file-link cursor-pointer" 
+                            title="Klik untuk download: <%= item.file_draft_sidang.split('/').pop() %>">
+                            📄 <%= item.file_draft_sidang.split('/').pop() %>
+                          </a>
+                        </td>
+                        <td class="py-2 px-4 whitespace-nowrap text-gray-600"><%= item.tgl_upload_formatted %></td>
+                        <td class="py-2 px-4">
+                          <% if(item.status === 'Menunggu'){ %>
+                            <span class="inline-block bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded">Menunggu</span>
+                          <% } else if(item.status === 'Disetujui'){ %>
+                            <span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">Disetujui</span>
+                          <% } else if(item.status === 'Ditolak'){ %>
+                            <span class="inline-block bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded">Ditolak</span>
+                          <% } else if(item.status === 'Revisi'){ %>
+                            <span class="inline-block bg-orange-100 text-orange-800 text-xs font-semibold px-2 py-1 rounded">Revisi</span>
+                          <% } else { %>
+                            <span class="inline-block bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-1 rounded"><%= item.status %></span>
+                          <% } %>
+                        </td>
+                        <td class="py-2 px-4 max-w-xs truncate" title="<%= item.balasan_dosen %>">
+                          <% if(!item.balasan_dosen || item.balasan_dosen === '-') { %>
+                            <span class="italic text-gray-400">Belum ada balasan</span>
+                          <% } else { %>
+                            <span class="text-gray-700 font-normal"><%= item.balasan_dosen.length > 40 ? item.balasan_dosen.substring(0, 40) + '...' : item.balasan_dosen %></span>
+                          <% } %>
+                        </td>
+                        <td class="py-2 px-4">
+                          <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition delete-btn" data-id="<%= item.id_draftsidang %>">
+                            Hapus
+                          </button>
+                        </td>
+                      </tr>
+                    <% }) %>
+                  <% } else { %>
+                    <tr><td colspan="5" class="text-center py-4 text-gray-400">Belum ada draft sidang diupload</td></tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Footer -->
-  <footer class="bg-green-600 text-white text-center p-4 mt-6">
-    <p>&copy; 2025 Sistem Informasi - Fakultas Teknologi Informasi</p>
-  </footer>
+    <!-- Footer -->
+    <footer class="bg-green-600 text-white text-center p-4 mt-6">
+      <p>&copy; 2025 Sistem Informasi - Fakultas Teknologi Informasi</p>
+    </footer>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // Display the selected file name
-      const inputFile = document.getElementById('draftSidangFile');
-      const fileNameDisplay = document.getElementById('fileName');
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Display the selected file name
+        const inputFile = document.getElementById('draftSidangFile');
+        const fileNameDisplay = document.getElementById('fileName');
 
-      // Enable button when a file is selected
-      inputFile.addEventListener('change', () => {
-        if (inputFile.files.length > 0) {
-          fileNameDisplay.textContent = inputFile.files[0].name;
-        } else {
-          fileNameDisplay.textContent = "No file chosen";
-        }
-      });
-
-      // Handle form submission
-      document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const formData = new FormData();
-        const fileInput = document.getElementById('draftSidangFile');
-        
-        if (fileInput.files.length === 0) {
-          Swal.fire({
-            icon: 'warning',
-            title: 'Peringatan',
-            text: 'Pilih file terlebih dahulu!'
-          });
-          return;
-        }
-        
-        // Show loading
-        Swal.fire({
-          title: 'Mengupload...',
-          text: 'Mohon tunggu, file sedang diupload',
-          allowOutsideClick: false,
-          showConfirmButton: false,
-          willOpen: () => {
-            Swal.showLoading();
+        // Enable button when a file is selected
+        inputFile.addEventListener('change', () => {
+          if (inputFile.files.length > 0) {
+            fileNameDisplay.textContent = inputFile.files[0].name;
+          } else {
+            fileNameDisplay.textContent = "No file chosen";
           }
         });
-        
-        formData.append('draftSidangFile', fileInput.files[0]);
-        
-        try {
-          const response = await fetch('/upload', {
-            method: 'POST',
-            body: formData,
-            credentials: 'same-origin'
+
+        // Handle form submission
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          const formData = new FormData();
+          const fileInput = document.getElementById('draftSidangFile');
+          
+          if (fileInput.files.length === 0) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Peringatan',
+              text: 'Pilih file terlebih dahulu!'
+            });
+            return;
+          }
+          
+          // Show loading
+          Swal.fire({
+            title: 'Mengupload...',
+            text: 'Mohon tunggu, file sedang diupload',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+              Swal.showLoading();
+            }
           });
           
-          const result = await response.json();
+          formData.append('draftSidangFile', fileInput.files[0]);
           
-          if (result.success) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Berhasil!',
-              text: 'Draft Sidang berhasil diupload!'
-            }).then(() => {
-              location.reload(); // Reload halaman untuk menampilkan data terbaru
+          try {
+            const response = await fetch('/uploaddraftsidang', {
+              method: 'POST',
+              body: formData,
+              credentials: 'same-origin'
             });
-          } else {
+            
+            const result = await response.json();
+            
+            if (result.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Draft Sidang berhasil diupload!'
+              }).then(() => {
+                location.reload(); // Reload halaman untuk menampilkan data terbaru
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Gagal Upload',
+                text: result.message || 'Terjadi kesalahan saat upload'
+              });
+            }
+          } catch (error) {
+            console.error('Error:', error);
             Swal.fire({
               icon: 'error',
-              title: 'Gagal Upload',
-              text: result.message || 'Terjadi kesalahan saat upload'
+              title: 'Error',
+              text: 'Terjadi kesalahan saat upload file'
             });
           }
-        } catch (error) {
-          console.error('Error:', error);
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Terjadi kesalahan saat upload file'
-          });
-        }
-      });
+        });
 
-      // Handle file download click
-      document.getElementById('fileTableBody').addEventListener('click', function(e) {
-        const link = e.target.closest('.file-download-link');
-        if (link) {
-          // Show download notification
-          Swal.fire({
-            icon: 'info',
-            title: 'Download Dimulai',
-            text: 'File sedang didownload...',
-            timer: 2000,
-            showConfirmButton: false
-          });
-        }
-      });
-    });
-  </script>
-</body>
+        // Handle file download click
+        document.getElementById('fileTableBody').addEventListener('click', function(e) {
+          const link = e.target.closest('.file-download-link');
+          if (link) {
+            // Show download notification
+            Swal.fire({
+              icon: 'info',
+              title: 'Download Dimulai',
+              text: 'File sedang didownload...',
+              timer: 2000,
+              showConfirmButton: false
+            });
+          }
+        });
 
+        // Handle delete button click
+        document.getElementById('fileTableBody').addEventListener('click', async (e) => {
+          if (e.target.classList.contains('delete-btn')) {
+            const draftId = e.target.dataset.id;
+            
+            const result = await Swal.fire({
+              title: 'Anda yakin?',
+              text: "File yang dihapus tidak dapat dikembalikan!",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#d33',
+              cancelButtonColor: '#3085d6',
+              confirmButtonText: 'Ya, hapus!',
+              cancelButtonText: 'Batal'
+            });
+
+            if (result.isConfirmed) {
+              try {
+                const response = await fetch(`/uploaddraftsidang/${draftId}`, {
+                  method: 'DELETE',
+                  credentials: 'same-origin'
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                  Swal.fire(
+                    'Dihapus!',
+                    'File Anda telah berhasil dihapus.',
+                    'success'
+                  ).then(() => {
+                    location.reload();
+                  });
+                } else {
+                  Swal.fire(
+                    'Gagal!',
+                    result.message || 'Terjadi kesalahan saat menghapus file.',
+                    'error'
+                  );
+                }
+              } catch (error) {
+                Swal.fire(
+                  'Error!',
+                  'Tidak dapat terhubung ke server.',
+                  'error'
+                );
+              }
+            }
+          }
+        });
+      });
+    </script>
+  </body>
 </html>

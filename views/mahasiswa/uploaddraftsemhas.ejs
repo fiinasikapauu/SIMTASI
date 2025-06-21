@@ -42,19 +42,7 @@
 
 <body class="bg-gray-100">
   <!-- Header -->
-  <header class="bg-green-600 text-white p-4">
-    <div class="container mx-auto flex justify-between items-center">
-      <div>
-        <h1 class="text-3xl font-bold">SIMTASI</h1>
-      </div>
-      <div>
-        <button class="text-white bg-green-700 px-4 py-2 rounded-full hover:bg-green-800">
-          <span
-            style="background-image: url('../images/user_icon.png'); background-size: cover; background-position: center; width: 24px; height: 24px; display: inline-block;"></span>
-        </button>
-      </div>
-    </div>
-  </header>
+  <%- include('../partial/header.ejs') %>
 
   <!-- Main Content -->
   <div class="container mx-auto p-6">
@@ -68,7 +56,7 @@
 
         <div class="max-w-4xl mx-auto px-4 py-10">
           <!-- Form Upload File -->
-          <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+          <form action="/uploaddraftsemhas" method="POST" enctype="multipart/form-data" id="uploadForm">
             <label for="draftSemhasFile" class="block text-lg font-medium text-green-600 mb-4">Pilih File Draft Seminar Hasil
               (PDF/DOC)</label>
             <!-- Box untuk upload -->
@@ -106,46 +94,52 @@
                   <th class="py-2 px-4 text-left font-medium">File Draft Seminar Hasil</th>
                   <th class="py-2 px-4 text-left font-medium">Tanggal Upload</th>
                   <th class="py-2 px-4 text-left font-medium">Status</th>
-                  <th class="py-2 px-4 text-left font-medium">Feedback</th>
+                  <th class="py-2 px-4 text-left font-medium">Tanggapan Dosen</th>
+                  <th class="py-2 px-4 text-left font-medium">Aksi</th>
                 </tr>
               </thead>
               <tbody id="fileTableBody">
-                <% if (typeof proposals !== 'undefined' && proposals.length > 0) { %>
-                  <% proposals.forEach(function(item) { %>
+                <% if (typeof drafts !== 'undefined' && drafts.length > 0) { %>
+                  <% drafts.forEach(function(item) { %>
                     <tr class="border-b border-gray-200 text-sm">
                       <td class="py-2 px-4 whitespace-nowrap">
-                        <a href="/uploads/draftsemhas/<%= item.file_draftsemhas %>" 
-                           download="<%= item.file_draftsemhas.split('/').pop() %>"
+                        <a href="/uploads/draftsemhas/<%= item.file_draft %>" 
+                           download="<%= item.file_draft.split('/').pop() %>"
                            class="text-green-700 underline hover:text-green-900 font-normal truncate block max-w-xs file-download-link file-link cursor-pointer" 
-                           title="Klik untuk download: <%= item.file_draftsemhas.split('/').pop() %>">
-                          📄 <%= item.file_draftsemhas.split('/').pop() %>
+                           title="Klik untuk download: <%= item.file_draft.split('/').pop() %>">
+                          📄 <%= item.file_draft.split('/').pop() %>
                         </a>
                       </td>
                       <td class="py-2 px-4 whitespace-nowrap text-gray-600"><%= item.tanggal_upload_formatted %></td>
                       <td class="py-2 px-4">
-                        <% if(item.status_review === 'Menunggu Review'){ %>
-                          <span class="inline-block bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded">Menunggu Review</span>
-                        <% } else if(item.status_review === 'Disetujui'){ %>
+                        <% if(item.status === 'Menunggu'){ %>
+                          <span class="inline-block bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded">Menunggu</span>
+                        <% } else if(item.status === 'Disetujui'){ %>
                           <span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">Disetujui</span>
-                        <% } else if(item.status_review === 'Ditolak'){ %>
+                        <% } else if(item.status === 'Ditolak'){ %>
                           <span class="inline-block bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded">Ditolak</span>
-                        <% } else if(item.status_review === 'Revisi'){ %>
+                        <% } else if(item.status === 'Revisi'){ %>
                           <span class="inline-block bg-orange-100 text-orange-800 text-xs font-semibold px-2 py-1 rounded">Revisi</span>
                         <% } else { %>
-                          <span class="inline-block bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-1 rounded"><%= item.status_review %></span>
+                          <span class="inline-block bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-1 rounded"><%= item.status %></span>
                         <% } %>
                       </td>
-                      <td class="py-2 px-4 max-w-xs truncate" title="<%= item.feedback_dosen %>">
-                        <% if(!item.feedback_dosen || item.feedback_dosen === '-') { %>
-                          <span class="italic text-gray-400">Belum ada feedback</span>
+                      <td class="py-2 px-4 max-w-xs truncate" title="<%= item.tanggapan_dosen %>">
+                        <% if(!item.tanggapan_dosen || item.tanggapan_dosen === '-') { %>
+                          <span class="italic text-gray-400">Belum ada tanggapan</span>
                         <% } else { %>
-                          <span class="text-gray-700 font-normal"><%= item.feedback_dosen.length > 40 ? item.feedback_dosen.substring(0, 40) + '...' : item.feedback_dosen %></span>
+                          <span class="text-gray-700 font-normal"><%= item.tanggapan_dosen.length > 40 ? item.tanggapan_dosen.substring(0, 40) + '...' : item.tanggapan_dosen %></span>
                         <% } %>
+                      </td>
+                      <td class="py-2 px-4">
+                        <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition delete-btn" data-id="<%= item.id_semhas %>">
+                          Hapus
+                        </button>
                       </td>
                     </tr>
                   <% }) %>
                 <% } else { %>
-                  <tr><td colspan="4" class="text-center py-4 text-gray-400">Belum ada draft seminar hasil diupload</td></tr>
+                  <tr><td colspan="5" class="text-center py-4 text-gray-400">Belum ada draft seminar hasil diupload</td></tr>
                 <% } %>
               </tbody>
             </table>
@@ -205,7 +199,7 @@
         formData.append('draftSemhasFile', fileInput.files[0]);
         
         try {
-          const response = await fetch('/upload', {
+          const response = await fetch('/uploaddraftsemhas', {
             method: 'POST',
             body: formData,
             credentials: 'same-origin'
@@ -250,6 +244,57 @@
             timer: 2000,
             showConfirmButton: false
           });
+        }
+      });
+
+      // Handle delete button click
+      document.getElementById('fileTableBody').addEventListener('click', async (e) => {
+        if (e.target.classList.contains('delete-btn')) {
+          const draftId = e.target.dataset.id;
+          
+          const result = await Swal.fire({
+            title: 'Anda yakin?',
+            text: "File yang dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+          });
+
+          if (result.isConfirmed) {
+            try {
+              const response = await fetch(`/uploaddraftsemhas/${draftId}`, {
+                method: 'DELETE',
+                credentials: 'same-origin'
+              });
+
+              const result = await response.json();
+
+              if (result.success) {
+                Swal.fire(
+                  'Dihapus!',
+                  'File Anda telah berhasil dihapus.',
+                  'success'
+                ).then(() => {
+                  location.reload();
+                });
+              } else {
+                Swal.fire(
+                  'Gagal!',
+                  result.message || 'Terjadi kesalahan saat menghapus file.',
+                  'error'
+                );
+              }
+            } catch (error) {
+              Swal.fire(
+                'Error!',
+                'Tidak dapat terhubung ke server.',
+                'error'
+              );
+            }
+          }
         }
       });
     });

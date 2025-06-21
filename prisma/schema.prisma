@@ -27,8 +27,10 @@ model user {
   pendaftaran_ta   pendaftaran_ta[]
   proposal_ta      proposal_ta[]
   revisi_laporan   revisi_laporan[]
-  seminar_hasil    seminar_hasil[]
+  draft_semhas     draft_semhas[]
   sidang_ta        sidang_ta[]
+  draft_sidang     draft_sidang[]
+  pendaftaran_semhas pendaftaran_semhas[]
   timeline_project timeline_project[]
   laporan_kemajuan laporan_kemajuan[]
   feedback         feedback[]         // Relasi balik ke model feedback
@@ -95,22 +97,21 @@ model revisi_laporan {
   @@index([email_user], map: "Revisi_Laporan_email_user_fkey")
 }
 
-model seminar_hasil {
-  id_semhas      Int      @id @default(autoincrement())
-  email_user     String
-  file_draft     String
-  tanggal_daftar DateTime
-  status         String
-  jadwal         DateTime
-  user           user     @relation(fields: [email_user], references: [email_user], map: "Seminar_Hasil_email_user_fkey")
+model draft_semhas {
+  id_semhas       Int       @id @default(autoincrement())
+  email_user      String
+  file_draft      String
+  tanggal_upload  DateTime?
+  tanggapan_dosen String?
+  status          String
+  user            user      @relation(fields: [email_user], references: [email_user])
 
-  @@index([email_user], map: "Seminar_Hasil_email_user_fkey")
+  @@index([email_user])
 }
 
 model sidang_ta {
   id_sidang         Int      @id @default(autoincrement())
   email_user        String
-  file_draft_sidang String
   tanggal_daftar    DateTime
   jadwal            DateTime
   nilai_akhir       Float
@@ -151,6 +152,29 @@ model feedback {
   user          user     @relation(fields: [email_user], references: [email_user], map: "Feedback_email_user_fkey")
 
   @@index([email_user], map: "Feedback_email_user_fkey")
+}
+
+model draft_sidang {
+  id_draftsidang    Int       @id @default(autoincrement())
+  email_user        String
+  file_draft_sidang String
+  tgl_upload        DateTime?
+  balasan_dosen     String?
+  status_draft      String
+  user              user      @relation(fields: [email_user], references: [email_user])
+
+  @@index([email_user])
+}
+
+model pendaftaran_semhas {
+  id                Int      @id @default(autoincrement())
+  email_user        String
+  tanggal_seminar   DateTime
+  status            String
+  waktu_pendaftaran DateTime @default(now())
+  user              user     @relation(fields: [email_user], references: [email_user])
+
+  @@index([email_user])
 }
 
 enum user_role {
