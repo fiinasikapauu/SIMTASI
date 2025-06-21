@@ -48,7 +48,6 @@ model konsultasi {
   id_konsultasi      Int      @id @default(autoincrement())
   email_user         String
   tanggal_konsultasi DateTime
-  topik_konsultasi   String
   dosen_pembimbing   String
   status             String
   user               user     @relation(fields: [email_user], references: [email_user], map: "Konsultasi_email_user_fkey")
@@ -57,7 +56,7 @@ model konsultasi {
 }
 
 model pendaftaran_ta {
-  id_pendaftaran      Int      @id @default(autoincrement())
+  id_pendaftaran      Int          @id @default(autoincrement())
   email_user          String
   id_topikta          Int
   judul_ta            String
@@ -69,6 +68,16 @@ model pendaftaran_ta {
   
   @@index([email_user], map: "Pendaftaran_TA_email_user_fkey")
   @@index([id_topikta], map: "Pendaftaran_TA_id_topikta_fkey")
+
+
+  // relasi
+  user        user        @relation(fields: [email_user], references: [email_user])
+  topikta     topikta     @relation(fields: [id_topikta], references: [id_topikta])
+  sidang_ta   sidang_ta?  @relation("PendaftaranSidang") // <-- cukup field relasi saja
+
+  @@index([email_user])
+  @@index([id_topikta])
+>>>>>>> 36306653dc40efafc38196f23fe6e6ff6c536234
 }
 
 model proposal_ta {
@@ -108,16 +117,22 @@ model seminar_hasil {
 }
 
 model sidang_ta {
-  id_sidang         Int      @id @default(autoincrement())
-  email_user        String
+  id_sidang        Int       @id @default(autoincrement())
+  id_pendaftaran   Int       @unique             // FK + unique → one-to-one
+  email_user       String
   file_draft_sidang String
-  tanggal_daftar    DateTime
-  jadwal            DateTime
-  nilai_akhir       Float
-  user              user     @relation(fields: [email_user], references: [email_user], map: "Sidang_TA_email_user_fkey")
+  tanggal_daftar   DateTime
+  jadwal           DateTime
+  nilai_akhir      Float
 
-  @@index([email_user], map: "Sidang_TA_email_user_fkey")
+  // relasi
+  user            user           @relation(fields: [email_user], references: [email_user])
+  pendaftaran_ta  pendaftaran_ta @relation("PendaftaranSidang", fields: [id_pendaftaran], references: [id_pendaftaran])
+
+  @@index([email_user])
+  // tidak perlu @@index([id_pendaftaran]) karena @unique sudah otomatis membuat index
 }
+
 
 model timeline_project {
   id_timeline     Int      @id @default(autoincrement())
@@ -135,7 +150,6 @@ model laporan_kemajuan {
   id_laporan        Int      @id @default(autoincrement())
   email_user        String
   file_laporan      String
-  original_filename  String   @db.VarChar(255)
   tanggal_upload    DateTime
   status_review     String
   feedback_dosen    String
@@ -148,6 +162,7 @@ model feedback {
   id_feedback   Int      @id @default(autoincrement())
   email_user    String
   tanggal       DateTime
+  topik_konsultasi String  // Menambahkan field untuk topik konsultasi
   feedback_text String
   user          user     @relation(fields: [email_user], references: [email_user], map: "Feedback_email_user_fkey")
 

@@ -10,19 +10,7 @@
 </head>
 <body class="bg-gray-100">
   <!-- Header -->
-  <header class="bg-green-600 text-white p-4">
-    <div class="container mx-auto flex justify-between items-center">
-      <div>
-        <h1 class="text-3xl font-bold">SIMTASI</h1>
-      </div>
-      <div>
-        <button class="text-white bg-green-700 px-4 py-2 rounded-full hover:bg-green-800">
-          <span
-            style="background-image: url('../images/user_icon.png'); background-size: cover; background-position: center; width: 24px; height: 24px; display: inline-block;"></span>
-        </button>
-      </div>
-    </div>
-  </header>
+  <%- include('../partial/header.ejs') %>
 
   <!-- Main Content -->
   <div class="container mx-auto p-6">
@@ -55,6 +43,12 @@
                 <option value="<%= mahasiswa.email_user %>"><%= mahasiswa.nama %></option>
               <% }) %>
             </select>
+          </div>
+
+          <!-- Menambahkan Input untuk Topik Konsultasi -->
+          <div>
+            <label for="topik_konsultasi" class="block text-lg font-medium text-gray-700">Topik Konsultasi :</label>
+            <textarea name="topik_konsultasi" id="topik_konsultasi" rows="4" class="mt-2 block w-full p-2 border border-gray-300 rounded-md" required></textarea>
           </div>
 
           <div>

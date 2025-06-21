@@ -7,6 +7,7 @@ const session = require('express-session');
 const multer = require('multer');
 const app = express();
 
+
 app.use(session({
   secret: 'rahasiaTA', 
   resave: false,
@@ -16,6 +17,12 @@ app.use(session({
     httpOnly: true          // Hanya dapat diakses melalui http, untuk mencegah XSS
   }
 }));
+
+// Middleware agar variabel user selalu tersedia di semua view
+app.use((req, res, next) => {
+  res.locals.user = req.user || null;
+  next();
+});
 
 
 const feedbackRoutes = require('./routes/feedbackRoutes'); // Tambahan route feedback
@@ -29,7 +36,8 @@ const monitoringRoutes = require('./routes/monitoringRoutes');  // Pastikan path
 const seminarRoutes = require('./routes/seminarRoutes');
 const bodyParser = require('body-parser');
 const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
-const kalenderRoutes = require('./routes/kalenderRoutes');
+const kalenderAdminRoutes = require('./routes/kalenderAdminRoutes');
+const riwayatRoutes = require('./routes/riwayatfeedbackdosenRoutes');
 const cors = require('cors');
 
 app.use(cors({
@@ -71,19 +79,18 @@ app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 
 app.use(monitoringRoutes); 
 
-app.use('/feedback', feedbackRoutes); // Route baru untuk feedback
+
 
 app.use('/', roleRoutes);
 app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
 
-
+app.use(riwayatRoutes);
 
 app.use(feedbackRoutes); // Ini akan membuat route /feedback tersedia
 
 app.use(monitoringRoutes); // Pastikan route digunakan dengan benar
 app.use('/', seminarRoutes)
-app.use('/', kalenderRoutes)
-
+app.use('/', kalenderAdminRoutes)
 
 // Router utama
 app.use('/', indexRouter);
@@ -96,15 +103,13 @@ app.get('/bookingkonsul', (req, res) => {
   res.render('mahasiswa/bookingkonsul'); // Pastikan nama file di sini sama dengan nama file EJS
 }); 
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.get('/approvaldospem', (req, res) => {
+  if (!req.session.userEmail) {
+    return res.redirect('/login');  // Jika belum login, redirect ke halaman login
+  }
+  res.render('dosen/approvaldospem');
+});
 
-// Static files
-app.use('/stylesheets', express.static(path.join(__dirname, 'public/stylesheets')));
-app.use('/javascripts', express.static(path.join(__dirname, 'public/javascripts')));
-app.use('/images', express.static(path.join(__dirname, 'public/images')));
-app.use('/uploads/proposals', express.static(path.join(__dirname, 'uploads/proposals')));
-app.use('/uploads/revisi_laporan', express.static(path.join(__dirname, 'uploads/revisi_laporan')));
-app.use('/uploads/laporan_kemajuan', express.static(path.join(__dirname, 'uploads/laporan_kemajuan')));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

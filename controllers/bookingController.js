@@ -35,7 +35,6 @@ const createBooking = async (req, res) => {
         email_user: emailUser, // Menggunakan email dari session pengguna
         dosen_pembimbing: dosen,
         tanggal_konsultasi: new Date(`${tanggal}T${waktu}:00`), // Format waktu yang valid
-        topik_konsultasi : '-',
         status: 'Pending',
       }
     });

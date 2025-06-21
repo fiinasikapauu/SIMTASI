@@ -130,7 +130,6 @@ CREATE TABLE `laporan_kemajuan` (
     `id_laporan` INTEGER NOT NULL AUTO_INCREMENT,
     `email_user` VARCHAR(191) NOT NULL,
     `file_laporan` VARCHAR(191) NOT NULL,
-    `original_filename` VARCHAR(255) NOT NULL,
     `tanggal_upload` DATETIME(3) NOT NULL,
     `status_review` VARCHAR(191) NOT NULL,
     `feedback_dosen` VARCHAR(191) NOT NULL,
