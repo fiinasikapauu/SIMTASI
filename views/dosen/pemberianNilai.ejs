@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pemberian Nilai Laporan TA</title>
+
+  <!-- Tailwind CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <!-- SweetAlert2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-100">
+
+  <!-- Header & Sidebar (sesuaikan path partial-mu) -->
+  <%- include('../partial/header.ejs') %>
+  <div class="flex">
+    <%- include('../sidebar/sidebardosen.ejs') %>
+
+    <!-- MAIN -->
+    <main class="flex-1 p-6">
+      <h1 class="text-3xl font-bold text-green-700 mb-6">
+        Pemberian Nilai&nbsp;Laporan&nbsp;Tugas&nbsp;Akhir
+      </h1>
+
+      <div class="bg-white rounded-lg shadow p-6 overflow-x-auto">
+        <h2 class="text-xl font-semibold mb-4">Daftar Mahasiswa</h2>
+
+        <table class="min-w-full text-sm">
+          <thead class="bg-green-600 text-white">
+            <tr>
+              <th class="py-3 px-4 text-left">Nama Mahasiswa</th>
+              <th class="py-3 px-4 text-left">NIM</th>
+              <th class="py-3 px-4 text-left">Nilai</th>
+              <th class="py-3 px-4 text-left">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (records.length === 0) { %>
+              <tr>
+                <td colspan="4" class="py-6 text-center text-gray-500">
+                  Belum ada data sidang.
+                </td>
+              </tr>
+            <% } %>
+
+            <% records.forEach(r => { %>
+              <tr class="border-t">
+                <td class="py-2 px-4"><%= r.user.nama %></td>
+                <td class="py-2 px-4"><%= r.user.nomorInduk %></td>
+
+                <!-- Form per baris -->
+                <form action="/sidang/pemberian-nilai/<%= r.id_sidang %>"
+                      method="POST"
+                      class="nilaiForm flex w-full">
+                  <td class="py-2 px-4">
+                    <input type="number"
+                           name="nilai"
+                           value="<%= r.nilai_akhir %>"
+                           placeholder="Masukkan Nilai"
+                           min="0" max="100" step="0.1"
+                           class="border rounded px-3 py-1 w-32 focus:outline-none focus:ring focus:border-green-400">
+                  </td>
+                  <td class="py-2 px-4">
+                    <button type="submit"
+                            class="bg-blue-600 text-white py-1 px-4 rounded hover:bg-blue-700 transition">
+                      Submit Nilai
+                    </button>
+                  </td>
+                </form>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-green-600 text-white text-center p-4 mt-6">
+    &copy; 2025 Sistem Informasi – Fakultas Teknologi Informasi
+  </footer>
+
+  <!-- SweetAlert sukses (cek query ?sukses=true) -->
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('sukses') === 'true') {
+      Swal.fire({
+        icon: 'success',
+        title: 'Nilai tersimpan!',
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }
+
+    /*  (Opt.) ­blokir submit kosong  */
+    document.querySelectorAll('.nilaiForm').forEach(f => {
+      f.addEventListener('submit', e => {
+        const val = parseFloat(f.elements['nilai'].value);
+        if (isNaN(val)) {
+          e.preventDefault();
+          Swal.fire({icon:'error',title:'Nilai belum diisi'}); }
+      });
+    });
+  </script>
+</body>
+</html>
