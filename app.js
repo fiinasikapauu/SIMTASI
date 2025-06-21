@@ -47,6 +47,7 @@ const daftarSemhasRouter = require('./routes/daftarSemhasRoutes');
 const kalenderAdminController = require('./controllers/kalenderAdminController');
 const kalenderMahasiswaRoutes = require('./routes/kalenderMahasiswaRoutes');
 const kalenderMahasiswaController = require('./controllers/kalenderMahasiswaController');
+const hasilKonsultasiRoutes = require('./routes/hasilKonsultasiRoutes');
 
 
 app.use(cors({
@@ -89,6 +90,7 @@ app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 app.use(monitoringRoutes); 
 
 app.use('/feedback', feedbackRoutes); // Route baru untuk feedback
+app.use(hasilKonsultasiRoutes);
 
 app.use('/', roleRoutes);
 app.use("/sidang/pemberian-nilai", pemberianNilaiRoute);
