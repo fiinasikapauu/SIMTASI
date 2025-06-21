@@ -1,13 +1,9 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { submitJadwal } = require('../controllers/jadwalController');
+const { isLoggedIn, isAdmin } = require("../middleware/auth");
+const jadwalController = require("../controllers/jadwalController");
 
-// Route untuk menampilkan form jadwal
-router.get('/', (req, res) => {
-  res.render('admin/jadwal'); // Menampilkan tampilan form admin/jadwal.ejs
-});
-
-// Route untuk menangani submit form jadwal
-router.post('/submit', submitJadwal); // Mengarah ke controller submitJadwal
+router.get("/", isLoggedIn, isAdmin, jadwalController.form);
+router.post("/", isLoggedIn, isAdmin, jadwalController.create);
 
 module.exports = router;

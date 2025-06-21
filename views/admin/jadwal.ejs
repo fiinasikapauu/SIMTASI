@@ -1,55 +1,85 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manajemen Jadwal Sidang dan Seminar</title>
-  <!-- Link CDN untuk Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-
 <body class="bg-gray-100">
-  <div class="min-h-screen flex items-center justify-center p-6">
-    <div class="container mx-auto max-w-3xl bg-white p-8 rounded-lg shadow-lg">
-      <h1 class="text-3xl font-bold text-center text-indigo-600 mb-6">Manajemen Jadwal Sidang dan Seminar</h1>
 
-      <!-- Form untuk menentukan jadwal -->
-      <form action="/jadwal/submit" method="POST" class="space-y-6">
-        <!-- Jenis Jadwal -->
-        <div>
-          <label for="jenis_jadwal" class="block text-sm font-medium text-gray-700">Jenis Jadwal</label>
-          <select id="jenis_jadwal" name="jenis_jadwal"
-            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
-            <option value="Sidang">Sidang</option>
-            <option value="Seminar">Seminar</option>
-          </select>
-        </div>
+  <!-- Header -->
+  <%- include('../partial/header.ejs') %>
 
-        <!-- Tanggal -->
-        <div>
-          <label for="tanggal" class="block text-sm font-medium text-gray-700">Tanggal</label>
-          <input type="date" id="tanggal" name="tanggal"
-            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
-        </div>
+  <div class="flex">
 
-        <!-- Waktu -->
-        <div>
-          <label for="waktu" class="block text-sm font-medium text-gray-700">Waktu</label>
-          <input type="time" id="waktu" name="waktu"
-            class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" required>
-        </div>
+    <!-- Sidebar -->
+    <%- include('../sidebar/sidebaradmin.ejs') %>
 
-        <!-- Tombol Submit -->
-        <div>
-          <button type="submit"
-            class="w-full bg-indigo-600 text-white py-3 px-4 rounded-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
-            Simpan Jadwal
-          </button>
-        </div>
-      </form>
+    <!-- Main Content -->
+    <div class="flex-1 p-6">
+      <div class="bg-white rounded-lg shadow-lg p-6 max-w-xl mx-auto">
+        <h2 class="text-2xl font-bold text-green-700 mb-6">Manajemen Jadwal Sidang dan Seminar</h2>
+
+        <form action="/jadwal" method="POST" id="jadwalForm" class="space-y-4">
+          <div>
+            <label for="jenis_jadwal" class="block font-medium text-gray-700 mb-1">Jenis Jadwal</label>
+            <select name="jenis_jadwal" id="jenis_jadwal" required
+                    class="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:border-green-400">
+              <option value="Seminar">Seminar</option>
+              <option value="Sidang">Sidang</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="tanggal" class="block font-medium text-gray-700 mb-1">Tanggal</label>
+            <input type="date" name="tanggal" id="tanggal" required
+                   class="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:border-green-400">
+          </div>
+
+          <div>
+            <label for="waktu" class="block font-medium text-gray-700 mb-1">Waktu</label>
+            <input type="time" name="waktu" id="waktu" required
+                   class="w-full px-4 py-2 border rounded focus:outline-none focus:ring focus:border-green-400">
+          </div>
+
+          <div>
+            <button type="submit"
+                    class="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition">
+              Simpan Jadwal
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</body>
 
+  <!-- Footer -->
+  <footer class="bg-green-600 text-white text-center p-4 mt-6">
+    <p>&copy; 2025 Sistem Informasi - Fakultas Teknologi Informasi</p>
+  </footer>
+
+  <!-- SweetAlert2 on successful submit (via flash / query param / manual trigger) -->
+  <script>
+    const jadwalForm = document.getElementById("jadwalForm");
+
+    jadwalForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: 'Jadwal berhasil disimpan.',
+        confirmButtonText: 'OK'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          jadwalForm.submit(); // submit form setelah klik OK
+        }
+      });
+    });
+  </script>
+</body>
 </html>
