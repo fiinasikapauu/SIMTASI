@@ -37,7 +37,6 @@ CREATE TABLE `konsultasi` (
     `id_konsultasi` INTEGER NOT NULL AUTO_INCREMENT,
     `email_user` VARCHAR(191) NOT NULL,
     `tanggal_konsultasi` DATETIME(3) NOT NULL,
-    `topik_konsultasi` VARCHAR(191) NOT NULL,
     `dosen_pembimbing` VARCHAR(191) NOT NULL,
     `status` VARCHAR(191) NOT NULL,
 
@@ -102,13 +101,15 @@ CREATE TABLE `seminar_hasil` (
 -- CreateTable
 CREATE TABLE `sidang_ta` (
     `id_sidang` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_pendaftaran` INTEGER NOT NULL,
     `email_user` VARCHAR(191) NOT NULL,
     `file_draft_sidang` VARCHAR(191) NOT NULL,
     `tanggal_daftar` DATETIME(3) NOT NULL,
     `jadwal` DATETIME(3) NOT NULL,
     `nilai_akhir` DOUBLE NOT NULL,
 
-    INDEX `Sidang_TA_email_user_fkey`(`email_user`),
+    UNIQUE INDEX `sidang_ta_id_pendaftaran_key`(`id_pendaftaran`),
+    INDEX `sidang_ta_email_user_idx`(`email_user`),
     PRIMARY KEY (`id_sidang`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -143,6 +144,7 @@ CREATE TABLE `feedback` (
     `id_feedback` INTEGER NOT NULL AUTO_INCREMENT,
     `email_user` VARCHAR(191) NOT NULL,
     `tanggal` DATETIME(3) NOT NULL,
+    `topik_konsultasi` VARCHAR(191) NOT NULL,
     `feedback_text` VARCHAR(191) NOT NULL,
 
     INDEX `Feedback_email_user_fkey`(`email_user`),
@@ -171,7 +173,10 @@ ALTER TABLE `revisi_laporan` ADD CONSTRAINT `Revisi_Laporan_email_user_fkey` FOR
 ALTER TABLE `seminar_hasil` ADD CONSTRAINT `Seminar_Hasil_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `sidang_ta` ADD CONSTRAINT `Sidang_TA_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `sidang_ta` ADD CONSTRAINT `sidang_ta_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `sidang_ta` ADD CONSTRAINT `sidang_ta_id_pendaftaran_fkey` FOREIGN KEY (`id_pendaftaran`) REFERENCES `pendaftaran_ta`(`id_pendaftaran`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `timeline_project` ADD CONSTRAINT `Timeline_Project_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
