@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kalender Sidang TA</title>
     <link rel="stylesheet" href="/stylesheets/output.css" />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
 
   <body class="bg-gray-100 font-sans">
@@ -33,6 +32,8 @@
         <div class="col-span-3 bg-white p-6 rounded-lg shadow-lg">
           <h2 class="text-3xl font-semibold text-green-600 mb-6">Kalender Sidang TA</h2>
 
+          <p class="mb-4">Selamat datang, <span class="font-bold"><%= user.nama %></span> (<%= user.email %>)</p>
+
           <!-- Kalender -->
           <div class="flex justify-between mb-4">
             <button id="prevMonth" class="bg-blue-500 text-white px-4 py-2 rounded-md">Prev</button>
@@ -46,6 +47,15 @@
           <div>
             <label for="selectedDate" class="block text-lg font-medium text-green-600 mb-2">Tanggal Sidang Terpilih:</label>
             <div id="selectedDate" class="text-lg font-semibold text-green-600"></div>
+          </div>
+
+          <!-- Pilihan Jenis Sidang -->
+          <div class="mt-4">
+            <label for="jenisSidang" class="block text-lg font-medium text-green-600 mb-2">Jenis Jadwal:</label>
+            <select id="jenisSidang" class="w-full p-2 border border-gray-300 rounded-md">
+              <option value="SEMHAS">Seminar Hasil</option>
+              <option value="TA">Sidang TA</option>
+            </select>
           </div>
 
           <!-- Tombol Apply -->
@@ -64,27 +74,44 @@
 
     <!-- JavaScript untuk Kalender -->
     <script>
+      // Ambil data dari EJS dan siapkan struktur data
+      const rawEvents = JSON.parse('<%- events %>');
+      const scheduledEvents = new Map(); // Map: 'YYYY-MM-DD' -> Set['TA', 'SEMHAS']
+
+      rawEvents.forEach(event => {
+        // Normalisasi tanggal ke format YYYY-MM-DD di zona waktu lokal
+        const date = new Date(event.tanggal);
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
+
+        if (!scheduledEvents.has(dateStr)) {
+          scheduledEvents.set(dateStr, new Set());
+        }
+        scheduledEvents.get(dateStr).add(event.jenis_sidang);
+      });
+
       let currentDate = new Date();
       const calendarContainer = document.getElementById("calendar");
       const monthYearDisplay = document.getElementById("monthYear");
       const prevMonthButton = document.getElementById("prevMonth");
       const nextMonthButton = document.getElementById("nextMonth");
       const selectedDateDisplay = document.getElementById("selectedDate");
+      const clearButton = document.getElementById("clearButton");
 
-      let selectedDayButton = null; // Variabel untuk menyimpan tombol tanggal yang dipilih
+      let lastClickedDate = null; // Untuk menyimpan tanggal yang terakhir diklik
 
-      // Menampilkan kalender sesuai bulan dan tahun saat ini
       function renderCalendar() {
         const month = currentDate.getMonth();
         const year = currentDate.getFullYear();
-        const firstDay = new Date(year, month, 1).getDay(); // Hari pertama bulan
-        const lastDate = new Date(year, month + 1, 0).getDate(); // Jumlah hari dalam bulan ini
+        const firstDay = new Date(year, month, 1).getDay();
+        const lastDate = new Date(year, month + 1, 0).getDate();
 
         monthYearDisplay.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
-
         calendarContainer.innerHTML = '';
-
-        // Menampilkan hari-hari dalam minggu
+        
+        //hari-hari dalam seminggu
         const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         daysOfWeek.forEach(day => {
           const dayElement = document.createElement('div');
@@ -93,41 +120,124 @@
           calendarContainer.appendChild(dayElement);
         });
 
-        // Menampilkan tanggal dalam bulan ini
+        //ruang sebelum tanggal 1
         for (let i = 0; i < firstDay; i++) {
-          calendarContainer.appendChild(document.createElement('div')); // Menambahkan ruang kosong untuk hari sebelum tanggal 1
+          calendarContainer.appendChild(document.createElement('div'));
         }
 
+        //tanggal-tanggal dalam bulan ini
         for (let day = 1; day <= lastDate; day++) {
           const dayButton = document.createElement('button');
           dayButton.textContent = day;
           dayButton.classList.add('w-full', 'px-4', 'py-2', 'border', 'border-gray-300', 'rounded-md', 'text-center', 'cursor-pointer');
+
+          const dateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
           
-          // Menandai tanggal yang sudah dipilih sebelumnya
-          if (selectedDayButton && selectedDayButton.textContent == day) {
-            dayButton.classList.add('bg-green-500', 'text-white');
+          // Warnai tombol berdasarkan jenis acara
+          if (scheduledEvents.has(dateStr)) {
+            const eventTypes = scheduledEvents.get(dateStr);
+            const hasSidang = eventTypes.has('TA');
+            const hasSemhas = eventTypes.has('SEMHAS');
+
+            if (hasSidang && hasSemhas) {
+              dayButton.classList.add('bg-gradient-to-br', 'from-green-500', 'to-blue-500', 'text-white');
+            } else if (hasSidang) {
+              dayButton.classList.add('bg-green-500', 'text-white');
+            } else if (hasSemhas) {
+              dayButton.classList.add('bg-blue-500', 'text-white');
+            }
+          }
+
+          //jika tanggal ini adalah yang terakhir diklik, tambahkan border tebal
+          if (lastClickedDate === dateStr) {
+            dayButton.classList.add('ring-2', 'ring-green-800');
           }
 
           dayButton.addEventListener('click', function() {
-            console.log('Tanggal yang dipilih: ', day);
-            // Jika tombol tanggal yang sama yang dipilih, jangan hapus
-            if (selectedDayButton && selectedDayButton !== dayButton) {
-              // Hapus class 'selected' dari tombol sebelumnya jika ada
-              selectedDayButton.classList.remove('bg-green-500', 'text-white');
-            }
-            // Tambahkan class 'selected' pada tombol yang dipilih
-            dayButton.classList.add('bg-green-500', 'text-white');
-            selectedDayButton = dayButton;
-            
-            // Tampilkan tanggal yang dipilih
-            const selectedDate = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-            selectedDateDisplay.textContent = selectedDate; // Tampilkan tanggal yang dipilih
+            lastClickedDate = dateStr;
+            selectedDateDisplay.textContent = dateStr;
+            renderCalendar();
+            updateClearButton();
           });
+
           calendarContainer.appendChild(dayButton);
+        }
+        updateClearButton();
+      }
+
+      //tombol apply untuk menyimpan jadwal
+      document.getElementById("applyButton").addEventListener("click", function() {
+        if (!selectedDateDisplay.textContent) {
+          alert("Peringatan: Pilih tanggal terlebih dahulu.");
+          return;
+        }
+        const tanggal = selectedDateDisplay.textContent;
+        const jenisSidang = document.getElementById("jenisSidang").value;
+
+        fetch('/kalender-sidang/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tanggal: tanggal,
+              jenis_sidang: jenisSidang
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              if (!scheduledEvents.has(tanggal)) {
+                scheduledEvents.set(tanggal, new Set());
+              }
+              scheduledEvents.get(tanggal).add(jenisSidang);
+              renderCalendar();
+              alert("Berhasil! Jadwal berhasil disimpan.");
+            } else {
+              alert("Gagal! " + (data.message || "Gagal menyimpan jadwal."));
+            }
+          })
+          .catch(error => console.error('Error:', error));
+      });
+
+      //tombol clear untuk menghapus jadwal
+      clearButton.addEventListener("click", function() {
+        const tanggal = selectedDateDisplay.textContent;
+        if (!tanggal || !scheduledEvents.has(tanggal)) return;
+
+        if (confirm(`Anda yakin ingin menghapus semua jadwal pada tanggal ${tanggal}?`)) {
+          fetch('/kalender-sidang/clear', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ tanggal: tanggal })
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                scheduledEvents.delete(tanggal);
+                selectedDateDisplay.textContent = '';
+                lastClickedDate = null;
+                renderCalendar();
+                alert('Berhasil! Jadwal telah dihapus.');
+              } else {
+                alert('Gagal! Gagal menghapus jadwal.');
+              }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+      });
+
+      //fungsi untuk mengupdate tombol clear
+      function updateClearButton() {
+        const tanggal = selectedDateDisplay.textContent;
+        if (tanggal && scheduledEvents.has(tanggal)) {
+          clearButton.disabled = false;
+          clearButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        } else {
+          clearButton.disabled = true;
+          clearButton.classList.add('opacity-50', 'cursor-not-allowed');
         }
       }
 
-      // Navigasi bulan
+      //navigasi bulan
       prevMonthButton.addEventListener("click", function() {
         currentDate.setMonth(currentDate.getMonth() - 1);
         renderCalendar();
@@ -138,43 +248,7 @@
         renderCalendar();
       });
 
-      // Tombol Apply untuk menyimpan tanggal sidang
-      document.getElementById("applyButton").addEventListener("click", function() {
-        const selectedDate = selectedDateDisplay.textContent;
-        if (selectedDate) {
-          fetch('/kalender-sidang/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              tanggal: selectedDate,
-              jenis_sidang: 'TA',
-              email_user: 'admin@example.com'
-            })
-          })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              alert("Tanggal Sidang berhasil disimpan!");
-            } else {
-              alert("Gagal menyimpan tanggal Sidang.");
-            }
-          })
-          .catch(error => console.error('Error:', error));
-        } else {
-          alert("Pilih tanggal terlebih dahulu.");
-        }
-      });
-
-      // Tombol Clear untuk menghapus tanggal sidang
-      document.getElementById("clearButton").addEventListener("click", function() {
-        selectedDateDisplay.textContent = ''; // Clear tanggal yang dipilih
-        if (selectedDayButton) {
-          selectedDayButton.classList.remove('bg-green-500', 'text-white');
-          selectedDayButton = null;
-        }
-      });
-
-      // Render kalender pertama kali
+      //render kalender
       renderCalendar();
     </script>
 
