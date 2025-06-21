@@ -50,7 +50,6 @@ model konsultasi {
   id_konsultasi      Int      @id @default(autoincrement())
   email_user         String
   tanggal_konsultasi DateTime
-  topik_konsultasi   String
   dosen_pembimbing   String
   status             String
   user               user     @relation(fields: [email_user], references: [email_user], map: "Konsultasi_email_user_fkey")
@@ -59,18 +58,21 @@ model konsultasi {
 }
 
 model pendaftaran_ta {
-  id_pendaftaran      Int      @id @default(autoincrement())
+  id_pendaftaran      Int          @id @default(autoincrement())
   email_user          String
   id_topikta          Int
   judul_ta            String
   tanggal_daftar      DateTime
   status_approval     String
   id_dosen_pembimbing String
-  user                user     @relation(fields: [email_user], references: [email_user], map: "Pendaftaran_TA_email_user_fkey")
-  topikta             topikta  @relation(fields: [id_topikta], references: [id_topikta], map: "Pendaftaran_TA_id_topikta_fkey")
 
-  @@index([email_user], map: "Pendaftaran_TA_email_user_fkey")
-  @@index([id_topikta], map: "Pendaftaran_TA_id_topikta_fkey")
+  // relasi
+  user        user        @relation(fields: [email_user], references: [email_user])
+  topikta     topikta     @relation(fields: [id_topikta], references: [id_topikta])
+  sidang_ta   sidang_ta?  @relation("PendaftaranSidang") // <-- cukup field relasi saja
+
+  @@index([email_user])
+  @@index([id_topikta])
 }
 
 model proposal_ta {
@@ -117,8 +119,10 @@ model sidang_ta {
   nilai_akhir       Float
   user              user     @relation(fields: [email_user], references: [email_user], map: "Sidang_TA_email_user_fkey")
 
-  @@index([email_user], map: "Sidang_TA_email_user_fkey")
+  @@index([email_user])
+  // tidak perlu @@index([id_pendaftaran]) karena @unique sudah otomatis membuat index
 }
+
 
 model timeline_project {
   id_timeline     Int      @id @default(autoincrement())
@@ -148,6 +152,7 @@ model feedback {
   id_feedback   Int      @id @default(autoincrement())
   email_user    String
   tanggal       DateTime
+  topik_konsultasi String  // Menambahkan field untuk topik konsultasi
   feedback_text String
   user          user     @relation(fields: [email_user], references: [email_user], map: "Feedback_email_user_fkey")
 
