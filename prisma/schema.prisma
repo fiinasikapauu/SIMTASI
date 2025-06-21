@@ -78,6 +78,7 @@ model proposal_ta {
   tanggal_upload DateTime
   status_review  String
   feedback_dosen String
+  dosen_penerima String   // Email dosen yang akan menerima proposal
   user           user     @relation(fields: [email_user], references: [email_user], map: "Proposal_TA_email_user_fkey")
 
   @@index([email_user], map: "Proposal_TA_email_user_fkey")
@@ -90,6 +91,7 @@ model revisi_laporan {
   tanggal_upload DateTime
   feedback_dosen String
   status         String
+  dosen_penerima String   // Email dosen yang akan menerima revisi
   user           user     @relation(fields: [email_user], references: [email_user], map: "Revisi_Laporan_email_user_fkey")
 
   @@index([email_user], map: "Revisi_Laporan_email_user_fkey")
@@ -138,6 +140,7 @@ model laporan_kemajuan {
   tanggal_upload    DateTime
   status_review     String
   feedback_dosen    String
+  dosen_penerima    String   // Email dosen yang akan menerima laporan
   user              user     @relation(fields: [email_user], references: [email_user], map: "Laporan_Kemajuan_email_user_fkey")
 
   @@index([email_user], map: "Laporan_Kemajuan_email_user_fkey")

@@ -68,6 +68,7 @@ CREATE TABLE `proposal_ta` (
     `tanggal_upload` DATETIME(3) NOT NULL,
     `status_review` VARCHAR(191) NOT NULL,
     `feedback_dosen` VARCHAR(191) NOT NULL,
+    `dosen_penerima` VARCHAR(191) NOT NULL,
 
     INDEX `Proposal_TA_email_user_fkey`(`email_user`),
     PRIMARY KEY (`id_proposal`)

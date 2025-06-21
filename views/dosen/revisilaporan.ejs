@@ -30,6 +30,7 @@
                 <tr>
                     <th class="py-3 px-6 text-left">Nama Mahasiswa</th>
                     <th class="py-3 px-6 text-left">File Laporan TA</th>
+                    <th class="py-3 px-6 text-left">Tanggal Upload</th>
                     <th class="py-3 px-6 text-left">Status Revisi</th>
                     <th class="py-3 px-6 text-left">Berikan Feedback</th>
                 </tr>
@@ -42,6 +43,7 @@
                       <td class="py-3 px-6">
                         <a href="/downloadrevisi/<%= item.id_revisi %>" download="<%= item.file_laporan %>" class="text-green-700 underline hover:text-green-900 font-normal truncate block max-w-xs file-link cursor-pointer" title="Download: <%= item.file_laporan %>">📄 <%= item.file_laporan %></a>
                       </td>
+                      <td class="py-3 px-6 whitespace-nowrap text-gray-600"><%= item.tanggal_upload_formatted %></td>
                       <td class="py-3 px-6">
                         <% if(item.status === 'Menunggu Review'){ %>
                           <span class="inline-block text-yellow-800 text-xs font-semibold px-2 py-1 rounded">Menunggu Review</span>
@@ -61,7 +63,7 @@
                     </tr>
                   <% }) %>
                 <% } else { %>
-                  <tr><td colspan="4" class="text-center py-4 text-gray-400">Belum ada revisi laporan mahasiswa</td></tr>
+                  <tr><td colspan="5" class="text-center py-4 text-gray-400">Belum ada revisi laporan mahasiswa</td></tr>
                 <% } %>
             </tbody>
         </table>
