@@ -40,6 +40,7 @@ const bodyParser = require('body-parser');
 const pemberianNilaiRoute = require("./routes/pemberianNilai");
 const kalenderAdminRoutes = require('./routes/kalenderAdminRoutes');
 const riwayatRoutes = require('./routes/riwayatfeedbackdosenRoutes');
+const riwayat2Routes = require('./routes/riwayatfeedbacklagiRoutes');
 const cors = require('cors');
 const draftRouter = require('./routes/draft');
 const daftarSemhasRouter = require('./routes/daftarSemhasRoutes');
@@ -93,6 +94,8 @@ app.use('/', roleRoutes);
 app.use("/sidang/pemberian-nilai", pemberianNilaiRoute);
 
 app.use(riwayatRoutes);
+app.use(riwayat2Routes);
+app.use('/riwayatfeedbacklagi', riwayat2Routes);
 
 app.use(feedbackRoutes); // Ini akan membuat route /feedback tersedia
 
