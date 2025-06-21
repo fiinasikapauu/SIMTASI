@@ -32,6 +32,7 @@ model user {
   timeline_project timeline_project[]
   laporan_kemajuan laporan_kemajuan[]
   feedback         feedback[]         // Relasi balik ke model feedback
+  jadwal_sidang_seminar jadwal_sidang_seminar[] @relation("AdminJadwal")
 }
 
 model kalender_sidang {
@@ -114,13 +115,10 @@ model sidang_ta {
   id_pendaftaran   Int       @unique             // FK + unique → one-to-one
   email_user       String
   file_draft_sidang String
-  tanggal_daftar   DateTime
-  jadwal           DateTime
-  nilai_akhir      Float
-
-  // relasi
-  user            user           @relation(fields: [email_user], references: [email_user])
-  pendaftaran_ta  pendaftaran_ta @relation("PendaftaranSidang", fields: [id_pendaftaran], references: [id_pendaftaran])
+  tanggal_daftar    DateTime
+  jadwal            DateTime
+  nilai_akhir       Float
+  user              user     @relation(fields: [email_user], references: [email_user], map: "Sidang_TA_email_user_fkey")
 
   @@index([email_user])
   // tidak perlu @@index([id_pendaftaran]) karena @unique sudah otomatis membuat index
@@ -166,4 +164,15 @@ enum user_role {
   ADMIN
   MAHASISWA
   DOSEN
+}
+
+model jadwal_sidang_seminar {
+  id_jadwal        Int      @id @default(autoincrement())
+  jenis_jadwal     String   // "Sidang" or "Seminar"
+  tanggal          DateTime
+  waktu            DateTime
+  admin_id         String
+  admin            user     @relation("AdminJadwal", fields: [admin_id], references: [email_user])
+
+  @@index([admin_id], map: "Jadwal_Sidang_Seminar_admin_fkey")
 }

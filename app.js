@@ -29,16 +29,20 @@ const feedbackRoutes = require('./routes/feedbackRoutes'); // Tambahan route fee
 const roleRoutes = require('./routes/roleRoutes'); // Updated route
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
+const daftartaonlineRoutes = require('./routes/daftartaonlineRoutes');
 const authRouter = require('./routes/auth');
+const jadwalRoute = require("./routes/jadwal");
 const topikRoutes = require('./routes/topikRoutes');
+const draftSidangRoute = require("./routes/draftSidang");
 const bookingRoutes = require('./routes/bookingRoutes'); // Import booking routes
 const monitoringRoutes = require('./routes/monitoringRoutes');  // Pastikan path ini benar
 const seminarRoutes = require('./routes/seminarRoutes');
 const bodyParser = require('body-parser');
-const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
+const pemberianNilaiRoute = require("./routes/pemberianNilai");
 const kalenderAdminRoutes = require('./routes/kalenderAdminRoutes');
 const riwayatRoutes = require('./routes/riwayatfeedbackdosenRoutes');
 const cors = require('cors');
+
 
 app.use(cors({
   origin: 'http://localhost:3000', // Frontend URL
@@ -79,10 +83,10 @@ app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 
 app.use(monitoringRoutes); 
 
-
+app.use('/feedback', feedbackRoutes); // Route baru untuk feedback
 
 app.use('/', roleRoutes);
-app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
+app.use("/sidang/pemberian-nilai", pemberianNilaiRoute);
 
 app.use(riwayatRoutes);
 
@@ -98,6 +102,7 @@ app.use('/users', usersRouter);
 app.use('/', authRouter); // Gunakan router untuk auth (signup & signin)
 app.use('/', topikRoutes); // Menggunakan routing untuk topik
 app.use('/', bookingRoutes); // Gunakan routing untuk booking konsultasi dosen
+
 
 app.get('/bookingkonsul', (req, res) => {
   res.render('mahasiswa/bookingkonsul'); // Pastikan nama file di sini sama dengan nama file EJS
