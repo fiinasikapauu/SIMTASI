@@ -67,7 +67,7 @@ model pendaftaran_ta {
   status_approval     String
   id_dosen_pembimbing String
 
-  // relasi
+  // Relasi
   user        user        @relation(fields: [email_user], references: [email_user])
   topikta     topikta     @relation(fields: [id_topikta], references: [id_topikta])
   sidang_ta   sidang_ta?  @relation("PendaftaranSidang") // <-- cukup field relasi saja
