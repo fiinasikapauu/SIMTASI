@@ -25,6 +25,36 @@
         <div class="max-w-4xl mx-auto px-4 py-10">
           <!-- Form Upload File -->
           <form action="/uploadrevisilaporan" method="POST" enctype="multipart/form-data" id="uploadRevisiForm">
+            <!-- Dropdown untuk memilih dosen penerima -->
+            <div class="mb-6">
+              <label for="dosen_penerima" class="block text-lg font-medium text-green-600 mb-4">Pilih Dosen Penerima Revisi</label>
+              <select id="dosen_penerima" name="dosen_penerima" class="w-full px-4 py-3 border border-green-500 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                <option value="">-- Pilih Dosen --</option>
+                <% if (typeof dosenList !== 'undefined' && dosenList.length > 0) { %>
+                  <% dosenList.forEach(function(dosen) { %>
+                    <option value="<%= dosen.email_user %>"><%= dosen.nama %> (<%= dosen.email_user %>)</option>
+                  <% }) %>
+                <% } %>
+              </select>
+            </div>
+
+            <!-- Tabel Penerima -->
+            <div class="mb-6" id="recipientInfo" style="display: none;">
+              <h3 class="text-xl font-semibold text-green-600 mb-4">Informasi Penerima</h3>
+              <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                <table class="w-full">
+                  <tr>
+                    <td class="py-2 px-4 font-medium text-green-700">Nama Dosen:</td>
+                    <td class="py-2 px-4" id="selectedDosenName">-</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 px-4 font-medium text-green-700">Email:</td>
+                    <td class="py-2 px-4" id="selectedDosenEmail">-</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
             <label for="revisiFile" class="block text-lg font-medium text-green-600 mb-4">Pilih File Laporan Revisi
               (PDF/DOC)</label>
             <!-- Box untuk upload -->
@@ -61,6 +91,7 @@
                 <tr>
                   <th class="py-2 px-4 text-left font-medium">File Laporan</th>
                   <th class="py-2 px-4 text-left font-medium">Tanggal Upload</th>
+                  <th class="py-2 px-4 text-left font-medium">Penerima</th>
                   <th class="py-2 px-4 text-left font-medium">Status</th>
                   <th class="py-2 px-4 text-left font-medium">Feedback</th>
                   <th class="py-2 px-4 text-left font-medium">Aksi</th>
@@ -71,11 +102,26 @@
                   <% revisiList.forEach(function(item) { %>
                     <tr class="border-b border-gray-200 text-sm">
                       <td class="py-2 px-4 whitespace-nowrap">
-                        <a href="/downloadrevisi/<%= item.id_revisi %>" class="text-green-700 underline hover:text-green-900 font-normal truncate block max-w-xs file-link cursor-pointer"download="<%= item.file_laporan.split('/').pop() %>"  title="Download: <%= item.file_laporan %>">
-                          📄 <%= item.file_laporan %>
+                        <a href="/downloadrevisi/<%= item.id_revisi %>" 
+                           download="<%= item.file_laporan.split('/').pop() %>"
+                           class="text-green-700 underline hover:text-green-900 font-normal truncate block max-w-xs file-download-link file-link cursor-pointer" 
+                           title="Klik untuk download: <%= item.file_laporan.split('/').pop() %>">
+                          📄 <%= item.file_laporan.split('/').pop() %>
                         </a>
                       </td>
                       <td class="py-2 px-4 whitespace-nowrap text-gray-600"><%= item.tanggal_upload_formatted %></td>
+                      <td class="py-2 px-4 whitespace-nowrap text-gray-600">
+                        <% 
+                          let penerimaName = '-';
+                          if (typeof dosenList !== 'undefined' && dosenList.length > 0) {
+                            const dosen = dosenList.find(d => d.email_user === item.dosen_penerima);
+                            if (dosen) {
+                              penerimaName = dosen.nama;
+                            }
+                          }
+                        %>
+                        <%= penerimaName %>
+                      </td>
                       <td class="py-2 px-4">
                         <% if(item.status === 'Menunggu Review'){ %>
                           <span class="inline-block bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded">Menunggu Review</span>
@@ -102,7 +148,7 @@
                     </tr>
                   <% }) %>
                 <% } else { %>
-                  <tr><td colspan="4" class="text-center py-4 text-gray-400">Belum ada revisi laporan diupload</td></tr>
+                  <tr><td colspan="6" class="text-center py-4 text-gray-400">Belum ada revisi laporan diupload</td></tr>
                 <% } %>
               </tbody>
             </table>
@@ -130,15 +176,52 @@
         }
       });
 
+      // Update recipient information when dosen is selected
+      const dosenSelect = document.getElementById('dosen_penerima');
+      const selectedDosenName = document.getElementById('selectedDosenName');
+      const selectedDosenEmail = document.getElementById('selectedDosenEmail');
+      const recipientInfo = document.getElementById('recipientInfo');
+
+      dosenSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (this.value) {
+          // Extract nama from option text (format: "Nama (email)")
+          const optionText = selectedOption.text;
+          const match = optionText.match(/^(.+?)\s*\((.+?)\)$/);
+          if (match) {
+            selectedDosenName.textContent = match[1].trim();
+            selectedDosenEmail.textContent = match[2].trim();
+          } else {
+            selectedDosenName.textContent = optionText;
+            selectedDosenEmail.textContent = this.value;
+          }
+          // Show recipient info
+          recipientInfo.style.display = 'block';
+        } else {
+          selectedDosenName.textContent = '-';
+          selectedDosenEmail.textContent = '-';
+          // Hide recipient info
+          recipientInfo.style.display = 'none';
+        }
+      });
+
       // Handle form submission
       document.getElementById('uploadRevisiForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData();
         const fileInput = document.getElementById('revisiFile');
+        const dosenPenerima = document.getElementById('dosen_penerima').value;
+        
         if (fileInput.files.length === 0) {
           Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Pilih file terlebih dahulu!' });
           return;
         }
+
+        if (!dosenPenerima) {
+          Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Pilih dosen penerima terlebih dahulu!' });
+          return;
+        }
+        
         Swal.fire({
           title: 'Mengupload...',
           text: 'Mohon tunggu, file sedang diupload',
@@ -146,7 +229,10 @@
           showConfirmButton: false,
           willOpen: () => { Swal.showLoading(); }
         });
+        
         formData.append('revisiFile', fileInput.files[0]);
+        formData.append('dosen_penerima', dosenPenerima);
+        
         try {
           const response = await fetch('/uploadrevisilaporan', {
             method: 'POST',
