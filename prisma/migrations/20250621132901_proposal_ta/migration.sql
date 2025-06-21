@@ -186,10 +186,7 @@ ALTER TABLE `revisi_laporan` ADD CONSTRAINT `Revisi_Laporan_email_user_fkey` FOR
 ALTER TABLE `seminar_hasil` ADD CONSTRAINT `Seminar_Hasil_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `sidang_ta` ADD CONSTRAINT `sidang_ta_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `sidang_ta` ADD CONSTRAINT `sidang_ta_id_pendaftaran_fkey` FOREIGN KEY (`id_pendaftaran`) REFERENCES `pendaftaran_ta`(`id_pendaftaran`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `sidang_ta` ADD CONSTRAINT `Sidang_TA_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `sidang_ta` ADD CONSTRAINT `sidang_ta_id_pendaftaran_fkey` FOREIGN KEY (`id_pendaftaran`) REFERENCES `pendaftaran_ta`(`id_pendaftaran`) ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -63,6 +63,20 @@ const getLaporanKemajuanPage = async (req, res) => {
       }
     });
 
+    // Ambil daftar dosen untuk dropdown
+    const dosenList = await prisma.user.findMany({
+      where: {
+        role: 'DOSEN'
+      },
+      select: {
+        email_user: true,
+        nama: true
+      },
+      orderBy: {
+        nama: 'asc'
+      }
+    });
+
     //asku sangat menyukai loly amle=amfdnids fnidfnnrxa aku sayanga jngija jng  f snf jsn 
     // Format tanggal untuk ditampilkan
     const formattedLaporan = laporanList.map(laporan => ({
@@ -80,7 +94,8 @@ const getLaporanKemajuanPage = async (req, res) => {
     res.render('mahasiswa/uploadlaporankemajuan', {
       title: 'Laporan Kemajuan',
       user: req.session.user,
-      laporanList: formattedLaporan
+      laporanList: formattedLaporan,
+      dosenList: dosenList
     });
 
   } catch (error) {
@@ -113,6 +128,15 @@ const uploadLaporanKemajuan = async (req, res) => {
       });
     }
 
+    // Cek apakah dosen_penerima dipilih
+    const { dosen_penerima } = req.body;
+    if (!dosen_penerima) {
+      return res.status(400).json({
+        success: false,
+        message: 'Pilih dosen penerima laporan'
+      });
+    }
+
     // Simpan data ke database
     const newLaporan = await prisma.laporan_kemajuan.create({
       data: {
@@ -120,7 +144,8 @@ const uploadLaporanKemajuan = async (req, res) => {
         file_laporan: req.file.filename,
         tanggal_upload: new Date(),
         status_review: 'Menunggu Review',
-        feedback_dosen: '-'
+        feedback_dosen: '-',
+        dosen_penerima: dosen_penerima
       }
     });
 
@@ -224,8 +249,13 @@ const getAllLaporanKemajuanForDosen = async (req, res) => {
       return res.redirect('/signin');
     }
 
-    // Ambil semua laporan kemajuan beserta nama mahasiswa
+    const dosenEmail = req.session.user.email;
+
+    // Ambil laporan yang ditujukan kepada dosen yang sedang login
     const laporanList = await prisma.laporan_kemajuan.findMany({
+      where: {
+        dosen_penerima: dosenEmail
+      },
       include: {
         user: {
           select: { nama: true }
@@ -354,28 +384,36 @@ const exportLaporanKemajuanPdf = async (req, res) => {
     if (!req.session.user || req.session.user.role !== 'DOSEN') {
       return res.status(403).send('Unauthorized');
     }
+    
+    const dosenEmail = req.session.user.email;
+    
     const laporanList = await prisma.laporan_kemajuan.findMany({
+      where: {
+        dosen_penerima: dosenEmail
+      },
       include: { user: { select: { nama: true } } },
       orderBy: { tanggal_upload: 'desc' }
     });
+    
     const doc = new PDFDocument({ margin: 25, size: 'A4' });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename="daftar_laporan_kemajuan_mahasiswa.pdf"');
     doc.pipe(res);
     doc.fontSize(14).font('Helvetica-Bold').text('Daftar Laporan Kemajuan Mahasiswa', { align: 'center' });
     doc.moveDown(1);
-    // Kolom: No, Nama, File, Status, Feedback
-    const col = [30, 65, 200, 340, 420, 540];
+    // Kolom: No, Nama, File, Tanggal, Status, Feedback
+    const col = [30, 65, 200, 280, 340, 420, 540];
     const rowHeight = 18;
     let y = doc.y;
     // Header
     doc.fontSize(9).font('Helvetica-Bold');
-    doc.rect(col[0], y, col[5]-col[0], rowHeight).stroke();
+    doc.rect(col[0], y, col[6]-col[0], rowHeight).stroke();
     doc.text('No', col[0], y + 4, { width: col[1]-col[0], align: 'center' });
     doc.text('Nama Mahasiswa', col[1], y + 4, { width: col[2]-col[1], align: 'center' });
     doc.text('File Laporan', col[2], y + 4, { width: col[3]-col[2], align: 'center' });
-    doc.text('Status', col[3], y + 4, { width: col[4]-col[3], align: 'center' });
-    doc.text('Feedback', col[4], y + 4, { width: col[5]-col[4], align: 'center' });
+    doc.text('Tanggal', col[3], y + 4, { width: col[4]-col[3], align: 'center' });
+    doc.text('Status', col[4], y + 4, { width: col[5]-col[4], align: 'center' });
+    doc.text('Feedback', col[5], y + 4, { width: col[6]-col[5], align: 'center' });
     // Garis vertikal header
     for (let i = 0; i < col.length; i++) {
       doc.moveTo(col[i], y).lineTo(col[i], y + rowHeight).stroke();
@@ -384,12 +422,13 @@ const exportLaporanKemajuanPdf = async (req, res) => {
     // Isi tabel
     doc.font('Helvetica').fontSize(8);
     laporanList.forEach((item, idx) => {
-      doc.rect(col[0], y, col[5]-col[0], rowHeight).stroke();
+      doc.rect(col[0], y, col[6]-col[0], rowHeight).stroke();
       doc.text(idx + 1, col[0], y + 4, { width: col[1]-col[0], align: 'center' });
-      doc.text((item.user && item.user.nama ? item.user.nama : '-').substring(0, 30), col[1]+2, y + 4, { width: col[2]-col[1]-4, align: 'left' });
-      doc.text((item.file_laporan ? item.file_laporan : '-').substring(0, 25), col[2]+2, y + 4, { width: col[3]-col[2]-4, align: 'left' });
-      doc.text((item.status_review ? item.status_review : '-').substring(0, 15), col[3]+2, y + 4, { width: col[4]-col[3]-4, align: 'left' });
-      doc.text((item.feedback_dosen ? item.feedback_dosen : '-').substring(0, 30), col[4]+2, y + 4, { width: col[5]-col[4]-4, align: 'left' });
+      doc.text((item.user?.nama || '-').substring(0, 25), col[1]+2, y + 4, { width: col[2]-col[1]-4, align: 'left' });
+      doc.text((item.file_laporan || '-').substring(0, 20), col[2]+2, y + 4, { width: col[3]-col[2]-4, align: 'left' });
+      doc.text(new Date(item.tanggal_upload).toLocaleDateString('id-ID').substring(0, 15), col[3]+2, y + 4, { width: col[4]-col[3]-4, align: 'left' });
+      doc.text((item.status_review || '-').substring(0, 15), col[4]+2, y + 4, { width: col[5]-col[4]-4, align: 'left' });
+      doc.text((item.feedback_dosen || '-').substring(0, 25), col[5]+2, y + 4, { width: col[6]-col[5]-4, align: 'left' });
       // Garis vertikal isi
       for (let i = 0; i < col.length; i++) {
         doc.moveTo(col[i], y).lineTo(col[i], y + rowHeight).stroke();

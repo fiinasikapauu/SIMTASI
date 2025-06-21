@@ -20,7 +20,7 @@ app.use(session({
 
 // Middleware agar variabel user selalu tersedia di semua view
 app.use((req, res, next) => {
-  res.locals.user = req.user || null;
+  res.locals.user = req.session.user || null;
   next();
 });
 
@@ -29,16 +29,24 @@ const feedbackRoutes = require('./routes/feedbackRoutes'); // Tambahan route fee
 const roleRoutes = require('./routes/roleRoutes'); // Updated route
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
+const daftartaonlineRoutes = require('./routes/daftartaonlineRoutes');
 const authRouter = require('./routes/auth');
+const jadwalRoute = require("./routes/jadwal");
 const topikRoutes = require('./routes/topikRoutes');
+const draftSidangRoute = require("./routes/draftSidang");
 const bookingRoutes = require('./routes/bookingRoutes'); // Import booking routes
 const monitoringRoutes = require('./routes/monitoringRoutes');  // Pastikan path ini benar
-const seminarRoutes = require('./routes/seminarRoutes');
 const bodyParser = require('body-parser');
-const sidangRoutes = require('./routes/sidangRoutes');  // Mengimpor routes
+const pemberianNilaiRoute = require("./routes/pemberianNilai");
 const kalenderAdminRoutes = require('./routes/kalenderAdminRoutes');
 const riwayatRoutes = require('./routes/riwayatfeedbackdosenRoutes');
 const cors = require('cors');
+const draftRouter = require('./routes/draft');
+const daftarSemhasRouter = require('./routes/daftarSemhasRoutes');
+const kalenderAdminController = require('./controllers/kalenderAdminController');
+const kalenderMahasiswaRoutes = require('./routes/kalenderMahasiswaRoutes');
+const kalenderMahasiswaController = require('./controllers/kalenderMahasiswaController');
+
 
 app.use(cors({
   origin: 'http://localhost:3000', // Frontend URL
@@ -79,18 +87,18 @@ app.set('view engine', 'ejs'); // Menggunakan EJS sebagai template engine
 
 app.use(monitoringRoutes); 
 
-
+app.use('/feedback', feedbackRoutes); // Route baru untuk feedback
 
 app.use('/', roleRoutes);
-app.use('/sidang', sidangRoutes); // Memastikan /sidang di sini
+app.use("/sidang/pemberian-nilai", pemberianNilaiRoute);
 
 app.use(riwayatRoutes);
 
 app.use(feedbackRoutes); // Ini akan membuat route /feedback tersedia
 
 app.use(monitoringRoutes); // Pastikan route digunakan dengan benar
-app.use('/', seminarRoutes)
-app.use('/', kalenderAdminRoutes)
+app.use('/kalender-sidang', kalenderAdminRoutes)
+app.use('/kalender', kalenderMahasiswaRoutes); // Menggunakan route kalender mahasiswa
 
 // Router utama
 app.use('/', indexRouter);
@@ -98,6 +106,12 @@ app.use('/users', usersRouter);
 app.use('/', authRouter); // Gunakan router untuk auth (signup & signin)
 app.use('/', topikRoutes); // Menggunakan routing untuk topik
 app.use('/', bookingRoutes); // Gunakan routing untuk booking konsultasi dosen
+app.use('/', draftRouter);
+app.use('/', daftarSemhasRouter);
+
+app.get('/kalender-sidang', kalenderAdminController.getKalenderSidangPage);
+app.get('/kalender', kalenderMahasiswaController.getKalenderPage);
+
 
 app.get('/bookingkonsul', (req, res) => {
   res.render('mahasiswa/bookingkonsul'); // Pastikan nama file di sini sama dengan nama file EJS

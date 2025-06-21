@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Draft Sidang TA</title>
+  <!-- Tailwind CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+    
+  <!-- Header -->
+  <%- include('../partial/header.ejs') %>
+
+  <div class="flex">
+    <!-- Sidebar untuk dosen -->
+    <%- include('../sidebar/sidebardosen.ejs') %>
+
+    <!-- Main -->
+    <main class="flex-1 p-6">
+      <h1 class="text-3xl font-bold text-green-700 mb-6">Draft Sidang</h1>
+
+      <div class="bg-white rounded-lg shadow p-4 overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="bg-green-700 text-white">
+            <tr>
+              <th class="py-3 px-4 text-left">No</th>
+              <th class="py-3 px-4 text-left">Nama</th>
+              <th class="py-3 px-4 text-left">NIM</th>
+              <th class="py-3 px-4 text-left">File Draft</th>
+              <th class="py-3 px-4 text-left">Periksa</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (drafts.length === 0) { %>
+              <tr>
+                <td colspan="5" class="py-6 text-center text-gray-500">Belum ada draft sidang yang di-upload.</td>
+              </tr>
+            <% } %>
+
+            <% drafts.forEach((d, idx) => { %>
+              <tr class="border-t">
+                <td class="py-2 px-4"><%= idx + 1 %></td>
+                <td class="py-2 px-4"><%= d.user.nama %></td>
+                <td class="py-2 px-4"><%= d.user.nomorInduk %></td>
+                <td class="py-2 px-4">
+                  <a href="/draftsidang/view/<%= d.id_sidang %>" target="_blank"
+                     class="text-blue-600 hover:underline">
+                    <%= d.file_draft_sidang %>
+                  </a>
+                </td>
+                <td class="py-2 px-4">
+                  <a href="/draftsidang/view/<%= d.id_sidang %>" target="_blank"
+                     class="bg-green-600 text-white py-1 px-3 rounded hover:bg-green-700">
+                    Lihat
+                  </a>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-green-600 text-white text-center p-4 mt-6">
+    &copy; 2025 Sistem Informasi – Fakultas Teknologi Informasi
+  </footer>
+</body>
+</html>
