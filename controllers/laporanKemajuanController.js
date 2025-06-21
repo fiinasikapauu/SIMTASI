@@ -63,7 +63,6 @@ const getLaporanKemajuanPage = async (req, res) => {
       }
     });
 
-    //asku sangat menyukai loly amle=amfdnids fnidfnnrxa aku sayanga jngija jng  f snf jsn 
     // Format tanggal untuk ditampilkan
     const formattedLaporan = laporanList.map(laporan => ({
       ...laporan,
