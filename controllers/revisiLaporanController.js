@@ -41,20 +41,38 @@ const getRevisiPage = async (req, res) => {
   try {
     const emailUser = req.session.user?.email;
     if (!emailUser) return res.redirect('/signin');
+    
     const revisiList = await prisma.revisi_laporan.findMany({
       where: { email_user: emailUser },
       orderBy: { tanggal_upload: 'desc' }
     });
+
+    // Ambil daftar dosen untuk dropdown
+    const dosenList = await prisma.user.findMany({
+      where: {
+        role: 'DOSEN'
+      },
+      select: {
+        email_user: true,
+        nama: true
+      },
+      orderBy: {
+        nama: 'asc'
+      }
+    });
+
     const formattedRevisi = revisiList.map(item => ({
       ...item,
       tanggal_upload_formatted: new Date(item.tanggal_upload).toLocaleDateString('id-ID', {
         year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
       })
     }));
+    
     res.render('mahasiswa/uploadrevisilaporan', {
       title: 'Upload Revisi Laporan',
       user: req.session.user,
-      revisiList: formattedRevisi
+      revisiList: formattedRevisi,
+      dosenList: dosenList
     });
   } catch (error) {
     console.error('Error fetching revisi laporan:', error);
@@ -75,13 +93,27 @@ const uploadRevisi = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'File revisi harus diupload' });
     }
+
+    // Cek apakah dosen_penerima dipilih
+    const { dosen_penerima } = req.body;
+    if (!dosen_penerima) {
+      return res.status(400).json({
+        success: false,
+        message: 'Pilih dosen penerima revisi'
+      });
+    }
+
+    // Simpan nama original file dalam feedback_dosen sementara (akan diupdate nanti)
+    const originalFilename = req.file.originalname;
+
     const newRevisi = await prisma.revisi_laporan.create({
       data: {
         email_user: emailUser,
         file_laporan: req.file.filename,
         tanggal_upload: new Date(),
-        feedback_dosen: '-',
-        status: 'Menunggu Review'
+        feedback_dosen: `ORIGINAL_FILENAME:${originalFilename}`, // Simpan nama original sementara
+        status: 'Menunggu Review',
+        dosen_penerima: dosen_penerima
       }
     });
     res.json({ success: true, message: 'Revisi laporan berhasil diupload', data: newRevisi });
@@ -135,7 +167,13 @@ const getAllRevisiForDosen = async (req, res) => {
     if (!req.session.user || req.session.user.role !== 'DOSEN') {
       return res.redirect('/signin');
     }
+
+    const dosenEmail = req.session.user.email;
+
     const revisiList = await prisma.revisi_laporan.findMany({
+      where: {
+        dosen_penerima: dosenEmail
+      },
       include: {
         user: { select: { nama: true } }
       },
@@ -249,28 +287,36 @@ const exportRevisiLaporanPdf = async (req, res) => {
     if (!req.session.user || req.session.user.role !== 'DOSEN') {
       return res.status(403).send('Unauthorized');
     }
+    
+    const dosenEmail = req.session.user.email;
+    
     const revisiList = await prisma.revisi_laporan.findMany({
+      where: {
+        dosen_penerima: dosenEmail
+      },
       include: { user: { select: { nama: true } } },
       orderBy: { tanggal_upload: 'desc' }
     });
+    
     const doc = new PDFDocument({ margin: 25, size: 'A4' });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'attachment; filename="daftar_revisi_laporan_mahasiswa.pdf"');
     doc.pipe(res);
     doc.fontSize(14).font('Helvetica-Bold').text('Daftar Revisi Laporan Mahasiswa', { align: 'center' });
     doc.moveDown(1);
-    // Kolom: No, Nama, File, Status, Feedback
-    const col = [30, 65, 200, 340, 420, 540];
+    // Kolom: No, Nama, File, Tanggal, Status, Feedback
+    const col = [30, 65, 200, 280, 340, 420, 540];
     const rowHeight = 18;
     let y = doc.y;
     // Header
     doc.fontSize(9).font('Helvetica-Bold');
-    doc.rect(col[0], y, col[5]-col[0], rowHeight).stroke();
+    doc.rect(col[0], y, col[6]-col[0], rowHeight).stroke();
     doc.text('No', col[0], y + 4, { width: col[1]-col[0], align: 'center' });
     doc.text('Nama Mahasiswa', col[1], y + 4, { width: col[2]-col[1], align: 'center' });
     doc.text('File Laporan', col[2], y + 4, { width: col[3]-col[2], align: 'center' });
-    doc.text('Status', col[3], y + 4, { width: col[4]-col[3], align: 'center' });
-    doc.text('Feedback', col[4], y + 4, { width: col[5]-col[4], align: 'center' });
+    doc.text('Tanggal', col[3], y + 4, { width: col[4]-col[3], align: 'center' });
+    doc.text('Status', col[4], y + 4, { width: col[5]-col[4], align: 'center' });
+    doc.text('Feedback', col[5], y + 4, { width: col[6]-col[5], align: 'center' });
     // Garis vertikal header
     for (let i = 0; i < col.length; i++) {
       doc.moveTo(col[i], y).lineTo(col[i], y + rowHeight).stroke();
@@ -279,12 +325,13 @@ const exportRevisiLaporanPdf = async (req, res) => {
     // Isi tabel
     doc.font('Helvetica').fontSize(8);
     revisiList.forEach((item, idx) => {
-      doc.rect(col[0], y, col[5]-col[0], rowHeight).stroke();
+      doc.rect(col[0], y, col[6]-col[0], rowHeight).stroke();
       doc.text(idx + 1, col[0], y + 4, { width: col[1]-col[0], align: 'center' });
-      doc.text((item.user && item.user.nama ? item.user.nama : '-').substring(0, 30), col[1]+2, y + 4, { width: col[2]-col[1]-4, align: 'left' });
-      doc.text((item.file_laporan ? item.file_laporan : '-').substring(0, 25), col[2]+2, y + 4, { width: col[3]-col[2]-4, align: 'left' });
-      doc.text((item.status ? item.status : '-').substring(0, 15), col[3]+2, y + 4, { width: col[4]-col[3]-4, align: 'left' });
-      doc.text((item.feedback_dosen ? item.feedback_dosen : '-').substring(0, 30), col[4]+2, y + 4, { width: col[5]-col[4]-4, align: 'left' });
+      doc.text((item.user?.nama || '-').substring(0, 25), col[1]+2, y + 4, { width: col[2]-col[1]-4, align: 'left' });
+      doc.text((item.file_laporan || '-').substring(0, 20), col[2]+2, y + 4, { width: col[3]-col[2]-4, align: 'left' });
+      doc.text(new Date(item.tanggal_upload).toLocaleDateString('id-ID').substring(0, 15), col[3]+2, y + 4, { width: col[4]-col[3]-4, align: 'left' });
+      doc.text((item.status || '-').substring(0, 15), col[4]+2, y + 4, { width: col[5]-col[4]-4, align: 'left' });
+      doc.text((item.feedback_dosen || '-').substring(0, 25), col[5]+2, y + 4, { width: col[6]-col[5]-4, align: 'left' });
       // Garis vertikal isi
       for (let i = 0; i < col.length; i++) {
         doc.moveTo(col[i], y).lineTo(col[i], y + rowHeight).stroke();

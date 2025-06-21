@@ -25,36 +25,52 @@
         <h2 class="text-3xl font-semibold text-green-600 mb-6">Sistem Daftar Seminar Hasil</h2>
 
         <div class="max-w-4xl mx-auto px-4 py-10">
-          <!-- Form Pendaftaran Seminar -->
-          <form action="/sistemdaftarseminar/daftar-seminar" method="POST" class="space-y-6"> <!-- Update action ke /sistemdaftarseminar/daftar-seminar -->
-            <!-- Nama Lengkap -->
-            <div class="mb-4">
-              <label for="nama" class="block text-lg font-medium text-green-600 mb-2">Nama Lengkap</label>
-              <input type="text" id="nama" name="nama" class="w-full p-4 rounded-lg bg-green-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Masukkan Nama Lengkap" required>
-            </div>
 
-            <!-- NIM -->
-            <div class="mb-4">
-              <label for="nim" class="block text-lg font-medium text-green-600 mb-2">NIM</label>
-              <input type="text" id="nim" name="nim" class="w-full p-4 rounded-lg bg-green-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Masukkan NIM" required>
+          <% if (pendaftaran) { %>
+            <!-- Tampilan Jika Sudah Terdaftar -->
+            <div id="statusPendaftaran" class="text-center">
+              <h3 class="text-2xl font-semibold text-gray-800 mb-4">Anda Sudah Terdaftar</h3>
+              <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded-lg mb-6">
+                <p class="font-bold">Jadwal Seminar Anda:</p>
+                <p class="text-lg"><%= pendaftaran.tanggal_seminar_formatted %></p>
+              </div>
+              <p class="text-gray-600 mb-6">Jika Anda ingin mengubah jadwal, silakan batalkan pendaftaran terlebih dahulu.</p>
+              <button id="batalBtn" class="w-full max-w-sm mx-auto p-4 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 focus:outline-none">
+                Batalkan Pendaftaran
+              </button>
             </div>
+          <% } else { %>
+            <!-- Form Pendaftaran Seminar -->
+            <form id="seminarForm" action="/sistemdaftarsemhas" method="POST" class="space-y-6">
+              <!-- Nama Lengkap -->
+              <div class="mb-4">
+                <label for="nama" class="block text-lg font-medium text-green-600 mb-2">Nama Lengkap</label>
+                <input type="text" id="nama" name="nama" class="w-full p-4 rounded-lg bg-gray-200 text-gray-800 focus:outline-none" value="<%= user.nama %>" readonly>
+              </div>
 
-            <!-- Tanggal Seminar -->
-            <div class="mb-4">
-              <label for="tanggal" class="block text-lg font-medium text-green-600 mb-2">Pilih Tanggal Seminar</label>
-              <select id="tanggal" name="tanggal" class="w-full p-4 rounded-lg bg-green-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500" required>
-                <option disabled selected>--Pilih Tanggal Seminar--</option>
-                <option value="2025-06-25">25 Juni 2025</option>
-                <option value="2025-06-26">26 Juni 2025</option>
-                <option value="2025-06-27">27 Juni 2025</option>
-              </select>
-            </div>
+              <!-- NIM -->
+              <div class="mb-4">
+                <label for="nim" class="block text-lg font-medium text-green-600 mb-2">NIM</label>
+                <input type="text" id="nim" name="nim" class="w-full p-4 rounded-lg bg-gray-200 text-gray-800 focus:outline-none" value="<%= user.nomorInduk %>" readonly>
+              </div>
 
-            <!-- Tombol Daftar -->
-            <div>
-              <button type="submit" class="w-full p-4 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 focus:outline-none">Daftar Seminar</button>
-            </div>
-          </form>
+              <!-- Tanggal Seminar -->
+              <div class="mb-4">
+                <label for="tanggal" class="block text-lg font-medium text-green-600 mb-2">Pilih Tanggal Seminar</label>
+                <select id="tanggal" name="tanggal" class="w-full p-4 rounded-lg bg-green-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                  <option value="" disabled selected>-- Pilih Tanggal Seminar --</option>
+                  <% jadwal.forEach(j => { %>
+                    <option value="<%= j.tanggal %>"><%= j.label %></option>
+                  <% }); %>
+                </select>
+              </div>
+
+              <!-- Tombol Daftar -->
+              <div>
+                <button id="submitBtn" type="submit" class="w-full p-4 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 focus:outline-none transition-opacity opacity-50 cursor-not-allowed" disabled>Daftar Seminar</button>
+              </div>
+            </form>
+          <% } %>
         </div>
       </div>
     </div>
@@ -64,6 +80,130 @@
   <footer class="bg-green-600 text-white text-center p-4 mt-6">
     <p>&copy; 2025 Sistem Informasi - Fakultas Teknologi Informasi</p>
   </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Logika untuk form pendaftaran
+      const seminarForm = document.getElementById('seminarForm');
+      if (seminarForm) {
+        const tanggalSelect = document.getElementById('tanggal');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function validateForm() {
+          if (tanggalSelect.value) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          } else {
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+          }
+        }
+
+        tanggalSelect.addEventListener('change', validateForm);
+        validateForm();
+
+        seminarForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+
+          if (submitBtn.disabled) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Data Belum Lengkap',
+              text: 'Silakan pilih tanggal seminar terlebih dahulu.',
+            });
+            return;
+          }
+
+          const formData = new FormData(seminarForm);
+          const data = Object.fromEntries(formData.entries());
+
+          Swal.fire({
+            title: 'Mendaftarkan...',
+            text: 'Mohon tunggu, pendaftaran sedang diproses.',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+
+          try {
+            const response = await fetch('/sistemdaftarsemhas', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: result.message,
+              }).then(() => {
+                window.location.href = '/homemahasiswa'; // Redirect ke home setelah berhasil
+              });
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Pendaftaran Gagal',
+                text: result.message || 'Terjadi kesalahan saat pendaftaran.',
+              });
+            }
+          } catch (error) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Tidak dapat terhubung ke server.',
+            });
+          }
+        });
+      }
+
+      // Logika untuk tombol batal pendaftaran
+      const batalBtn = document.getElementById('batalBtn');
+      if (batalBtn) {
+        batalBtn.addEventListener('click', async () => {
+          const confirmation = await Swal.fire({
+            title: 'Anda Yakin?',
+            text: "Anda akan membatalkan pendaftaran seminar ini.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, Batalkan!',
+            cancelButtonText: 'Tidak',
+          });
+
+          if (confirmation.isConfirmed) {
+            Swal.fire({
+              title: 'Membatalkan...',
+              text: 'Mohon tunggu, pendaftaran sedang dibatalkan.',
+              allowOutsideClick: false,
+              didOpen: () => { Swal.showLoading(); },
+            });
+
+            try {
+              const response = await fetch('/sistemdaftarsemhas', { method: 'DELETE' });
+              const result = await response.json();
+
+              if (result.success) {
+                Swal.fire('Berhasil!', result.message, 'success').then(() => {
+                  location.reload();
+                });
+              } else {
+                Swal.fire('Gagal!', result.message, 'error');
+              }
+            } catch (error) {
+              Swal.fire('Error!', 'Tidak dapat terhubung ke server.', 'error');
+            }
+          }
+        });
+      }
+    });
+  </script>
 
 </body>
 
