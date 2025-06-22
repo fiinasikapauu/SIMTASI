@@ -1,4 +1,6 @@
-const prisma = require('../middleware/auth'); // Prisma client atau database connection
+const { PrismaClient, user_role } = require('@prisma/client');
+const prisma = new PrismaClient();
+
 
 // Mengambil data draft yang statusnya "Menunggu"
 exports.getValidasiDraft = async (req, res) => {

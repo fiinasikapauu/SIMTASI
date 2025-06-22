@@ -1,4 +1,5 @@
-const prisma = require('../middleware/auth'); // Prisma client atau database connection
+const { PrismaClient, user_role } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 // Controller untuk mengambil data persetujuan mahasiswa
 const getApprovalData = async (req, res) => {
