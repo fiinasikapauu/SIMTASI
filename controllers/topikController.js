@@ -1,5 +1,5 @@
-// controllers/topikController.js
-const prisma = require('../middleware/auth'); 
+const { PrismaClient, user_role } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 const addTopik = async (req, res) => {
   const { topik, dosen } = req.body;  

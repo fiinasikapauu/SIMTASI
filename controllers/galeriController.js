@@ -1,4 +1,5 @@
-const prisma = require('../middleware/auth');  // Prisma client atau database connection 
+const { PrismaClient, user_role } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 // Controller untuk menampilkan Galeri Judul TA yang Selesai
 const getFinishedTA = async (req, res) => {
@@ -7,7 +8,7 @@ const getFinishedTA = async (req, res) => {
     const data = await prisma.pendaftaran_ta.findMany({
         where: {
         sidang_ta: { // Pastikan sidang_ta ada
-        id_sidang: {},  // Pastikan sidang_ta ada (tidak null)
+        id_sidang: {},  // Pastikan sidang_ta ada 
           }
       },
       include: {
