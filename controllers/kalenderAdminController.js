@@ -38,12 +38,15 @@ exports.saveSidangDate = async (req, res) => {
 
         // Gabungkan tanggal dari kalender dengan waktu default (misal: 12:00)
         const waktu_mulai = new Date(`${tanggal}T12:00:00`);
+        const waktu = new Date();
+        waktu.setHours(12, 0, 0, 0);
 
         const newJadwal = await prisma.jadwal_sidang_seminar.create({
             data: {
                 admin_id: admin_id,
                 jenis_jadwal: jenis_jadwal,
-                waktu_mulai: waktu_mulai,
+                tanggal: waktu_mulai,
+                waktu: waktu,
             },
         });
 
