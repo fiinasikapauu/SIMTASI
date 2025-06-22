@@ -8,7 +8,7 @@ const getFinishedTA = async (req, res) => {
     const data = await prisma.pendaftaran_ta.findMany({
         where: {
         sidang_ta: { // Pastikan sidang_ta ada
-        id_sidang: {},  // Pastikan sidang_ta ada (tidak null)
+        id_sidang: {},  // Pastikan sidang_ta ada 
           }
       },
       include: {
