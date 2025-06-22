@@ -1,4 +1,5 @@
-const prisma = require('../middleware/auth');  // Prisma client atau database connection 
+const { PrismaClient, user_role } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 // Controller untuk menampilkan Galeri Judul TA yang Selesai
 const getFinishedTA = async (req, res) => {

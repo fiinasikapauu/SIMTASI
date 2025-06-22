@@ -38,7 +38,7 @@ router.get('/approvaldospem', isLoggedIn, isDosen, approvalController.getApprova
 router.post('/approvaldospem', approvalController.updateApprovalStatus);
 
 // Route untuk menampilkan Galeri Judul TA yang Selesai
-router.get('/galerijudulTA',isLoggedIn, isAdmin, getFinishedTA);
+router.get('/galerijudulTA', getFinishedTA);
 
 router.get('/galerijudulTA', isLoggedIn, isAdmin, galeriController.downloadPDF);
 
