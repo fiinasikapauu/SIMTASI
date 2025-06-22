@@ -19,40 +19,41 @@
             <!-- Main Content Area -->
             <div class="col-span-2 bg-white p-6 rounded-lg shadow-lg">
                 <h2 class="text-2xl font-semibold text-green-600 mb-6">Sistem Approval Dosen Pembimbing</h2>
-
-                <div class="border-collapse overflow-x-auto bg-white rounded-lg shadow-lg">
-                    <table class="border-b min-w-full table-auto w-full text-lg">
-                        <thead>
-                            <tr class="border-b border-collapse bg-green-600 text-white border-2">
-                                <th class="border-r border-collapse px-6 py-4 text-center">No</th>
-                                <th class="border-r border-collapse px-6 py-4 text-center">Nama</th>
-                                <th class="border-r border-collapse px-6 py-4 text-center">Topik TA</th>
-                                <th class="border-r border-collapse px-6 py-4 text-center">Judul TA</th>
-                                <th class="border-r border-collapse px-6 py-4 text-center">Tanggal Pengajuan</th>
-                                <th class="border-r border-collapse px-6 py-4 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% mahasiswaList.forEach((mahasiswa, index) => { %>
-                            <tr class="border-r border-collapse bg-gray-100 border-b border-gray-600">
-                                <td class="border-r border-collapse px-6 py-4 text-center"><%= index + 1 %></td>
-                                <td class="border-r border-collapse px-6 py-4"><%= mahasiswa.user.nama %></td>
-                                <td class="border-r border-collapse px-6 py-4"><%= mahasiswa.topikta.topik %></td>
-                                <td class="border-r border-collapse px-6 py-4 text-center"><%= mahasiswa.judul_ta %></td>
-                                <td class="border-r border-collapse px-6 py-4 text-center"><%= mahasiswa.tanggal_daftar %></td>
-                                <td class="border-r border-collapse px-6 py-4 text-center p-4 mr-4">
-                                    <div class="flex flex-warp">
-                                        <button class="mr-4 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 approvalBtn" data-id="<%= mahasiswa.id_pendaftaran %>" data-status="Disetujui">
-                                        Setuju
-                                    </button>
-                                    <button class="ml-4 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 approvalBtn" data-id="<%= mahasiswa.id_pendaftaran %>" data-status="Ditolak">
-                                         Tidak Setuju
-                                    </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <% }) %>
-                        </tbody>
+                <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+                    <table class="min-w-full table-auto w-full border border-gray-400 border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-green-600 text-white">
+                        <th class="px-4 py-2 border border-gray-400 text-center">No</th>
+                        <th class="px-4 py-2 border border-gray-400 text-center">Nama</th>
+                        <th class="px-4 py-2 border border-gray-400 text-center">Topik TA</th>
+                        <th class="px-4 py-2 border border-gray-400 text-center">Judul TA</th>
+                        <th class="px-4 py-2 border border-gray-400 text-center">Tanggal Pengajuan</th>
+                        <th class="px-4 py-2 border border-gray-400 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% mahasiswaList.forEach((mahasiswa, index) => { %>
+                        <tr class="bg-white hover:bg-gray-100">
+                        <td class="px-4 py-2 border border-gray-400 text-center"><%= index + 1 %></td>
+                        <td class="px-4 py-2 border border-gray-400"><%= mahasiswa.user.nama %></td>
+                        <td class="px-4 py-2 border border-gray-400"><%= mahasiswa.topikta.topik %></td>
+                        <td class="px-4 py-2 border border-gray-400 text-center"><%= mahasiswa.judul_ta %></td>
+                        <td class="px-4 py-2 border border-gray-400 text-center"><%= mahasiswa.tanggal_daftar %></td>
+                        <td class="px-4 py-2 border border-gray-400 text-center">
+                            <div class="flex justify-center space-x-2">
+                            <button class="bg-green-600 text-white py-1 px-3 rounded hover:bg-green-700 approvalBtn"
+                                data-id="<%= mahasiswa.id_pendaftaran %>" data-status="Disetujui">
+                                Setuju
+                            </button>
+                            <button class="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700 approvalBtn"
+                                data-id="<%= mahasiswa.id_pendaftaran %>" data-status="Ditolak">
+                                Tidak Setuju
+                            </button>
+                            </div>
+                        </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
                     </table>
                 </div>
             </div>

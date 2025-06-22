@@ -4,6 +4,11 @@ const topikController = require('../controllers/topikController');
 const router = express.Router();
 const monitoringController = require('../controllers/monitoringController');
 const approvalController = require('../controllers/approvalController');
+const { getFinishedTA } = require('../controllers/galeriController');  // Impor controller
+const galeriController = require('../controllers/galeriController');
+const validasisemhasController = require('../controllers/validasisemhasController');
+const validasisidangController = require('../controllers/validasisidangController');
+const app = require('../app');
 
 // Route untuk menangani GET Daftar Topik
 router.get('/daftartopikta', (req, res) => {
@@ -30,5 +35,19 @@ router.get('/approvaldospem', approvalController.getApprovalData);
 
 // Route untuk menerima dan memproses persetujuan dosen
 router.post('/approvaldospem', approvalController.updateApprovalStatus);
+
+// Route untuk menampilkan Galeri Judul TA yang Selesai
+router.get('/galerijudulTA', getFinishedTA);
+
+router.get('/galerijudulTA', galeriController.downloadPDF);
+
+router.get('/validasidraftsemhas', validasisemhasController.getValidasiDraft);
+router.post('/validasidraftsemhas/:id', validasisemhasController.updateStatusDraft);
+
+// Endpoint to get the validasi draft sidang
+router.get('/validasidraftsidang', validasisidangController.getValidasiDraftSidang);
+// Endpoint to update the status of draft sidang
+router.post('/validasidraftsidang/:id', validasisidangController.updateStatusDraftSidang);
+
 
 module.exports = router;

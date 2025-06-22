@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Daftar Topik TA Tersedia</title>
+    <link rel="stylesheet" href="/stylesheets/output.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+  <body class="bg-gray-100">
+    <!-- Header -->
+    <%- include('../partial/header.ejs') %>
+
+    <!-- Main Content -->
+    <div class="container mx-auto p-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Sidebar -->
+        <%- include('../sidebar/sidebaradmin.ejs') %>
+        <!-- Main Content Area -->
+            <div class="col-span-2 bg-white p-6 rounded-lg shadow-lg">
+              <h2 class="text-2xl font-semibold text-green-600 mb-6">Validasi Dokumen Draft Semhas</h2>
+              <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+                <table class="table-auto w-full border border-gray-300 text-center">
+                  <thead class="bg-green-600 text-white">
+                    <tr>
+                      <th class="px-4 py-2 border border-gray-300">No</th>
+                      <th class="px-4 py-2 border border-gray-300">Nama Mahasiswa</th>
+                      <th class="px-4 py-2 border border-gray-300">Nomor Induk</th>
+                      <th class="px-4 py-2 border border-gray-300">Draft Semhas</th>
+                      <th class="px-4 py-2 border border-gray-300">Tanggal</th>
+                      <th class="px-4 py-2 border border-gray-300">Status</th>
+                      <th class="px-4 py-2 border border-gray-300">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% daftarDraft.forEach((item, index) => { %>
+                    <tr class="bg-gray-50 hover:bg-gray-100">
+                      <td class="px-4 py-2 border border-gray-300"><%= index + 1 %></td>
+                      <td class="px-4 py-2 border border-gray-300"><%= item.nama %></td>
+                      <td class="px-4 py-2 border border-gray-300"><%= item.nim %></td>
+                      <td class="px-4 py-2 border border-gray-300">
+                        <a href="/uploads/<%= item.file_draft %>" class="text-blue-600 underline" target="_blank">Lihat File</a>
+                      </td>
+                      <td class="px-4 py-2 border border-gray-300"><%= item.tanggal %></td>
+                      <td class="px-4 py-2 border border-gray-300 font-semibold <%= item.status === 'disetujui' ? 'text-green-600' : item.status === 'ditolak' ? 'text-red-600' : 'text-yellow-600' %>"><%= item.status %></td>
+                      <td class="px-4 py-2 border border-gray-300">
+                        <button class="btn-setuju bg-green-600 text-white px-4 py-2 rounded" data-id="<%= item.id %>">Setuju</button>
+                        <button class="btn-tolak bg-red-600 text-white px-4 py-2 rounded" data-id="<%= item.id %>">Tolak</button>
+                      </td>
+                    </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer -->
+    <footer class="bg-green-600 text-white text-center p-4 mt-6">
+      <p>&copy; 2025 Sistem Informasi - Fakultas Teknologi Informasi</p>
+    </footer>
+    <!-- Check if the success parameter is passed in the URL -->
+    <script src="/javascripts/alert-semhas.js"></script>
+  </body>
+</html>

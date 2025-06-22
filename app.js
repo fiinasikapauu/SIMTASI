@@ -81,6 +81,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/favicon.ico', express.static(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 app.use(express.static('public'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Menonaktifkan request untuk favicon.ico
 app.get('/favicon.ico', (req, res) => res.status(204).end())
 
@@ -135,6 +137,8 @@ app.get('/approvaldospem', (req, res) => {
   res.render('dosen/approvaldospem');
 });
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
