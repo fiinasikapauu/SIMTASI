@@ -33,18 +33,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% kalender.forEach(function(item) { %>
+                        <% jadwal.forEach(function(item) { %>
                         <tr class="border-b">
                             <td class="px-6 py-4 text-gray-700">
-                                <%= new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) %>
+                                <%= new Date(item.waktu_mulai).toLocaleString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
                             </td>
                             <td class="px-6 py-4 text-gray-700">
-                                <% if (item.jenis_sidang === 'SEMHAS') { %>
+                                <% if (item.jenis_jadwal === 'Seminar') { %>
                                     Seminar Hasil
-                                <% } else if (item.jenis_sidang === 'TA') { %>
+                                <% } else if (item.jenis_jadwal === 'Sidang') { %>
                                     Sidang TA
                                 <% } else { %>
-                                    <%= item.jenis_sidang %>
+                                    <%= item.jenis_jadwal %>
                                 <% } %>
                             </td>
                         </tr>

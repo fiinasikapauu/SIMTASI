@@ -4,15 +4,15 @@ const prisma = new PrismaClient();
 module.exports = {
     getKalenderPage: async (req, res) => {
         try {
-            // Fetch kalender sidang data from the database
-            const kalender = await prisma.kalender_sidang.findMany({
+            // Ambil data dari tabel jadwal_sidang_seminar
+            const jadwal = await prisma.jadwal_sidang_seminar.findMany({
                 orderBy: {
-                    tanggal: 'asc'
+                    waktu_mulai: 'asc' // Urutkan berdasarkan waktu
                 }
             });
 
-            // Render the kalender view and pass the data to the EJS template
-            res.render('mahasiswa/kalender', { kalender });
+            // Render view kalender mahasiswa dan teruskan data jadwal
+            res.render('mahasiswa/kalender', { jadwal }); // Ganti nama variabel menjadi 'jadwal'
         } catch (error) {
             console.error("Error fetching calendar data:", error);
             res.status(500).send("Internal Server Error");

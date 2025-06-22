@@ -22,7 +22,6 @@ model user {
   role             user_role
   password         String
   beban_bimbingan Int   @default(0) // Berikan nilai default, misalnya 0
-  kalender_sidang  kalender_sidang[]
   konsultasi       konsultasi[]
   pendaftaran_ta   pendaftaran_ta[]
   proposal_ta      proposal_ta[]
@@ -35,16 +34,6 @@ model user {
   laporan_kemajuan laporan_kemajuan[]
   feedback         feedback[]         // Relasi balik ke model feedback
   jadwal_sidang_seminar jadwal_sidang_seminar[] @relation("AdminJadwal")
-}
-
-model kalender_sidang {
-  id_kalender  Int      @id @default(autoincrement())
-  email_user   String
-  tanggal      DateTime
-  jenis_sidang String
-  user         user     @relation(fields: [email_user], references: [email_user], map: "Kalender_Sidang_email_user_fkey")
-
-  @@index([email_user], map: "Kalender_Sidang_email_user_fkey")
 }
 
 model konsultasi {

@@ -49,6 +49,7 @@ const kalenderMahasiswaRoutes = require('./routes/kalenderMahasiswaRoutes');
 const kalenderMahasiswaController = require('./controllers/kalenderMahasiswaController');
 const daftarSidangRouter = require('./routes/daftarSidangRoutes');
 const hasilKonsultasiRoutes = require('./routes/hasilKonsultasiRoutes');
+const daftarPesertaRoutes = require('./routes/daftarPesertaRoutes');
 
 
 app.use(cors({
@@ -116,6 +117,8 @@ app.use('/', bookingRoutes); // Gunakan routing untuk booking konsultasi dosen
 app.use('/', draftRouter);
 app.use('/', daftarSemhasRouter);
 app.use('/', daftarSidangRouter)
+app.use('/jadwal', jadwalRoute); // Menggunakan routing untuk jadwal
+app.use('/daftarpeserta', daftarPesertaRoutes);
 
 app.get('/kalender-sidang', kalenderAdminController.getKalenderSidangPage);
 app.get('/kalender', kalenderMahasiswaController.getKalenderPage);
