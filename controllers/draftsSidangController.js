@@ -64,15 +64,38 @@ const uploadDraftSidang = async (req, res) => {
         message: 'File draft sidang harus diupload',
       });
     }
+
+    // 1. Cari data sidang_ta yang aktif untuk mahasiswa ini
+    const sidangTa = await prisma.sidang_ta.findFirst({
+      where: {
+        email_user: emailUser,
+        // Anda mungkin perlu menambahkan kondisi lain di sini, 
+        // misalnya status sidang yang masih aktif atau belum selesai.
+      },
+      orderBy: {
+        tanggal_daftar: 'desc', // Ambil yang terbaru jika ada banyak
+      },
+    });
+
+    if (!sidangTa) {
+      return res.status(404).json({
+        success: false,
+        message: 'Data pendaftaran sidang tidak ditemukan untuk Anda. Pastikan Anda sudah mendaftar sidang.',
+      });
+    }
+
+    // 2. Gunakan id_sidang dari data yang ditemukan
     const newDraftSidang = await prisma.draft_sidang.create({
       data: {
         email_user: emailUser,
+        id_sidang: sidangTa.id_sidang, // Tambahkan id_sidang di sini
         file_draft_sidang: req.file.filename,
         tgl_upload: new Date(),
         status_draft: 'Menunggu',
         balasan_dosen: '-',
       },
     });
+
     res.json({
       success: true,
       message: 'Draft sidang berhasil diupload',
