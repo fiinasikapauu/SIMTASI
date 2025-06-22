@@ -9,16 +9,16 @@ exports.getKalenderSidangPage = async (req, res) => {
             return res.redirect('/signin');
         }
 
-        // Ambil semua jadwal yang sudah ada untuk admin ini
-        const existingEvents = await prisma.kalender_sidang.findMany({
-            where: {
-                email_user: user.email
-            }
+        // Ambil semua jadwal dari jadwal_sidang_seminar
+        const existingEvents = await prisma.jadwal_sidang_seminar.findMany({
+            // Jika Anda hanya ingin admin melihat jadwal yang mereka buat:
+            // where: { admin_id: user.email } 
         });
 
         res.render('admin/kalender-sidang', {
             user: user,
-            events: JSON.stringify(existingEvents) // Kirim sebagai JSON string
+            // Ubah nama field agar sesuai dengan view: waktu_mulai -> tanggal, jenis_jadwal -> jenis_sidang
+            events: JSON.stringify(existingEvents.map(e => ({...e, tanggal: e.waktu_mulai, jenis_sidang: e.jenis_jadwal}))) 
         });
     } catch (error) {
         console.error('Error getting calendar page:', error);
@@ -26,85 +26,68 @@ exports.getKalenderSidangPage = async (req, res) => {
     }
 };
 
+// Fungsi untuk menyimpan jadwal baru
 exports.saveSidangDate = async (req, res) => {
     try {
-        // Ambil data dari request body
-        const { tanggal, jenis_sidang } = req.body;
-        const email_user = req.session.user?.email;
+        const { tanggal, jenis_jadwal } = req.body; // Disesuaikan dengan nama di view
+        const admin_id = req.session.user?.email;
 
-        // Periksa apakah semua data sudah ada
-        if (!tanggal || !jenis_sidang || !email_user) {
+        if (!tanggal || !jenis_jadwal || !admin_id) {
             return res.status(400).json({ success: false, message: 'Data tidak lengkap atau sesi tidak valid' });
         }
 
-        const eventDate = new Date(tanggal);
+        // Gabungkan tanggal dari kalender dengan waktu default (misal: 12:00)
+        const waktu_mulai = new Date(`${tanggal}T12:00:00`);
+        const waktu = new Date();
+        waktu.setHours(12, 0, 0, 0);
 
-        // Cek apakah jadwal dengan jenis yang sama sudah ada pada tanggal tersebut
-        const existingEvent = await prisma.kalender_sidang.findFirst({
-            where: {
-                email_user: email_user,
-                jenis_sidang: jenis_sidang,
-                tanggal: {
-                    gte: new Date(eventDate.setUTCHours(0, 0, 0, 0)),
-                    lt: new Date(eventDate.setUTCHours(23, 59, 59, 999))
-                }
-            }
-        });
-
-        if (existingEvent) {
-            return res.status(409).json({ success: false, message: 'Jadwal dengan jenis yang sama sudah ada pada tanggal ini.' });
-        }
-
-        // Menyimpan tanggal sidang ke dalam database menggunakan Prisma
-        const newSidang = await prisma.kalender_sidang.create({
+        const newJadwal = await prisma.jadwal_sidang_seminar.create({
             data: {
-                email_user: email_user,      // Email pengguna
-                tanggal: new Date(tanggal),  // Tanggal yang dipilih
-                jenis_sidang: jenis_sidang,  // Jenis sidang, misalnya "TA" atau "SEMHAS"
+                admin_id: admin_id,
+                jenis_jadwal: jenis_jadwal,
+                tanggal: waktu_mulai,
+                waktu: waktu,
             },
         });
 
-        // Mengirimkan respons sukses
-        return res.status(200).json({ success: true, sidang: newSidang });
+        return res.status(200).json({ success: true, jadwal: newJadwal });
     } catch (error) {
-        console.error('Error saving sidang date:', error);
+        console.error('Error saving jadwal date:', error);
         return res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server' });
     }
 };
 
-// Fungsi untuk menghapus tanggal sidang
+// Fungsi untuk menghapus semua jadwal pada tanggal tertentu
 exports.clearSidangDate = async (req, res) => {
     try {
         const { tanggal } = req.body;
-        const email_user = req.session.user?.email;
+        const admin_id = req.session.user?.email;
 
-        if (!tanggal || !email_user) {
+        if (!tanggal || !admin_id) {
             return res.status(400).json({ success: false, message: 'Data tidak lengkap' });
         }
-
-        // Tentukan rentang waktu untuk hari yang dipilih
+        
         const startDate = new Date(tanggal);
-        startDate.setUTCHours(0, 0, 0, 0); // Set ke awal hari (UTC)
-
+        startDate.setUTCHours(0, 0, 0, 0);
         const endDate = new Date(startDate);
-        endDate.setUTCDate(startDate.getUTCDate() + 1); // Set ke awal hari berikutnya
+        endDate.setDate(startDate.getDate() + 1);
 
-        // Hapus semua data sidang dalam rentang tanggal tersebut untuk pengguna ini
-        const deletedSidang = await prisma.kalender_sidang.deleteMany({
+        const deletedJadwal = await prisma.jadwal_sidang_seminar.deleteMany({
             where: {
-                email_user: email_user,
-                tanggal: {
-                    gte: startDate, // Greater than or equal to the start of the day
-                    lt: endDate,    // Less than the start of the next day
+                // Hapus semua jadwal pada hari itu, terlepas dari siapa adminnya
+                // Jika ingin hanya admin yang bersangkutan bisa hapus, tambahkan: admin_id: admin_id
+                waktu_mulai: {
+                    gte: startDate,
+                    lt: endDate,
                 },
             },
         });
 
-        if (deletedSidang.count === 0) {
-            return res.status(404).json({ success: false, message: 'Tanggal tidak ditemukan untuk dihapus' });
+        if (deletedJadwal.count === 0) {
+            return res.status(404).json({ success: false, message: 'Tidak ada jadwal untuk dihapus pada tanggal ini' });
         }
 
-        return res.status(200).json({ success: true, count: deletedSidang.count });
+        return res.status(200).json({ success: true, count: deletedJadwal.count });
     } catch (error) {
         console.error('Error clearing sidang date:', error);
         return res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server' });

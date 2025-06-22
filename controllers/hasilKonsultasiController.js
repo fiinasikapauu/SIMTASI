@@ -1,22 +1,21 @@
 const { PrismaClient } = require('@prisma/client');
-const PDFDocument = require('pdfkit');
+const pdfMake = require('pdfmake/build/pdfmake');
+const pdfFonts = require('pdfmake/build/vfs_fonts');
 const fs = require('fs');
 const path = require('path');
+
+// Mengatur font virtual (vfs) dari pdfmake
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const prisma = new PrismaClient();
 
 // Fungsi untuk menampilkan halaman Hasil Konsultasi
 exports.getHasilKonsultasi = async (req, res) => {
     try {
-        // Ambil data dari database berdasarkan user yang login
-        const userEmail = req.session.user.email; // Ambil email user yang sudah login
+        const userEmail = req.session.user.email;
         const konsultasi = await prisma.konsultasi.findFirst({
-            where: {
-                email_user: userEmail
-            },
-            include: {
-                user: true, // Untuk mendapatkan nama lengkap dari user
-            }
+            where: { email_user: userEmail },
+            include: { user: true },
         });
 
         if (!konsultasi) {
@@ -26,11 +25,8 @@ exports.getHasilKonsultasi = async (req, res) => {
         const { nama } = konsultasi.user;
         const { tanggal_konsultasi, dosen_pembimbing } = konsultasi;
 
-        // Cek apakah ada feedback yang terkait dengan email_user
         const feedback = await prisma.feedback.findFirst({
-            where: {
-                email_user: userEmail
-            }
+            where: { email_user: userEmail }
         });
 
         if (!feedback) {
@@ -39,7 +35,6 @@ exports.getHasilKonsultasi = async (req, res) => {
 
         const { feedback_text, topik_konsultasi } = feedback;
 
-        // Render halaman hasil konsultasi dengan data yang diambil
         res.render('mahasiswa/hasilKonsultasi', {
             nama,
             dosen_pembimbing,
@@ -58,14 +53,9 @@ exports.generatePDF = async (req, res) => {
     try {
         const userEmail = req.session.user.email;
 
-        // Ambil data konsultasi berdasarkan user yang login
         const konsultasi = await prisma.konsultasi.findFirst({
-            where: {
-                email_user: userEmail
-            },
-            include: {
-                user: true,
-            }
+            where: { email_user: userEmail },
+            include: { user: true },
         });
 
         if (!konsultasi) {
@@ -75,11 +65,18 @@ exports.generatePDF = async (req, res) => {
         const { nama } = konsultasi.user;
         const { tanggal_konsultasi, dosen_pembimbing } = konsultasi;
 
-        // Cari feedback berdasarkan email_user (tanpa pembatasan tanggal)
+        // Format tanggal agar lebih mudah dibaca
+        const formattedDate = new Date(tanggal_konsultasi).toLocaleString('id-ID', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+
         const feedback = await prisma.feedback.findFirst({
-            where: {
-                email_user: userEmail // Cek feedback hanya berdasarkan email
-            }
+            where: { email_user: userEmail }
         });
 
         if (!feedback) {
@@ -88,82 +85,104 @@ exports.generatePDF = async (req, res) => {
 
         const { feedback_text, topik_konsultasi } = feedback;
 
-        // Membuat file PDF dengan desain yang lebih menarik
-        const doc = new PDFDocument({
-            size: 'A4',
-            margin: 50
-        });
-        const filePath = path.join(__dirname, 'hasil_konsultasi.pdf');
-        doc.pipe(fs.createWriteStream(filePath));
+        // Definisikan struktur dokumen PDF menggunakan pdfMake
+        const docDefinition = {
+            content: [
+                // Header (Latar belakang penuh dari kiri ke kanan)
+                {
+                    text: 'Laporan Hasil Konsultasi',
+                    alignment: 'center',
+                    fontSize: 32,
+                    bold: true,
+                    color: '#FFFFFF', // Warna teks putih
+                    background: '#81C784', // Warna latar belakang hijau muda
+                    margin: [0, 20],
+                    lineHeight: 1.5
+                },
+                {
+                    text: 'SIMTASI - Sistem Informasi Tugas Akhir',
+                    alignment: 'center',
+                    fontSize: 14,
+                    margin: [0, 10],
+                    italics: true,
+                    color: '#FFFFFF',
+                    background: '#81C784', // Latar belakang header hijau muda
+                    lineHeight: 1.5
+                },
 
-        // HEADER DESIGN
-        doc.fillColor('#ffffff').rect(0, 0, 595, 100).fill('#4CAF50'); // Set background color for header
-        doc.fillColor('#ffffff').fontSize(24).text('Laporan Hasil Konsultasi', {
-            align: 'center',
-            underline: true,
-            continued: false
-        });
-        doc.moveDown();
-        doc.fillColor('#ffffff').fontSize(12).text('SIMTASI - Sistem Informasi Tugas Akhir', {
-            align: 'center'
-        });
-        doc.moveDown(2); // Add extra space after header
+                // Tabel untuk Data
+                {
+                    table: {
+                        widths: ['30%', '70%'],
+                        body: [
+                            ['Nama Lengkap:', nama],
+                            ['Dosen Pembimbing:', dosen_pembimbing],
+                            ['Tanggal Konsultasi:', formattedDate],
+                            ['Topik Konsultasi:', topik_konsultasi],
+                            ['Feedback Dosen:', feedback_text],
+                        ]
+                    },
+                    layout: 'lightHorizontalLines', // Gaya tabel dengan garis horizontal
+                    margin: [0, 20], // Menambahkan margin di antara tabel
+                    style: 'tableStyle'
+                },
 
-        // BODY CONTENT DESIGN
-        doc.fillColor('#000000').fontSize(12);
+                // Garis Pemisah
+                {
+                    text: '------------------------------------------------------',
+                    alignment: 'center',
+                    fontSize: 14,
+                    color: '#555',
+                    margin: [0, 10]
+                },
 
-        // Tampilkan Nama Lengkap
-        doc.text(`Nama Lengkap:`, { continued: true }).font('Helvetica-Bold').text(nama);
-        doc.moveDown();
+                // Footer (Latar belakang penuh dari kiri ke kanan)
+                {
+                    text: 'Sistem Informasi - Fakultas Teknologi Informasi',
+                    alignment: 'center',
+                    fontSize: 10,
+                    margin: [0, 20],
+                    color: '#FFFFFF',
+                    background: '#81C784', // Footer warna latar belakang hijau muda
+                    lineHeight: 1.5
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 24,
+                    bold: true,
+                    alignment: 'center',
+                    color: '#2C6B3F' // Warna hijau tua
+                },
+                subheader: {
+                    fontSize: 16,
+                    bold: true,
+                    alignment: 'left'
+                },
+                paragraph: {
+                    fontSize: 12,
+                    alignment: 'left',
+                    color: '#333'
+                },
+                tableStyle: {
+                    fontSize: 12,
+                    alignment: 'left',
+                    color: '#555',
+                    margin: [0, 5],
+                }
+            },
+            pageMargins: [30, 50, 30, 50], // Menambahkan margin pada halaman
+            background: '#E8F5E9', // Latar belakang untuk seluruh halaman hijau muda
+        };
 
-        // Tampilkan Dosen Pembimbing
-        doc.text(`Dosen Pembimbing:`, { continued: true }).font('Helvetica-Bold').text(dosen_pembimbing);
-        doc.moveDown();
+        // Membuat PDF menggunakan pdfMake
+        const pdfDoc = pdfMake.createPdf(docDefinition);
 
-        // Tampilkan Tanggal Konsultasi
-        doc.text(`Tanggal Konsultasi:`, { continued: true }).font('Helvetica-Bold').text(tanggal_konsultasi);
-        doc.moveDown();
-
-        // Tampilkan Topik Konsultasi
-        doc.text(`Topik Konsultasi:`, { continued: true }).font('Helvetica-Bold').text(topik_konsultasi);
-        doc.moveDown();
-
-        // Tampilkan Feedback Dosen
-        doc.text(`Feedback Dosen:`, { continued: true }).font('Helvetica-Bold').text(feedback_text);
-        doc.moveDown(2);
-
-        // Add Divider Line
-        doc.strokeColor('#4CAF50').lineWidth(1).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-        doc.moveDown(2); // Add space after line
-
-        // FOOTER DESIGN
-        doc.fillColor('#4CAF50').fontSize(10).text('Sistem Informasi - Fakultas Teknologi Informasi', {
-            align: 'center'
-        });
-
-        // Memastikan Footer berada di bagian bawah halaman
-        const footerHeight = 30; // Tinggi footer
-        if (doc.y < doc.page.height - footerHeight) {
-            doc.moveDown(doc.page.height - doc.y - footerHeight); // Pindahkan dokumen jika perlu
-        }
-        doc.fillColor('#4CAF50').fontSize(10).text('Sistem Informasi - Fakultas Teknologi Informasi', {
-            align: 'center'
-        });
-
-        doc.end();
-
-        // Mengirimkan file PDF untuk diunduh
-        doc.on('finish', () => {
-            console.log("PDF selesai dibuat, mengirimkan ke user...");
-            res.setHeader('Content-Disposition', 'attachment; filename=hasil_konsultasi.pdf');
+        // Mengambil buffer PDF dan mengirimkannya ke browser
+        pdfDoc.getBuffer((buffer) => {
             res.setHeader('Content-Type', 'application/pdf');
-            const fileStream = fs.createReadStream(filePath);
-            fileStream.pipe(res);
-
-            // Hapus file setelah dikirim
-            fileStream.on('end', () => {
-                fs.unlinkSync(filePath);
-            });
+            res.setHeader('Content-Disposition', `attachment; filename="Bukti-Konsultasi-${userEmail}.pdf"`);
+            res.end(buffer); // Pastikan file benar-benar terkirim
         });
 
     } catch (error) {

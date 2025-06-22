@@ -53,8 +53,8 @@
           <div class="mt-4">
             <label for="jenisSidang" class="block text-lg font-medium text-green-600 mb-2">Jenis Jadwal:</label>
             <select id="jenisSidang" class="w-full p-2 border border-gray-300 rounded-md">
-              <option value="SEMHAS">Seminar Hasil</option>
-              <option value="TA">Sidang TA</option>
+              <option value="Seminar">Seminar Hasil</option>
+              <option value="Sidang">Sidang TA</option>
             </select>
           </div>
 
@@ -136,8 +136,8 @@
           // Warnai tombol berdasarkan jenis acara
           if (scheduledEvents.has(dateStr)) {
             const eventTypes = scheduledEvents.get(dateStr);
-            const hasSidang = eventTypes.has('TA');
-            const hasSemhas = eventTypes.has('SEMHAS');
+            const hasSidang = eventTypes.has('Sidang');
+            const hasSemhas = eventTypes.has('Seminar');
 
             if (hasSidang && hasSemhas) {
               dayButton.classList.add('bg-gradient-to-br', 'from-green-500', 'to-blue-500', 'text-white');
@@ -172,14 +172,14 @@
           return;
         }
         const tanggal = selectedDateDisplay.textContent;
-        const jenisSidang = document.getElementById("jenisSidang").value;
+        const jenis_jadwal = document.getElementById("jenisSidang").value;
 
         fetch('/kalender-sidang/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               tanggal: tanggal,
-              jenis_sidang: jenisSidang
+              jenis_jadwal: jenis_jadwal
             })
           })
           .then(response => response.json())
@@ -188,7 +188,7 @@
               if (!scheduledEvents.has(tanggal)) {
                 scheduledEvents.set(tanggal, new Set());
               }
-              scheduledEvents.get(tanggal).add(jenisSidang);
+              scheduledEvents.get(tanggal).add(jenis_jadwal);
               renderCalendar();
               alert("Berhasil! Jadwal berhasil disimpan.");
             } else {

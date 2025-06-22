@@ -47,7 +47,9 @@ const daftarSemhasRouter = require('./routes/daftarSemhasRoutes');
 const kalenderAdminController = require('./controllers/kalenderAdminController');
 const kalenderMahasiswaRoutes = require('./routes/kalenderMahasiswaRoutes');
 const kalenderMahasiswaController = require('./controllers/kalenderMahasiswaController');
+const daftarSidangRouter = require('./routes/daftarSidangRoutes');
 const hasilKonsultasiRoutes = require('./routes/hasilKonsultasiRoutes');
+const daftarPesertaRoutes = require('./routes/daftarPesertaRoutes');
 
 
 app.use(cors({
@@ -112,9 +114,13 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/', authRouter); // Gunakan router untuk auth (signup & signin)
 app.use('/', topikRoutes); // Menggunakan routing untuk topik
+app.use('/draftsidang', draftSidangRoute); // Daftarkan rute untuk draft sidang dosen
 app.use('/', bookingRoutes); // Gunakan routing untuk booking konsultasi dosen
 app.use('/', draftRouter);
 app.use('/', daftarSemhasRouter);
+app.use('/', daftarSidangRouter)
+app.use('/jadwal', jadwalRoute); // Menggunakan routing untuk jadwal
+app.use('/daftarpeserta', daftarPesertaRoutes);
 
 app.get('/kalender-sidang', kalenderAdminController.getKalenderSidangPage);
 app.get('/kalender', kalenderMahasiswaController.getKalenderPage);

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Peserta Seminar dan Sidang</title>
+    <link href="/stylesheets/output.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- Header -->
+  <%- include('../partial/header.ejs') %>
+
+  <!-- Main Content -->
+  <div class="container mx-auto p-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      
+      <!-- Sidebar -->
+      <%- include('../sidebar/sidebaradmin.ejs') %>
+
+      <!-- Daftar Peserta Container -->
+      <div class="col-span-3 bg-white p-6 rounded-lg shadow-lg">
+          <header>
+              <h1 class="text-3xl font-semibold text-green-600">Daftar Peserta Seminar Hasil dan Sidang TA</h1>
+              <p class="mt-2 text-gray-600">Berikut adalah daftar mahasiswa yang telah mendaftar untuk seminar hasil dan sidang TA.</p>
+          </header>
+
+          <div class="mt-6 mb-6">
+              <button onclick="window.location.href='/daftarpeserta/download'" class="inline-flex items-center px-6 py-3 mb-6 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Unduh PDF
+              </button>
+          </div>
+
+          <div class="relative overflow-x-auto rounded-lg">
+              <table class="min-w-full bg-white table-auto text-sm text-left text-gray-500">
+                  <thead>
+                      <tr class="bg-green-200">
+                          <th class="px-6 py-3 text-left text-green-700">Nama</th>
+                          <th class="px-6 py-3 text-left text-green-700">NIM</th>
+                          <th class="px-6 py-3 text-left text-green-700">Tanggal Daftar</th>
+                          <th class="px-6 py-3 text-left text-green-700">Jenis Kegiatan</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <% if (peserta.length > 0) { %>
+                          <% peserta.forEach(item => { %>
+                              <tr class="border-b hover:bg-gray-50">
+                                  <td class="px-6 py-4 font-medium text-gray-900"><%= item.nama %></td>
+                                  <td class="px-6 py-4"><%= item.nim %></td>
+                                  <td class="px-6 py-4"><%= item.tanggal_daftar %></td>
+                                  <td class="px-6 py-4"><%= item.jenis_kegiatan %></td>
+                              </tr>
+                          <% }) %>
+                      <% } else { %>
+                          <tr class="bg-white border-b">
+                            <td colspan="4" class="px-6 py-4 text-center text-gray-500">
+                              Tidak ada peserta yang terdaftar saat ini.
+                            </td>
+                          </tr>
+                      <% } %>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-green-600 text-white text-center p-4 mt-6">
+      <p>&copy; 2025 Sistem Informasi - Fakultas Teknologi Informasi</p>
+  </footer>
+
+</body>
+</html>
