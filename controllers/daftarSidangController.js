@@ -63,19 +63,12 @@ const handleDaftarSidang = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Anda sudah terdaftar untuk sidang TA.' });
     }
 
-    // 2. Dapatkan id_pendaftaran mahasiswa
-    const pendaftaranTA = await prisma.pendaftaran_ta.findFirst({
-      where: { email_user: emailUser, status_approval: 'Diterima' }
-    });
-    if (!pendaftaranTA) {
-      return res.status(400).json({ success: false, message: 'Pendaftaran TA Anda belum ditemukan atau disetujui.' });
-    }
+    // Pengecekan pendaftaran TA dihapus agar bisa mendaftar tanpa syarat.
     
-    // 3. Buat record sidang_ta baru menggunakan tanggal dari data dummy
+    // Buat record sidang_ta baru menggunakan tanggal dari form
     await prisma.sidang_ta.create({
       data: {
         email_user: emailUser,
-        id_pendaftaran: pendaftaranTA.id_pendaftaran,
         tanggal_daftar: new Date(),
         jadwal: new Date(tanggal_sidang), // Menggunakan tanggal yang dipilih dari form
         nilai_akhir: 0,

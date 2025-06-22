@@ -111,6 +111,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/', authRouter); // Gunakan router untuk auth (signup & signin)
 app.use('/', topikRoutes); // Menggunakan routing untuk topik
+app.use('/draftsidang', draftSidangRoute); // Daftarkan rute untuk draft sidang dosen
 app.use('/', bookingRoutes); // Gunakan routing untuk booking konsultasi dosen
 app.use('/', draftRouter);
 app.use('/', daftarSemhasRouter);

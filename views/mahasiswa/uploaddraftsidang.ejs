@@ -70,20 +70,6 @@
                         </td>
                         <td class="py-2 px-4"><%= item.tgl_upload_formatted %></td>
                         <td class="py-2 px-4">
-                          <% if(item.status_draft === 'Menunggu'){ %>
-                            <span class="inline-block bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded">Menunggu</span>
-                          <% } else if(item.status_draft === 'Disetujui'){ %>
-                            <span class="inline-block bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">Disetujui</span>
-                          <% } else if(item.status_draft === 'Ditolak'){ %>
-                            <span class="inline-block bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded">Ditolak</span>
-                          <% } else if(item.status_draft === 'Revisi'){ %>
-                            <span class="inline-block bg-orange-100 text-orange-800 text-xs font-semibold px-2 py-1 rounded">Revisi</span>
-                          <% } else { %>
-                            <span class="inline-block bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-1 rounded"><%= item.status_draft %></span>
-                          <% } %>
-                        </td>
-                        <td class="py-2 px-4"><%= item.balasan_dosen %></td>
-                        <td class="py-2 px-4">
                           <button class="bg-red-600 hover:bg-red-700 text-white py-1 px-2 rounded text-sm delete-btn" data-id="<%= item.id_draftsidang %>">
                             Hapus
                           </button>
@@ -91,7 +77,7 @@
                       </tr>
                     <% }) %>
                   <% } else { %>
-                    <tr><td colspan="5" class="text-center py-4 text-gray-500">Belum ada draft diupload</td></tr>
+                    <tr><td colspan="3" class="text-center py-4 text-gray-500">Belum ada draft diupload</td></tr>
                   <% } %>
                 </tbody>
               </table>
