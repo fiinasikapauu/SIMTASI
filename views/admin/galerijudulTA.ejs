@@ -8,30 +8,7 @@
   </head>
   <body class="bg-gray-100">
     <!-- Header -->
-    <header class="bg-green-600 text-white p-4">
-      <div class="container mx-auto flex justify-between items-center">
-        <div>
-          <h1 class="text-3xl font-bold">SIMTASI</h1>
-        </div>
-        <div>
-          <button
-            class="text-white bg-green-700 px-4 py-2 rounded-full hover:bg-green-800"
-          >
-            <span
-              style="
-                background-image: url('../images/user_icon.png');
-                background-size: cover;
-                background-position: center;
-                width: 24px;
-                height: 24px;
-                display: inline-block;
-              "
-            ></span>
-          </button>
-        </div>
-      </div>
-    </header>
-    </div>
+      <%- include('../partial/header.ejs') %>
 
     <!-- Main Content -->
     <div class="container mx-auto p-6">
@@ -39,42 +16,38 @@
         <!-- Sidebar -->
         <%- include('../sidebar/sidebaradmin.ejs') %>
              <!-- Main Content Area -->
-             <div class="container mx-auto p-8">
-             <h2 class="text-4xl font-bold text-green-600 mb-8">Galeri Judul TA yang Selesai</h2>
-                
-                <form method="get" action="/galerijudulTA" class="mb-4">
-                  <div class="flex space-x-4">
-                    <input type="text" name="tahun" placeholder="Tahun" class="px-4 py-2 border rounded" />
-                    <input type="text" name="dosen" placeholder="Dosen Pembimbing" class="px-4 py-2 border rounded" />
-                    <input type="text" name="bidang" placeholder="Bidang Keilmuan" class="px-4 py-2 border rounded" />
-                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded">Filter</button>
-                  </div>
-                </form>
-
-                <table class="table-auto w-full border-collapse">
+              <div class="col-span-2 bg-white p-6 rounded-lg shadow-lg ">
+              <h2 class="text-2xl font-semibold text-green-600 mb-6">Galeri TA Yang Sudah Selesai</h2>
+              <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+                <table class="table-auto w-full border border-gray-400">
                   <thead>
                     <tr class="bg-green-600 text-white">
-                      <th class="px-6 py-2 text-center">No</th>
-                      <th class="px-6 py-2 text-center">Nama</th>
-                      <th class="px-6 py-2 text-center">Judul TA</th>
-                      <th class="px-6 py-2 text-center">Dosen Pembimbing</th>
-                      <th class="px-6 py-2 text-center">Tahun Selesai</th>
+                      <th class="px-6 py-2 text-center border border-gray-400">No</th>
+                      <th class="px-6 py-2 text-center border border-gray-400">Nama</th>
+                      <th class="px-6 py-2 text-center border border-gray-400">Judul TA</th>
+                      <th class="px-6 py-2 text-center border border-gray-400">Dosen Pembimbing</th>
+                      <th class="px-6 py-2 text-center border border-gray-400">Tahun Selesai</th>
                     </tr>
                   </thead>
                   <tbody>
                     <% mahasiswaList.forEach((item, index) => { %>
-                      <tr class="border-b">
-                        <td class="px-6 py-2 text-center"><%= index + 1 %></td>
-                        <td class="px-6 py-2"><%= item.nama %></td>
-                        <td class="px-6 py-2"><%= item.judul_ta %></td>
-                        <td class="px-6 py-2"><%= item.dosen_pembimbing %></td>
-                        <td class="px-6 py-2 text-center"><%= item.tahun_selesai %></td>
+                      <tr class="border-t border-gray-300">
+                        <td class="px-6 py-2 text-center border border-gray-400"><%= index + 1 %></td>
+                        <td class="px-6 py-2 border border-gray-400"><%= item.nama %></td>
+                        <td class="px-6 py-2 border border-gray-400"><%= item.judul_ta %></td>
+                        <td class="px-6 py-2 border border-gray-400"><%= item.dosen_pembimbing %></td>
+                        <td class="px-6 py-2 text-center border border-gray-400"><%= item.tahun_selesai %></td>
                       </tr>
                     <% }) %>
                   </tbody>
                 </table>
               </div>
             </div>
+        </div>
+        <div class="flex justify-end mb-4">
+        <a href="/galerijudulTA" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+          <i class="fas fa-file-pdf mr-2"></i>Download PDF
+        </a>
         </div>
     </div>
     <!-- Footer -->

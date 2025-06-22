@@ -5,6 +5,7 @@ CREATE TABLE `topikta` (
     `dosen` VARCHAR(255) NOT NULL,
     `waktu` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
 
+    INDEX `Topikta_dosen_fkey`(`dosen`),
     PRIMARY KEY (`id_topikta`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -81,21 +82,22 @@ CREATE TABLE `revisi_laporan` (
     `tanggal_upload` DATETIME(3) NOT NULL,
     `feedback_dosen` VARCHAR(191) NOT NULL,
     `status` VARCHAR(191) NOT NULL,
+    `dosen_penerima` VARCHAR(191) NOT NULL,
 
     INDEX `Revisi_Laporan_email_user_fkey`(`email_user`),
     PRIMARY KEY (`id_revisi`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `seminar_hasil` (
+CREATE TABLE `draft_semhas` (
     `id_semhas` INTEGER NOT NULL AUTO_INCREMENT,
     `email_user` VARCHAR(191) NOT NULL,
     `file_draft` VARCHAR(191) NOT NULL,
-    `tanggal_daftar` DATETIME(3) NOT NULL,
+    `tanggal_upload` DATETIME(3) NULL,
+    `tanggapan_dosen` VARCHAR(191) NULL,
     `status` VARCHAR(191) NOT NULL,
-    `jadwal` DATETIME(3) NOT NULL,
 
-    INDEX `Seminar_Hasil_email_user_fkey`(`email_user`),
+    INDEX `draft_semhas_email_user_idx`(`email_user`),
     PRIMARY KEY (`id_semhas`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -104,7 +106,6 @@ CREATE TABLE `sidang_ta` (
     `id_sidang` INTEGER NOT NULL AUTO_INCREMENT,
     `id_pendaftaran` INTEGER NOT NULL,
     `email_user` VARCHAR(191) NOT NULL,
-    `file_draft_sidang` VARCHAR(191) NOT NULL,
     `tanggal_daftar` DATETIME(3) NOT NULL,
     `jadwal` DATETIME(3) NOT NULL,
     `nilai_akhir` DOUBLE NOT NULL,
@@ -135,6 +136,7 @@ CREATE TABLE `laporan_kemajuan` (
     `tanggal_upload` DATETIME(3) NOT NULL,
     `status_review` VARCHAR(191) NOT NULL,
     `feedback_dosen` VARCHAR(191) NOT NULL,
+    `dosen_penerima` VARCHAR(191) NOT NULL,
 
     INDEX `Laporan_Kemajuan_email_user_fkey`(`email_user`),
     PRIMARY KEY (`id_laporan`)
@@ -148,8 +150,35 @@ CREATE TABLE `feedback` (
     `topik_konsultasi` VARCHAR(191) NOT NULL,
     `feedback_text` VARCHAR(191) NOT NULL,
 
-    INDEX `Feedback_email_user_fkey`(`email_user`),
+    INDEX `feedback_email_user_idx`(`email_user`),
     PRIMARY KEY (`id_feedback`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `draft_sidang` (
+    `id_draftsidang` INTEGER NOT NULL AUTO_INCREMENT,
+    `id_sidang` INTEGER NOT NULL,
+    `email_user` VARCHAR(191) NOT NULL,
+    `file_draft_sidang` VARCHAR(191) NOT NULL,
+    `tgl_upload` DATETIME(3) NULL,
+    `balasan_dosen` VARCHAR(191) NULL,
+    `status_draft` VARCHAR(191) NOT NULL,
+
+    INDEX `draft_sidang_email_user_idx`(`email_user`),
+    INDEX `draft_sidang_id_sidang_idx`(`id_sidang`),
+    PRIMARY KEY (`id_draftsidang`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `pendaftaran_semhas` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `email_user` VARCHAR(191) NOT NULL,
+    `tanggal_seminar` DATETIME(3) NOT NULL,
+    `status` VARCHAR(191) NOT NULL,
+    `waktu_pendaftaran` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    INDEX `pendaftaran_semhas_email_user_idx`(`email_user`),
+    PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -163,6 +192,9 @@ CREATE TABLE `jadwal_sidang_seminar` (
     INDEX `Jadwal_Sidang_Seminar_admin_fkey`(`admin_id`),
     PRIMARY KEY (`id_jadwal`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `topikta` ADD CONSTRAINT `topikta_dosen_fkey` FOREIGN KEY (`dosen`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `kalender_sidang` ADD CONSTRAINT `Kalender_Sidang_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -183,10 +215,10 @@ ALTER TABLE `proposal_ta` ADD CONSTRAINT `Proposal_TA_email_user_fkey` FOREIGN K
 ALTER TABLE `revisi_laporan` ADD CONSTRAINT `Revisi_Laporan_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `seminar_hasil` ADD CONSTRAINT `Seminar_Hasil_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `draft_semhas` ADD CONSTRAINT `draft_semhas_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `sidang_ta` ADD CONSTRAINT `Sidang_TA_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `sidang_ta` ADD CONSTRAINT `sidang_ta_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `sidang_ta` ADD CONSTRAINT `sidang_ta_id_pendaftaran_fkey` FOREIGN KEY (`id_pendaftaran`) REFERENCES `pendaftaran_ta`(`id_pendaftaran`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -198,7 +230,16 @@ ALTER TABLE `timeline_project` ADD CONSTRAINT `Timeline_Project_email_user_fkey`
 ALTER TABLE `laporan_kemajuan` ADD CONSTRAINT `Laporan_Kemajuan_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `feedback` ADD CONSTRAINT `Feedback_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `feedback` ADD CONSTRAINT `feedback_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `draft_sidang` ADD CONSTRAINT `draft_sidang_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `draft_sidang` ADD CONSTRAINT `draft_sidang_id_sidang_fkey` FOREIGN KEY (`id_sidang`) REFERENCES `sidang_ta`(`id_sidang`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `pendaftaran_semhas` ADD CONSTRAINT `pendaftaran_semhas_email_user_fkey` FOREIGN KEY (`email_user`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `jadwal_sidang_seminar` ADD CONSTRAINT `jadwal_sidang_seminar_admin_id_fkey` FOREIGN KEY (`admin_id`) REFERENCES `user`(`email_user`) ON DELETE RESTRICT ON UPDATE CASCADE;
