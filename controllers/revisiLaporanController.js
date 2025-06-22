@@ -5,7 +5,9 @@ const path = require('path');
 const fs = require('fs');
 const PDFDocument = require('pdfkit');
 
-// Konfigurasi multer untuk upload file revisi laporan
+// ========================================
+// MULTER CONFIGURATION
+// ========================================
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = path.join(__dirname, '../uploads/revisi_laporan/');
@@ -35,6 +37,10 @@ const upload = multer({
     }
   }
 });
+
+// ========================================
+// MAHASISWA CONTROLLERS
+// ========================================
 
 // Render halaman upload revisi laporan
 const getRevisiPage = async (req, res) => {
@@ -134,90 +140,159 @@ const downloadRevisi = async (req, res) => {
   try {
     const { id } = req.params;
     const emailUser = req.session.user?.email;
+    const userRole = req.session.user?.role;
+
     if (!emailUser) {
-      return res.status(401).json({ success: false, message: 'User tidak terautentikasi' });
+      return res.status(401).json({
+        success: false,
+        message: 'User tidak terautentikasi'
+      });
     }
-    // Cari revisi berdasarkan ID dan email user
-    const revisi = await prisma.revisi_laporan.findFirst({
-      where: {
-        id_revisi: parseInt(id),
-        email_user: emailUser
-      }
-    });
+
+    // Cari revisi berdasarkan ID
+    let revisi;
+    if (userRole === 'DOSEN') {
+      // Dosen dapat download semua revisi laporan
+      revisi = await prisma.revisi_laporan.findFirst({
+        where: {
+          id_revisi: parseInt(id)
+        }
+      });
+    } else {
+      // Mahasiswa hanya dapat download revisi mereka sendiri
+      revisi = await prisma.revisi_laporan.findFirst({
+        where: {
+          id_revisi: parseInt(id),
+          email_user: emailUser
+        }
+      });
+    }
+
     if (!revisi) {
-      return res.status(404).json({ success: false, message: 'Revisi laporan tidak ditemukan' });
+      return res.status(404).json({
+        success: false,
+        message: 'Revisi laporan tidak ditemukan'
+      });
     }
+
     const filePath = path.join(__dirname, '../uploads/revisi_laporan/', revisi.file_laporan);
+    
+    // Cek apakah file ada
     if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ success: false, message: 'File tidak ditemukan' });
+      return res.status(404).json({
+        success: false,
+        message: 'File tidak ditemukan'
+      });
     }
+
+    // Set header untuk download
     res.setHeader('Content-Disposition', `attachment; filename="${revisi.file_laporan}"`);
     res.setHeader('Content-Type', 'application/octet-stream');
+
+    // Stream file ke response
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);
+
   } catch (error) {
     console.error('Error downloading revisi laporan:', error);
-    res.status(500).json({ success: false, message: 'Terjadi kesalahan saat mendownload file' });
+    res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan saat mendownload file'
+    });
   }
 };
 
-// Controller untuk dosen: menampilkan semua revisi laporan mahasiswa
-const getAllRevisiForDosen = async (req, res) => {
+// Controller untuk mengambil data revisi laporan dalam format JSON (untuk AJAX)
+const getRevisiLaporanData = async (req, res) => {
   try {
-    if (!req.session.user || req.session.user.role !== 'DOSEN') {
-      return res.redirect('/signin');
+    const emailUser = req.session.user?.email;
+    
+    if (!emailUser) {
+      return res.status(401).json({
+        success: false,
+        message: 'User tidak terautentikasi'
+      });
     }
-
-    const dosenEmail = req.session.user.email;
 
     const revisiList = await prisma.revisi_laporan.findMany({
       where: {
-        dosen_penerima: dosenEmail
+        email_user: emailUser
       },
-      include: {
-        user: { select: { nama: true } }
-      },
-      orderBy: { tanggal_upload: 'desc' }
+      orderBy: {
+        tanggal_upload: 'desc'
+      }
     });
-    const formattedRevisi = revisiList.map(item => ({
-      ...item,
-      nama_mahasiswa: item.user?.nama || '-',
-      tanggal_upload_formatted: new Date(item.tanggal_upload).toLocaleDateString('id-ID', {
-        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-      })
+
+    const formattedRevisi = revisiList.map(revisi => ({
+      ...revisi,
+      tanggal_upload_formatted: new Date(revisi.tanggal_upload).toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      status_class: getStatusClass(revisi.status)
     }));
-    res.render('dosen/revisilaporan', {
-      title: 'Daftar Revisi Laporan Mahasiswa',
-      user: req.session.user,
-      revisiList: formattedRevisi
+
+    res.json({
+      success: true,
+      data: formattedRevisi
     });
+
   } catch (error) {
-    console.error('Error fetching revisi laporan for dosen:', error);
-    res.status(500).render('error', {
-      message: 'Terjadi kesalahan saat mengambil data revisi laporan',
-      error: error
+    console.error('Error fetching revisi laporan data:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan saat mengambil data revisi laporan'
     });
   }
 };
 
-// Controller untuk update feedback dosen pada revisi laporan
-const updateRevisiFeedback = async (req, res) => {
+// Controller untuk mengambil data proposal dalam format JSON (untuk AJAX) - untuk konsistensi
+const getProposalData = async (req, res) => {
   try {
-    if (!req.session.user || req.session.user.role !== 'DOSEN') {
-      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    const emailUser = req.session.user?.email;
+    
+    if (!emailUser) {
+      return res.status(401).json({
+        success: false,
+        message: 'User tidak terautentikasi'
+      });
     }
-    const { id_revisi, feedback_dosen, status } = req.body;
-    if (!id_revisi || !feedback_dosen || !status) {
-      return res.status(400).json({ success: false, message: 'Data tidak lengkap' });
-    }
-    const updated = await prisma.revisi_laporan.update({
-      where: { id_revisi: parseInt(id_revisi) },
-      data: { feedback_dosen, status }
+
+    const proposals = await prisma.proposal_ta.findMany({
+      where: {
+        email_user: emailUser
+      },
+      orderBy: {
+        tanggal_upload: 'desc'
+      }
     });
-    res.json({ success: true, message: 'Feedback berhasil disimpan', data: updated });
+
+    const formattedProposals = proposals.map(proposal => ({
+      ...proposal,
+      tanggal_upload_formatted: new Date(proposal.tanggal_upload).toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      status_class: getStatusClass(proposal.status_review)
+    }));
+
+    res.json({
+      success: true,
+      data: formattedProposals
+    });
+
   } catch (error) {
-    console.error('Error updating revisi feedback:', error);
-    res.status(500).json({ success: false, message: 'Terjadi kesalahan saat menyimpan feedback' });
+    console.error('Error fetching proposal data:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan saat mengambil data proposal'
+    });
   }
 };
 
@@ -278,6 +353,70 @@ const deleteRevisiLaporan = async (req, res) => {
       success: false,
       message: 'Terjadi kesalahan saat menghapus revisi laporan'
     });
+  }
+};
+
+// ========================================
+// DOSEN CONTROLLERS
+// ========================================
+
+// Controller untuk dosen: menampilkan semua revisi laporan mahasiswa
+const getAllRevisiForDosen = async (req, res) => {
+  try {
+    if (!req.session.user || req.session.user.role !== 'DOSEN') {
+      return res.redirect('/signin');
+    }
+
+    const dosenEmail = req.session.user.email;
+
+    const revisiList = await prisma.revisi_laporan.findMany({
+      where: {
+        dosen_penerima: dosenEmail
+      },
+      include: {
+        user: { select: { nama: true } }
+      },
+      orderBy: { tanggal_upload: 'desc' }
+    });
+    const formattedRevisi = revisiList.map(item => ({
+      ...item,
+      nama_mahasiswa: item.user?.nama || '-',
+      tanggal_upload_formatted: new Date(item.tanggal_upload).toLocaleDateString('id-ID', {
+        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+      })
+    }));
+    res.render('dosen/revisilaporan', {
+      title: 'Daftar Revisi Laporan Mahasiswa',
+      user: req.session.user,
+      revisiList: formattedRevisi
+    });
+  } catch (error) {
+    console.error('Error fetching revisi laporan for dosen:', error);
+    res.status(500).render('error', {
+      message: 'Terjadi kesalahan saat mengambil data revisi laporan',
+      error: error
+    });
+  }
+};
+
+// Controller untuk update feedback dosen pada revisi laporan
+const updateRevisiFeedback = async (req, res) => {
+  try {
+    if (!req.session.user || req.session.user.role !== 'DOSEN') {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const { id_revisi, feedback_dosen, status } = req.body;
+    if (!id_revisi || !feedback_dosen || !status) {
+      return res.status(400).json({ success: false, message: 'Data tidak lengkap' });
+    }
+    const updated = await prisma.revisi_laporan.update({
+      where: { id_revisi: parseInt(id_revisi) },
+      data: { feedback_dosen, status }
+    });
+    res.json({ success: true, message: 'Feedback berhasil disimpan', data: updated });
+  } catch (error) {
+    console.error('Error updating revisi feedback:', error);
+    res.status(500).json({ success: false, message: 'Terjadi kesalahan saat menyimpan feedback' });
   }
 };
 
@@ -350,6 +489,29 @@ const exportRevisiLaporanPdf = async (req, res) => {
   }
 };
 
+// ========================================
+// HELPER FUNCTIONS
+// ========================================
+
+// Helper function untuk menentukan class CSS berdasarkan status
+function getStatusClass(status) {
+  switch (status) {
+    case 'Menunggu Review':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'Disetujui':
+      return 'bg-green-100 text-green-800';
+    case 'Ditolak':
+      return 'bg-red-100 text-red-800';
+    case 'Revisi':
+      return 'bg-orange-100 text-orange-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+}
+
+// ========================================
+// MODULE EXPORTS
+// ========================================
 module.exports = {
   getRevisiPage,
   uploadRevisi: [upload.single('revisiFile'), uploadRevisi],
@@ -357,5 +519,7 @@ module.exports = {
   getAllRevisiForDosen,
   updateRevisiFeedback,
   deleteRevisiLaporan,
-  exportRevisiLaporanPdf
+  exportRevisiLaporanPdf,
+  getRevisiLaporanData,
+  getProposalData
 }; 

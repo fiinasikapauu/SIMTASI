@@ -3,10 +3,11 @@ const prisma = new PrismaClient();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { Prisma } = require('@prisma/client');
 const PDFDocument = require('pdfkit');
 
-// Konfigurasi multer untuk upload file
+// ========================================
+// MULTER CONFIGURATION
+// ========================================
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = 'uploads/proposals/';
@@ -43,26 +44,19 @@ const upload = multer({
   }
 });
 
+// ========================================
+// MAHASISWA CONTROLLERS
+// ========================================
+
 // Controller untuk menampilkan halaman proposal
 const getProposalPage = async (req, res) => {
   try {
     // Ambil email user dari session
     const emailUser = req.session.user?.email;
     
-    console.log('Session user:', req.session.user);
-    console.log('Email user from session:', emailUser);
-    
     if (!emailUser) {
-      console.log('No email user found, redirecting to signin');
       return res.redirect('/signin');
     }
-
-    console.log('Fetching proposals for user:', emailUser);
-
-    // Check all proposals in database for debugging
-    const allProposals = await prisma.proposal_ta.findMany();
-    console.log('All proposals in database:', allProposals.length);
-    console.log('All proposals data:', allProposals);
 
     // Ambil data proposal berdasarkan email user yang login
     const proposals = await prisma.proposal_ta.findMany({
@@ -73,9 +67,6 @@ const getProposalPage = async (req, res) => {
         tanggal_upload: 'desc' // Urutkan berdasarkan tanggal upload terbaru
       }
     });
-
-    console.log('Found proposals for user:', proposals.length);
-    console.log('Proposals data:', proposals);
 
     // Ambil daftar dosen untuk dropdown
     const dosenList = await prisma.user.findMany({
@@ -91,8 +82,6 @@ const getProposalPage = async (req, res) => {
       }
     });
 
-    console.log('Dosen list:', dosenList);
-
     // Format tanggal untuk ditampilkan
     const formattedProposals = proposals.map(proposal => ({
       ...proposal,
@@ -105,8 +94,6 @@ const getProposalPage = async (req, res) => {
       }),
       status_class: getStatusClass(proposal.status_review)
     }));
-
-    console.log('Formatted proposals:', formattedProposals.length);
 
     res.render('mahasiswa/uploadproposalta', {
       title: 'Proposal Tugas Akhir',
@@ -173,7 +160,7 @@ const uploadProposal = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error uploading proposal:', error, req.file, req.session.user);
+    console.error('Error uploading proposal:', error);
     
     // Hapus file jika terjadi error
     if (req.file) {
@@ -293,6 +280,70 @@ const downloadProposal = async (req, res) => {
   }
 };
 
+// Controller untuk menghapus proposal
+const deleteProposal = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const emailUser = req.session.user?.email;
+
+    if (!emailUser) {
+      return res.status(401).json({
+        success: false,
+        message: 'User tidak terautentikasi'
+      });
+    }
+
+    // Cari proposal berdasarkan ID dan email user
+    const proposal = await prisma.proposal_ta.findFirst({
+      where: {
+        id_proposal: parseInt(id),
+        email_user: emailUser
+      }
+    });
+
+    if (!proposal) {
+      return res.status(404).json({
+        success: false,
+        message: 'Proposal tidak ditemukan'
+      });
+    }
+
+    // Hapus file dari sistem
+    const filePath = path.join('uploads/proposals/', proposal.file_proposal);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    // Hapus data dari database
+    try {
+      await prisma.proposal_ta.delete({
+        where: { id_proposal: parseInt(id) }
+      });
+    } catch (err) {
+      // Tangani error jika data sudah tidak ada
+      return res.status(404).json({
+        success: false,
+        message: 'Proposal sudah dihapus atau tidak ditemukan.'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Proposal berhasil dihapus'
+    });
+  } catch (error) {
+    console.error('Error deleting proposal:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan saat menghapus proposal'
+    });
+  }
+};
+
+// ========================================
+// DOSEN CONTROLLERS
+// ========================================
+
 // Controller untuk dosen: menampilkan semua proposal mahasiswa
 const getAllProposalsForDosen = async (req, res) => {
   try {
@@ -357,8 +408,6 @@ const updateProposalFeedback = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Data tidak lengkap' });
     }
     
-    console.log('Updating proposal feedback:', { id_proposal, feedback_dosen, status_review });
-    
     const updated = await prisma.proposal_ta.update({
       where: { id_proposal: parseInt(id_proposal) },
       data: {
@@ -367,89 +416,10 @@ const updateProposalFeedback = async (req, res) => {
       }
     });
     
-    console.log('Proposal updated successfully:', updated);
-    
-    // Verify the proposal still exists after update
-    const verification = await prisma.proposal_ta.findFirst({
-      where: { id_proposal: parseInt(id_proposal) }
-    });
-    
-    console.log('Verification - proposal still exists:', !!verification);
-    if (verification) {
-      console.log('Verification - proposal data:', {
-        id: verification.id_proposal,
-        email: verification.email_user,
-        status: verification.status_review,
-        feedback: verification.feedback_dosen
-      });
-    }
-    
     res.json({ success: true, message: 'Feedback berhasil disimpan', data: updated });
   } catch (error) {
     console.error('Error updating proposal feedback:', error);
     res.status(500).json({ success: false, message: 'Terjadi kesalahan saat menyimpan feedback' });
-  }
-};
-
-// Controller untuk menghapus proposal
-const deleteProposal = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const emailUser = req.session.user?.email;
-
-    if (!emailUser) {
-      return res.status(401).json({
-        success: false,
-        message: 'User tidak terautentikasi'
-      });
-    }
-
-    // Cari proposal berdasarkan ID dan email user
-    const proposal = await prisma.proposal_ta.findFirst({
-      where: {
-        id_proposal: parseInt(id),
-        email_user: emailUser
-      }
-    });
-
-    if (!proposal) {
-      return res.status(404).json({
-        success: false,
-        message: 'Proposal tidak ditemukan'
-      });
-    }
-
-    // Hapus file dari sistem
-    const filePath = path.join('uploads/proposals/', proposal.file_proposal);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-
-    // Hapus data dari database
-    try {
-      await prisma.proposal_ta.delete({
-        where: { id_proposal: parseInt(id) }
-      });
-    } catch (err) {
-      if (err instanceof Prisma.NotFoundError) {
-        return res.status(404).json({
-          success: false,
-          message: 'Proposal sudah dihapus atau tidak ditemukan.'
-        });
-      }
-      throw err;
-    }
-
-    res.json({
-      success: true,
-      message: 'Proposal berhasil dihapus'
-    });
-  } catch (error) {
-    console.error('Error deleting proposal:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Terjadi kesalahan saat menghapus proposal'
-    });
   }
 };
 
@@ -522,6 +492,10 @@ const exportProposalPdf = async (req, res) => {
   }
 };
 
+// ========================================
+// HELPER FUNCTIONS
+// ========================================
+
 // Helper function untuk menentukan class CSS berdasarkan status
 function getStatusClass(status) {
   switch (status) {
@@ -538,6 +512,9 @@ function getStatusClass(status) {
   }
 }
 
+// ========================================
+// MODULE EXPORTS
+// ========================================
 module.exports = {
   getProposalPage,
   uploadProposal: [upload.single('proposalFile'), uploadProposal],

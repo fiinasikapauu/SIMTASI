@@ -4,9 +4,10 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const PDFDocument = require('pdfkit');
-const { defineDmmfProperty } = require('@prisma/client/runtime/library');
 
-// Konfigurasi multer untuk upload file
+// ========================================
+// MULTER CONFIGURATION
+// ========================================
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadPath = 'uploads/laporan_kemajuan/';
@@ -42,6 +43,10 @@ const upload = multer({
     }
   }
 });
+
+// ========================================
+// MAHASISWA CONTROLLERS
+// ========================================
 
 // Controller untuk menampilkan halaman laporan kemajuan mahasiswa
 const getLaporanKemajuanPage = async (req, res) => {
@@ -155,7 +160,7 @@ const uploadLaporanKemajuan = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error uploading laporan kemajuan:', error, req.file, req.session.user);
+    console.error('Error uploading laporan kemajuan:', error);
     
     // Hapus file jika terjadi error
     if (req.file) {
@@ -240,6 +245,117 @@ const downloadLaporanKemajuan = async (req, res) => {
   }
 };
 
+// Controller untuk mengambil data laporan kemajuan dalam format JSON (untuk AJAX)
+const getLaporanKemajuanData = async (req, res) => {
+  try {
+    const emailUser = req.session.user?.email;
+    
+    if (!emailUser) {
+      return res.status(401).json({
+        success: false,
+        message: 'User tidak terautentikasi'
+      });
+    }
+
+    const laporanList = await prisma.laporan_kemajuan.findMany({
+      where: {
+        email_user: emailUser
+      },
+      orderBy: {
+        tanggal_upload: 'desc'
+      }
+    });
+
+    const formattedLaporan = laporanList.map(laporan => ({
+      ...laporan,
+      tanggal_upload_formatted: new Date(laporan.tanggal_upload).toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      status_class: getStatusClass(laporan.status_review)
+    }));
+
+    res.json({
+      success: true,
+      data: formattedLaporan
+    });
+
+  } catch (error) {
+    console.error('Error fetching laporan kemajuan data:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan saat mengambil data laporan kemajuan'
+    });
+  }
+};
+
+// Controller untuk menghapus laporan kemajuan berdasarkan id_laporan dan file
+const deleteLaporanKemajuan = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const emailUser = req.session.user?.email;
+
+    if (!emailUser) {
+      return res.status(401).json({
+        success: false,
+        message: 'User tidak terautentikasi'
+      });
+    }
+
+    // Cari laporan berdasarkan ID dan email user
+    const laporan = await prisma.laporan_kemajuan.findFirst({
+      where: {
+        id_laporan: parseInt(id),
+        email_user: emailUser
+      }
+    });
+
+    if (!laporan) {
+      return res.status(404).json({
+        success: false,
+        message: 'Laporan kemajuan tidak ditemukan'
+      });
+    }
+
+    // Hapus file dari sistem
+    const filePath = path.join('uploads/laporan_kemajuan/', laporan.file_laporan);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    // Hapus data dari database
+    try {
+      await prisma.laporan_kemajuan.delete({
+        where: { id_laporan: parseInt(id) }
+      });
+    } catch (err) {
+      // Tangani error jika data sudah tidak ada
+      return res.status(404).json({
+        success: false,
+        message: 'Laporan sudah dihapus atau tidak ditemukan.'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Laporan kemajuan berhasil dihapus'
+    });
+  } catch (error) {
+    console.error('Error deleting laporan kemajuan:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan saat menghapus laporan kemajuan'
+    });
+  }
+};
+
+// ========================================
+// DOSEN CONTROLLERS
+// ========================================
+
 // Controller untuk dosen: menampilkan semua laporan kemajuan mahasiswa
 const getAllLaporanKemajuanForDosen = async (req, res) => {
   try {
@@ -317,66 +433,6 @@ const updateLaporanKemajuanFeedback = async (req, res) => {
   }
 };
 
-// Controller untuk menghapus laporan kemajuan berdasarkan id_laporan dan file
-const deleteLaporanKemajuan = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const emailUser = req.session.user?.email;
-
-    if (!emailUser) {
-      return res.status(401).json({
-        success: false,
-        message: 'User tidak terautentikasi'
-      });
-    }
-
-    // Cari laporan berdasarkan ID dan email user
-    const laporan = await prisma.laporan_kemajuan.findFirst({
-      where: {
-        id_laporan: parseInt(id),
-        email_user: emailUser
-      }
-    });
-
-    if (!laporan) {
-      return res.status(404).json({
-        success: false,
-        message: 'Laporan kemajuan tidak ditemukan'
-      });
-    }
-
-    // Hapus file dari sistem
-    const filePath = path.join('uploads/laporan_kemajuan/', laporan.file_laporan);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-
-    // Hapus data dari database
-    try {
-      await prisma.laporan_kemajuan.delete({
-        where: { id_laporan: parseInt(id) }
-      });
-    } catch (err) {
-      // Tangani error jika data sudah tidak ada
-      return res.status(404).json({
-        success: false,
-        message: 'Laporan sudah dihapus atau tidak ditemukan.'
-      });
-    }
-
-    res.json({
-      success: true,
-      message: 'Laporan kemajuan berhasil dihapus'
-    });
-  } catch (error) {
-    console.error('Error deleting laporan kemajuan:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Terjadi kesalahan saat menghapus laporan kemajuan'
-    });
-  }
-};
-
 // Controller untuk export PDF daftar laporan kemajuan mahasiswa
 const exportLaporanKemajuanPdf = async (req, res) => {
   try {
@@ -446,6 +502,10 @@ const exportLaporanKemajuanPdf = async (req, res) => {
   }
 };
 
+// ========================================
+// HELPER FUNCTIONS
+// ========================================
+
 // Helper function untuk menentukan class CSS berdasarkan status
 function getStatusClass(status) {
   switch (status) {
@@ -462,6 +522,9 @@ function getStatusClass(status) {
   }
 }
 
+// ========================================
+// MODULE EXPORTS
+// ========================================
 module.exports = {
   getLaporanKemajuanPage,
   uploadLaporanKemajuan: [upload.single('laporanFile'), uploadLaporanKemajuan],
@@ -469,5 +532,6 @@ module.exports = {
   getAllLaporanKemajuanForDosen,
   updateLaporanKemajuanFeedback,
   deleteLaporanKemajuan,
-  exportLaporanKemajuanPdf
+  exportLaporanKemajuanPdf,
+  getLaporanKemajuanData
 }; 
