@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
 const draftSemhasController = require("../controllers/draftSemhasController");
-const draftSidangController = require("../controllers/draftsSidangController");
+const draftSidangController = require("../controllers/draftSidangController");
 
 // Middleware untuk cek autentikasi
 const requireAuth = (req, res, next) => {
