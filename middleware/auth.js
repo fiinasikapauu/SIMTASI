@@ -2,42 +2,43 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-module.exports = prisma;
-
-module.exports.isLoggedIn = (req, res, next) => {
-  // Cek apakah pengguna sudah login
+// Middleware Cek Login
+const isLoggedIn = (req, res, next) => {
   if (req.session && req.session.user) {
     return next();
-  } else {
-    return res.redirect("/signin"); // Jika belum login, arahkan ke halaman login
   }
+  return res.redirect('/signin');
 };
 
-module.exports.isMahasiswa = (req, res, next) => {
-  // Cek apakah user memiliki role "MAHASISWA"
-  if (req.session.user && req.session.user.role === "MAHASISWA") {
+// Middleware Role Mahasiswa
+const isMahasiswa = (req, res, next) => {
+  if (req.session?.user?.role === 'MAHASISWA') {
     return next();
-  } else {
-    return res.redirect("/signin"); // Jika bukan mahasiswa, arahkan ke halaman login
   }
+  req.session.destroy(() => res.redirect('/signin'));
 };
 
-module.exports.isDosen = (req, res, next) => {
-  // Cek apakah user memiliki role "DOSEN"
-  if (req.session.user && req.session.user.role === "DOSEN") {
+// Middleware Role Dosen
+const isDosen = (req, res, next) => {
+  if (req.session?.user?.role === 'DOSEN') {
     return next();
-  } else {
-    return res.redirect("/signin"); // Jika bukan dosen, arahkan ke halaman login
   }
+  req.session.destroy(() => res.redirect('/signin'));
 };
 
-module.exports.isAdmin = (req, res, next) => {
-  // Cek apakah user memiliki role "ADMIN"
-  if (req.session.user && req.session.user.role === "ADMIN") {
+// Middleware Role Admin
+const isAdmin = (req, res, next) => {
+  if (req.session?.user?.role === 'ADMIN') {
     return next();
-  } else {
-    return res.redirect("/signin"); // Jika bukan admin, arahkan ke halaman login
   }
+  req.session.destroy(() => res.redirect('/signin'));
 };
 
-
+// Ekspor semua fungsi dan prisma
+module.exports = {
+  prisma,
+  isLoggedIn,
+  isMahasiswa,
+  isDosen,
+  isAdmin
+};
