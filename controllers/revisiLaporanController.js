@@ -94,10 +94,16 @@ const uploadRevisi = async (req, res) => {
   try {
     const emailUser = req.session.user?.email;
     if (!emailUser) {
-      return res.status(401).json({ success: false, message: 'User tidak terautentikasi' });
+      return res.status(401).json({ 
+        success: false, 
+        message: 'User tidak terautentikasi' 
+      });
     }
     if (!req.file) {
-      return res.status(400).json({ success: false, message: 'File revisi harus diupload' });
+      return res.status(400).json({ 
+        success: false, 
+        message: 'File revisi harus diupload' 
+      });
     }
 
     // Cek apakah dosen_penerima dipilih
@@ -109,29 +115,39 @@ const uploadRevisi = async (req, res) => {
       });
     }
 
-    // Simpan nama original file dalam feedback_dosen sementara (akan diupdate nanti)
-    const originalFilename = req.file.originalname;
 
     const newRevisi = await prisma.revisi_laporan.create({
       data: {
         email_user: emailUser,
         file_laporan: req.file.filename,
         tanggal_upload: new Date(),
-        feedback_dosen: `ORIGINAL_FILENAME:${originalFilename}`, // Simpan nama original sementara
+        feedback_dosen: `-`, 
         status: 'Menunggu Review',
         dosen_penerima: dosen_penerima
       }
     });
-    res.json({ success: true, message: 'Revisi laporan berhasil diupload', data: newRevisi });
+
+    res.json({ 
+      success: true, 
+      message: 'Revisi laporan berhasil diupload', 
+      data: newRevisi 
+    });
+
   } catch (error) {
     console.error('Error uploading revisi laporan:', error, req.file, req.session.user);
+    
     if (req.file) {
       const filePath = path.join('uploads/revisi_laporan/', req.file.filename);
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
       }
     }
-    res.status(500).json({ success: false, message: 'Terjadi kesalahan saat upload revisi laporan', error: error.message, prisma: error });
+    
+    res.status(500).json({ 
+      success: false, 
+      message: 'Terjadi kesalahan saat upload revisi laporan', 
+      error: error.message, 
+    });
   }
 };
 
