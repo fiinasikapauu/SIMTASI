@@ -285,7 +285,7 @@
           }).then(async (result) => {
             if (result.isConfirmed) {
               try {
-                const response = await fetch(`/laporankemajuan/${id}`, {
+                const response = await fetch(`/deletelaporankemajuan/${id}`, {
                   method: 'DELETE',
                   credentials: 'same-origin',
                   headers: { 'Content-Type': 'application/json' }

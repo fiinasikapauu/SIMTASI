@@ -102,7 +102,7 @@
                   <% revisiList.forEach(function(item) { %>
                     <tr class="border-b border-gray-200 text-sm">
                       <td class="py-2 px-4 whitespace-nowrap">
-                        <a href="/downloadrevisi/<%= item.id_revisi %>" 
+                        <a href="/downloadrevisilaporan/<%= item.id_revisi %>" 
                            download="<%= item.file_laporan.split('/').pop() %>"
                            class="text-green-700 underline hover:text-green-900 font-normal truncate block max-w-xs file-download-link file-link cursor-pointer" 
                            title="Klik untuk download: <%= item.file_laporan.split('/').pop() %>">
