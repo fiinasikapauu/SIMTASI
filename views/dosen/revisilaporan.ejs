@@ -41,7 +41,7 @@
                     <tr class="border-b border-gray-200 text-sm">
                       <td class="py-3 px-6"><%= item.nama_mahasiswa %></td>
                       <td class="py-3 px-6">
-                        <a href="/downloadrevisi/<%= item.id_revisi %>" download="<%= item.file_laporan %>" class="text-green-700 underline hover:text-green-900 font-normal truncate block max-w-xs file-link cursor-pointer" title="Download: <%= item.file_laporan %>">📄 <%= item.file_laporan %></a>
+                        <a href="/downloadrevisilaporan/<%= item.id_revisi %>" download="<%= item.file_laporan %>" class="text-green-700 underline hover:text-green-900 font-normal truncate block max-w-xs file-link cursor-pointer" title="Download: <%= item.file_laporan %>">📄 <%= item.file_laporan %></a>
                       </td>
                       <td class="py-3 px-6 whitespace-nowrap text-gray-600"><%= item.tanggal_upload_formatted %></td>
                       <td class="py-3 px-6">

@@ -24,7 +24,7 @@
 
         <div class="max-w-4xl mx-auto px-4 py-10">
           <!-- Form Upload File -->
-          <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+          <form action="/uploadproposalta" method="POST" enctype="multipart/form-data" id="uploadForm">
             <!-- Dropdown untuk memilih dosen penerima -->
             <div class="mb-6">
               <label for="dosen_penerima" class="block text-lg font-medium text-green-600 mb-4">Pilih Dosen Penerima Proposal</label>
@@ -102,7 +102,7 @@
                   <% proposals.forEach(function(item) { %>
                     <tr class="border-b border-gray-200 text-sm">
                       <td class="py-2 px-4 whitespace-nowrap">
-                        <a href="/uploads/proposals/<%= item.file_proposal %>" 
+                        <a href="/downloaduploadproposalta/<%= item.id_proposal %>" 
                            download="<%= item.file_proposal.split('/').pop() %>"
                            class="text-green-700 underline hover:text-green-900 font-normal truncate block max-w-xs file-download-link file-link cursor-pointer" 
                            title="Klik untuk download: <%= item.file_proposal.split('/').pop() %>">
@@ -248,7 +248,7 @@
         formData.append('dosen_penerima', dosenPenerima);
         
         try {
-          const response = await fetch('/upload', {
+          const response = await fetch('/uploadproposalta', {
             method: 'POST',
             body: formData,
             credentials: 'same-origin'
@@ -314,7 +314,7 @@
           }).then(async (result) => {
             if (result.isConfirmed) {
               try {
-                const response = await fetch(`/proposal/${id}`, {
+                const response = await fetch(`/deleteuploadproposalta/${id}`, {
                   method: 'DELETE',
                   credentials: 'same-origin',
                   headers: { 'Content-Type': 'application/json' }
